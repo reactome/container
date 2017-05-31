@@ -1,0 +1,4 @@
+FROM perl:5.20
+COPY . /usr/local/bin/perl
+WORKDIR /usr/local/bin/perl
+CMD [ "perl", "./script.pl" ]

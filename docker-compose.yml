@@ -1,0 +1,16 @@
+version: '3'
+services:
+
+  tomcat:
+    image: tomcat:7.0
+    container_name: tomcat-server
+
+  apache-server:
+    image: httpd:2.4
+    container_name: apache-server
+
+  perl:
+    build:
+      context: ./perl
+      dockerfile: dockerfile
+    container_name: perl-components
