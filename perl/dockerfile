@@ -5,19 +5,21 @@ RUN apt-get install -y apt-utils
 RUN apt-get install -y libapache2-mod-perl2 graphviz libossp-uuid-perl libsoap-lite-perl libical-dev libical1a libapr1
 RUN cpan install CPAN
 RUN cpan install App::cpanminus
-RUN cpanm install --notest --quiet File::Which File::Slurp File::HomeDir File::HomeDir \
+
+RUN cpanm install --notest --quiet File::Which File::Slurp File::HomeDir File::FcntlLock File::Listing File::Rename File::Slurp::Tiny File::Copy::Recursive  \
 	WWW::SearchResult WWW::Search Search::Query \
 	URI::Encode \
-	Font::TTF \
+	Font::TTF Font::TTFMetrics \
 	RTF::Writer \
 	Try::Tiny \
 	IO::Capture \
-	Log::Log4perl \
+	Log::Log4perl Log::Message \
 	JSON::XS JSON::PP \
 	PDF::API2 \
 	namespace \
 	Test \
 	Email::Valid \
+	Mail::Send Mail::Header Mail::Field Mail::Address Mail::Internet Mail::Filter Mail::Util Mail::Mailer Mail::Cap \
 	DateTime::TimeZone DateTime::Locale DateTime::Format::Strptime DateTime::Format::DateParse DateTime::Duration DateTime::Infinite  DateTime::Helpers DateTime::LeapSecond \
 	Data::Dump Data::Transformer Data::UUID  \
 	HTML::Entities HTML::LinkExtor HTML::Parser HTML::HeadParser HTML::PullParser HTML::Filter HTML::TokeParser \
@@ -28,23 +30,23 @@ RUN cpanm install --notest --quiet File::Which File::Slurp File::HomeDir File::H
 	XML::Parser XML::LibXSLT XML::LibXML \
 	Attribute::Params::Validate \
 	Algorithm::Diff::XS \
-	File::FcntlLock \
-	Net::SSLeay Net::SSL Net::Daemon \
-	Type::Tiny::XS \
+	Net::SSLeay Net::SSL Net::Daemon
+
+RUN cpanm install --notest --quiet Type::Tiny Type::Tiny::XS Type::Tiny::XS::Util \
 	YAML \
+	IO::Tty@1.12 IO::Pty \
 	Convert::Binary::C Convert::Binary::C::Cached \
 	IPC::ShareLite \
-	IO::Tty::Constant IO::Tty IO::Pty \
 	Lexical::SealRequireHints \
 	bareword::filehandles \
 	Crypt::SSLeay \
 	Bit::Vector \
-	Text::CharWidth Text::Iconv Text::Soundex \
-	Locale::gettext \
+	Text::CharWidth Text::Iconv Text::Soundex Text::Unidecode Text::WrapI18N Text::Template \
+	Locale::gettext Locale::RecodeData Locale::TextDomain Locale::Recode Locale::gettext_dumb Locale::Util Locale::gettext_pp \
 	Devel \
 	List::MoreUtils \
 	GFF::Filehandle \
-	Date::Calc::XS \
+	Date::Calc::XS Date \
 	DBD \
 	BSD::Resource \
 	Unicode::Map \
@@ -55,8 +57,9 @@ RUN cpanm install --notest --quiet File::Which File::Slurp File::HomeDir File::H
 	Exporter \
 	Moo \
 	MLDBM::Serializer \
-	Class::Singleton \
-	URI \
+	Class::Singleton
+
+RUN cpanm install --notest --quiet URI \
 	Term::UI Term::UI::History \
 	Task::Weaken \
 	PostScript::Metrics PostScript::TextBlock PostScript::Document PostScript::Elements  \
@@ -67,26 +70,21 @@ RUN cpanm install --notest --quiet File::Which File::Slurp File::HomeDir File::H
 	Spreadsheet::WriteExcel Spreadsheet::ParseExcel \
 	Algorithm::Munkres Algorithm::DiffOld Algorithm::C3 Algorithm::Merge \
 	Reply::Plugin::TypeTiny \
-	File::Listing File::Rename File::Slurp::Tiny File::Copy::Recursive \
 	Method::Generate::Accessor Method::Generate::DemolishAll Method::Generate::Constructor Method::Generate::BuildAll Method::Inliner \
-	Log::Message \
 	CGI \
 	Cache \
 	Data \
 	Dist::CheckConflicts \
 	Time::Zone \
 	Types::Standard Types::Common::String Types::Common::Numeric Types::TypeTiny \
-	Font::TTF Font::TTFMetrics \
 	Archive::Extract \
 	Git \
 	Encode \
 	Perl4::CoreLibs \
 	Import::Into \
-	Text::Unidecode Text::WrapI18N Text::Template \
-	Heap::Elem Heap::Fibonacci Heap071::Elem Heap071::Fibonacci  \
+	Heap::Elem Heap::Fibonacci Heap071::Elem Heap071::Fibonacci \
 	SVG \
 	Math::Spline Math::Derivative \
-	Locale::RecodeData Locale::TextDomain Locale::Recode Locale::gettext_dumb Locale::Util Locale::gettext_pp \
 	MRO::Compat \
 	inc \
 	Array::Compare \
@@ -94,10 +92,8 @@ RUN cpanm install --notest --quiet File::Which File::Slurp File::HomeDir File::H
 	LWP \
 	Error \
 	Statistics::Descriptive \
-	Date \
 	MIME::WordDecoder MIME::Entity MIME::Body MIME::Parser MIME::Words MIME::Tools MIME::Decoder MIME::Head \
 	Pod::Readme Pod::LaTeX \
-	Mail::Send Mail::Header Mail::Field Mail::Address Mail::Internet Mail::Filter Mail::Util Mail::Mailer Mail::Cap \
 	Regexp::Common \
 	Package \
 	Graph \
