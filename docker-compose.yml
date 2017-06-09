@@ -4,13 +4,13 @@ services:
   tomcat:
     image: tomcat:7.0
     container_name: tomcat-server
+    volumes:
+      - ./release/modules/GKB/:/usr/local/gkb/modules
+      - ./release/scripts/:/usr/local/bin/perl/scripts
 
   apache-server:
     image: httpd:2.4
     container_name: apache-server
-
-  perl:
-    build:
-      context: ./perl
-      dockerfile: dockerfile
-    container_name: perl-components
+    volumes:
+      - ./release/modules/GKB/:/usr/local/gkb/modules
+      - ./release/scripts/:/usr/local/bin/perl/scripts
