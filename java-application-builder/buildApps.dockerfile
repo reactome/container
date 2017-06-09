@@ -1,6 +1,4 @@
 FROM maven:3.5-jdk-8
-#RUN apt-get update
-#RUN apt-get install -y git
 ENV PATHWAY_BROWSER_VERSION=v3.2.0
 RUN mkdir -p /gitroot
 WORKDIR /gitroot
@@ -42,6 +40,3 @@ RUN cd /gitroot/browser && mvn package && \
 	cd /gitroot/quadtree && mvn install && \
 	cd /gitroot/diagram-exporter && mvn install && \
 	cd /gitroot/content-service && mvn package
-# 
-# RUN mkdir /webapps && cp /gitroot/browser/target/PathwayBrowser*.war /webapps/PathwayBrowser.war && \
-# 	cp /gitroot/content-service/target/ContentService*.war /webapps/ContentService.war
