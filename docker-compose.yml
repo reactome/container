@@ -1,0 +1,47 @@
+version: '3'
+services:
+
+  tomcat:
+    image: tomcat:7.0
+    container_name: tomcat-server
+    depends_on: 
+      - database
+    volumes:
+      - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
+      - ./release/scripts/:/usr/local/bin/perl/scripts
+    env_file:
+      - .env
+    ports:
+      - 8082:8080
+
+  apache-server:
+    image: httpd:2.4
+    container_name: apache-server
+    volumes:
+      - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
+      - ./release/scripts/:/usr/local/bin/perl/scripts
+
+  database:
+    image: mysql
+    container_name: mysql-database
+    volumes:
+      - ./mysql/docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d
+    env_file:
+      - .env
+    ports:
+      - 3306:3306
+
+  wordpress-sites:
+    image: wordpress
+    container_name: wordpress-sites
+    links:
+      - database
+    depends_on:
+      - database
+    env_file:
+      - .env
+    ports:
+      - 8080:80
+    volumes:
+      - ./release/website/html/wordpress/wp-content/:/var/www/html/wp-content
+      - ./release/website/html/wordpress/wp-includes/:/var/www/html/wp-includes
