@@ -4,8 +4,8 @@ services:
   tomcat:
     image: tomcat:7.0
     container_name: tomcat-server
-    depends_on: 
-      - database
+    depends_on:
+      - mysql-database
     volumes:
       - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
       - ./release/scripts/:/usr/local/bin/perl/scripts
@@ -21,7 +21,7 @@ services:
       - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
       - ./release/scripts/:/usr/local/bin/perl/scripts
 
-  database:
+  mysql-database:
     image: mysql
     container_name: mysql-database
     volumes:
@@ -35,13 +35,24 @@ services:
     image: wordpress
     container_name: wordpress-sites
     links:
-      - database
+      - mysql-database
     depends_on:
-      - database
+      - mysql-database
+      - apache-server
+      - tomcat
     env_file:
       - .env
     ports:
       - 8080:80
+    entrypoint:
+      - /wait-for.sh
+      - mysql-database:3306
+      - -t
+      - "90"
+      - --
+      - /usr/local/bin/docker-entrypoint.sh
+      - apache2-foreground
     volumes:
+      - ./wait-for.sh:/wait-for.sh
       - ./release/website/html/wordpress/wp-content/:/var/www/html/wp-content
       - ./release/website/html/wordpress/wp-includes/:/var/www/html/wp-includes
