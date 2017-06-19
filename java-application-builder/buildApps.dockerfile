@@ -46,11 +46,3 @@ WORKDIR /gitroot/RESTfulAPI
 RUN git checkout master
 
 RUN apt-get update && apt-get install ant -y
-#
-# # really, these build commands should not be a part of the *image* build
-# # but commands that are executed with a running *container* from this image.
-# RUN cd /gitroot/browser && mvn package && \
-# 	cd /gitroot/diagram-exporter && mvn install && \
-# 	cd /gitroot/content-service && mvn package && \
-# 	cd /gitroot/AnalysisTools/Core && mvn package install && \
-# 	cd /gitroot/AnalysisTools/Service && mvn package

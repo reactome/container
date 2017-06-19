@@ -74,18 +74,6 @@
             <artifactId>jackson-core-asl</artifactId>
             <version>1.9.2</version>
         </dependency>
-        <!--
-        <dependency>
-        <groupId>javax.ws.rs</groupId>
-        <artifactId>javax.ws.rs-api</artifactId>
-        <version>2.0.1</version>
-    </dependency>
-    <dependency>
-        <groupId>javax.ws.rs</groupId>
-        <artifactId>javax.ws.rs</artifactId>
-        <version>1.0</version>
-        </dependency>
--->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -152,20 +140,7 @@
             <artifactId>psi25-xml</artifactId>
             <version>1.8.3</version>
         </dependency>
-        <!--
-<dependency>
-        <groupId>org.hupo.psi.mi.psicquic</groupId>
-        <artifactId>psicquic-registry-client</artifactId>
-        <version>1.1.0</version>
-        </dependency>
--->
-        <!--
-<dependency>
-        <groupId>org.hupo.psi.mi.psicquic</groupId>
-        <artifactId>psicquic-simple-client</artifactId>
-        <version>1.3.2</version>
-        </dependency>
--->
+
         <dependency>
             <groupId>psidev.psi.mi</groupId>
             <artifactId>psimitab</artifactId>
@@ -189,20 +164,9 @@
             <version>milestone2</version>
         </dependency>
     </dependencies>
-    <!--
-<repositories>
-    <repository>
-        <id>project-repo</id>
-        <url>file://${project.basedir}/web/WEB-INF/lib/</url>
-    </repository>
-    </repositories>
--->
+
     <repositories>
-        <repository>
-            <id>project-repo</id>
-            <name>project-repo</name>
-            <url>file://${project.basedir}/web/WEB-INF/lib/</url>
-        </repository>
+
         <repository>
             <id>central-ebi-repo</id>
             <name>central-ebi-repo</name>

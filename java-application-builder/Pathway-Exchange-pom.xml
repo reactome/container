@@ -54,13 +54,6 @@
     </build>
 
     <dependencies>
-        <!--
-<dependency>
-        <groupId>org.ivis</groupId>
-        <artifactId>chilay-sbgn</artifactId>
-        <version>2.0.1-SNAPSHOT</version>
-        </dependency>
--->
         <dependency>
             <groupId>com.sun.xml.fastinfoset</groupId>
             <artifactId>FastInfoset</artifactId>
@@ -154,14 +147,6 @@ mvn install:install-file -Dfile=./lib/sbml/libsbmlj.jar -DgroupId=org.sbml -Dart
             <version>0.8-rc1</version>
         </dependency>
     </dependencies>
-    <!--
-<repositories>
-    <repository>
-        <id>project-repo</id>
-        <url>file://${project.basedir}/web/WEB-INF/lib/</url>
-    </repository>
-    </repositories>
--->
     <repositories>
         <repository>
             <id>biojava-legacy-repo</id>
@@ -196,11 +181,6 @@ mvn install:install-file -Dfile=./lib/sbml/libsbmlj.jar -DgroupId=org.sbml -Dart
             <id>JSBML-SNAPSHOT</id>
             <name>The JSBML Snapshot repository</name>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-        </repository>
-        <repository>
-            <id>project-repo</id>
-            <name>project-repo</name>
-            <url>file://${project.basedir}/lib/</url>
         </repository>
         <repository>
             <id>central-ebi-repo</id>
