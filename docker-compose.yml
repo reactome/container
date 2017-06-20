@@ -44,15 +44,9 @@ services:
       - .env
     ports:
       - 8080:80
-    entrypoint:
-      - /wait-for.sh
-      - mysql-database:3306
-      - -t
-      - "90"
-      - --
-      - /usr/local/bin/docker-entrypoint.sh
-      - apache2-foreground
+    entrypoint: /wait-for.sh mysql-database:3306 -t 90 -- /usr/local/bin/docker-entrypoint.sh apache2-foreground
     volumes:
       - ./wait-for.sh:/wait-for.sh
-      - ./release/website/html/wordpress/wp-content/:/var/www/html/wp-content
-      - ./release/website/html/wordpress/wp-includes/:/var/www/html/wp-includes
+      # WordPress will copy from /usr/src/wordpress/ so we need to inject our content into their.
+      - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013/:/usr/src/wordpress/wp-content/themes/HS_OICR_2013/
+      - ./release/website/html/wordpress/wp-content/plugins/:/usr/src/wordpress/wp-content/plugins/
