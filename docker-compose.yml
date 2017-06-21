@@ -32,7 +32,10 @@ services:
       - 3306:3306
 
   wordpress-sites:
-    image: wordpress
+    image: wordpress:with-netcat
+    build:
+      context: ./wordpress
+      dockerfile: wordpress.dockerfile
     container_name: wordpress-sites
     links:
       - mysql-database
@@ -46,7 +49,7 @@ services:
       - 8080:80
     entrypoint: /wait-for.sh mysql-database:3306 -t 90 -- /usr/local/bin/docker-entrypoint.sh apache2-foreground
     volumes:
-      - ./wait-for.sh:/wait-for.sh
+      - ./wordpress/wait-for.sh:/wait-for.sh
       - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
       - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wordpress/wp-content/plugins
       # WordPress will copy from /usr/src/wordpress/ so we need to inject our content into there.
