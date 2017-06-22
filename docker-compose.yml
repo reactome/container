@@ -7,6 +7,7 @@ services:
     depends_on:
       - mysql-database
     volumes:
+      - ./webapps/:/usr/local/tomcat/webapps/ #it  has been copied from feature/build-web-applications after building webapps
       - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
       - ./release/scripts/:/usr/local/bin/perl/scripts
     env_file:
