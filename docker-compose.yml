@@ -8,6 +8,7 @@ services:
       - mysql-for-tomcat
     volumes:
       - ./webapps/:/usr/local/tomcat/webapps/ #it  has been copied from feature/build-web-applications after building webapps
+      - ./tomcat/logs/:/usr/local/tomcat/logs/ #to save logs inside host directory of tomcat/logs/
       - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
       - ./release/scripts/:/usr/local/bin/perl/scripts
     env_file:
