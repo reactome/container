@@ -13,14 +13,14 @@ services:
     env_file:
       - .env
     ports:
-      - 8082:8080
+      - 8080:8080
 
-  apache-server:
-    image: httpd:2.4
-    container_name: apache-server
-    volumes:
-      - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
-      - ./release/scripts/:/usr/local/bin/perl/scripts
+  # apache-server:
+  #   image: httpd:2.4
+  #   container_name: apache-server
+  #   volumes:
+  #     - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
+  #     - ./release/scripts/:/usr/local/bin/perl/scripts
 
   mysql-for-tomcat:
     image: mysql
@@ -30,37 +30,39 @@ services:
     volumes:
       - ./mysql/tomcat_data/:/docker-entrypoint-initdb.d
 
-  mysql-database:
-    image: mysql
-    container_name: mysql-database
-    volumes:
-      - ./mysql/wordpress_data/:/docker-entrypoint-initdb.d
-    env_file:
-      - .env
-    ports:
-      - 3306:3306
+  # mysql-database:
+  #   image: mysql
+  #   container_name: mysql-database
+  #   volumes:
+  #     - ./mysql/wordpress_data/:/docker-entrypoint-initdb.d
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - 3306:3306
 
-  wordpress-sites:
-    image: wordpress:with-netcat
-    build:
-      context: ./wordpress
-      dockerfile: wordpress.dockerfile
-    container_name: wordpress-sites
-    links:
-      - mysql-database
-    depends_on:
-      - mysql-database
-      - apache-server
-      - tomcat
-    env_file:
-      - .env
-    ports:
-      - 8080:80
-    entrypoint: /wait-for.sh mysql-database:3306 -t 90 -- /usr/local/bin/docker-entrypoint.sh apache2-foreground
-    volumes:
-      - ./wordpress/wait-for.sh:/wait-for.sh
-      - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
-      - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wordpress/wp-content/plugins
+  # wordpress-sites:
+  #   image: wordpress:with-netcat
+  #   build:
+  #     context: ./wordpress
+  #     dockerfile: wordpress.dockerfile
+  #   container_name: wordpress-sites
+  #   links:
+  #     - mysql-database
+  #   depends_on:
+  #     - mysql-database
+  #     - apache-server
+  #     - tomcat
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - 8080:80
+  #   entrypoint: /wait-for.sh mysql-database:3306 -t 90 -- /usr/local/bin/docker-entrypoint.sh apache2-foreground
+  #   volumes:
+  #     - ./wordpress/wait-for.sh:/wait-for.sh
+  #     - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
+  #     - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wordpress/wp-content/plugins
+
+
       # WordPress will copy from /usr/src/wordpress/ so we need to inject our content into there.
     #   - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/usr/src/wordpress/wp-content/themes/HS_OICR_2013
     #   - ./release/website/html/wordpress/wp-content/plugins:/usr/src/wordpress/wp-content/plugins
