@@ -2,17 +2,23 @@ version: '3'
 services:
 
   tomcat:
-    image: tomcat:7.0
+    image: reactome-tomcat
     container_name: tomcat-server
+    build:
+      context: ./tomcat
+      dockerfile: tomcat.dockerfile
     depends_on:
       - mysql-for-tomcat
+    entrypoint: /wait-for.sh mysql-for-tomcat:3306 -t 360 -- catalina.sh run
     volumes:
-      - ./webapps/:/usr/local/tomcat/webapps/ #it  has been copied from feature/build-web-applications after building webapps
-      - ./tomcat/logs/:/usr/local/tomcat/logs/ #to save logs inside host directory of tomcat/logs/
+      - ./tomcat/webapps/ReactomeRESTfulAPI:/usr/local/tomcat/webapps/ReactomeRESTfulAPI #it  has been copied from feature/build-web-applications after building webapps
+      - ./logs/tomcat/:/usr/local/tomcat/logs/ #to save logs inside host directory of tomcat/logs/
       - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
       - ./release/scripts/:/usr/local/bin/perl/scripts
+      - ./wait-for.sh:/wait-for.sh
+      - ./tomcat/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
     env_file:
-      - .env
+      - tomcat.env
     ports:
       - 8080:8080
 
@@ -27,9 +33,11 @@ services:
     image: mysql
     container_name: mysql-for-tomcat
     env_file:
-      - .env
+      - tomcat.env
     volumes:
       - ./mysql/tomcat_data/:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
 
   # mysql-database:
   #   image: mysql
