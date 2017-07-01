@@ -5,6 +5,7 @@ docker build -t reactome-app-builder  -f buildApps.dockerfile .
 set -x
 docker run -it --name=java-webapp-builder --rm -v "$(pwd)/webapps:/webapps" \
 	-v "$(pwd)/Pathway-Exchange-pom.xml:/gitroot/Pathway-Exchange/pom.xml" \
+	-v "$(pwd)/ReactomeJar.xml:/gitroot/CuratorTool/ant/ReactomeJar.xml" \
 	-v "$(pwd)/RESTfulAPI-pom.xml:/gitroot/RESTfulAPI/pom.xml" \
 	-v "$(pwd)/m2-cache:/root/.m2" \
 	reactome-app-builder \

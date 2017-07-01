@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!-- ====================================================================== 
+    Project: Build ReactomeJar from CuratorTool
+    
+    Description: There are two targets, one to compile the files and other
+    to build Jar using those compiled files. To run this, install ANT and
+    then run `ant -buildfile ReactomeJar.xml` an remember to keep the directory 
+    structure as present in git folder.
+
+    Date: 1 July, 2017
+     ====================================================================== -->
+<project name="ReactomeJar" default="jar" basedir="..">
+	<property name="destDir" value="${basedir}" />
+	<property name="gitDir" value="${basedir}" />
+	<property name="sourceClsDir" value="${gitDir}/classes" />
+	<property name="srcDir" value="${gitDir}/src" />
+		
+	<target name="jar" depends="compile">
+        <jar destfile="${destDir}/reactome.jar">
+            <fileset dir="${sourceClsDir}">
+            	    <include name="org/gk/model/*.class" />
+            	    <include name="org/gk/schema/*.class" />
+            	    <include name="org/gk/util/*.class" />
+            	    <include name="org/gk/persistence/*.class" />
+            	    <include name="org/gk/database/*.class" />
+            	    <include name="org/gk/database/util/*.class" />
+            		<include name="org/gk/graphEditor/*.class" />
+            	    <include name="org/gk/property/*.class" />
+            	    <include name="org/gk/render/*.class" />
+            	    <include name="org/gk/slicing/*.class" />
+            	    <include name="org/gk/gkCurator/*.class" />
+            		<include name="org/gk/gkEditor/*.class" />
+            		<include name="org/gk/elv/*.class" />
+            		<include name="org/gk/gkCurator/authorTool/*.class" />
+            		<include name="org/gk/pathwaylayout/*.class" />
+            </fileset>
+        	<fileset dir="${srcDir}">
+            	    <include name="org/gk/model/*.java" />
+            	    <include name="org/gk/schema/*.java" />
+            	    <include name="org/gk/util/*.java" />
+            	    <include name="org/gk/persistence/*.java" />
+            	    <include name="org/gk/database/*.java" />
+            	    <include name="org/gk/database/util/*.java" />
+            		<include name="org/gk/graphEditor/*.java" />
+            	    <include name="org/gk/property/*.java" />
+            	    <include name="org/gk/render/*.java" />
+            	    <include name="org/gk/slicing/*.java" />
+            	    <include name="org/gk/gkCurator/*.java" />
+            		<include name="org/gk/gkEditor/*.java" />
+            		<include name="org/gk/elv/*.java" />
+            		<include name="org/gk/gkCurator/authorTool/*.java" />
+            		<include name="org/gk/pathwaylayout/*.java" />
+        	</fileset>
+        </jar>
+    </target>
+	<path id="master-classpath">
+		<fileset dir="${gitDir}/lib">
+			<include name="**/**.jar"/>
+		</fileset>
+		<pathelement path="${sourceClsDir}"/>
+	</path>
+
+	<target name="compile" description="Compile source tree java files">
+		<mkdir dir="${sourceClsDir}"/>
+		<javac destdir="${sourceClsDir}">
+			<src path="${srcDir}"/>
+			<classpath refid="master-classpath"/>
+		</javac>
+	</target>
+	
+</project>
