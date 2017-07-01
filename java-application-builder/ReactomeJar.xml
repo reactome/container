@@ -18,38 +18,10 @@
 	<target name="jar" depends="compile">
         <jar destfile="${destDir}/reactome.jar">
             <fileset dir="${sourceClsDir}">
-            	    <include name="org/gk/model/*.class" />
-            	    <include name="org/gk/schema/*.class" />
-            	    <include name="org/gk/util/*.class" />
-            	    <include name="org/gk/persistence/*.class" />
-            	    <include name="org/gk/database/*.class" />
-            	    <include name="org/gk/database/util/*.class" />
-            		<include name="org/gk/graphEditor/*.class" />
-            	    <include name="org/gk/property/*.class" />
-            	    <include name="org/gk/render/*.class" />
-            	    <include name="org/gk/slicing/*.class" />
-            	    <include name="org/gk/gkCurator/*.class" />
-            		<include name="org/gk/gkEditor/*.class" />
-            		<include name="org/gk/elv/*.class" />
-            		<include name="org/gk/gkCurator/authorTool/*.class" />
-            		<include name="org/gk/pathwaylayout/*.class" />
+            	    <include name="**/**.class" />
             </fileset>
         	<fileset dir="${srcDir}">
-            	    <include name="org/gk/model/*.java" />
-            	    <include name="org/gk/schema/*.java" />
-            	    <include name="org/gk/util/*.java" />
-            	    <include name="org/gk/persistence/*.java" />
-            	    <include name="org/gk/database/*.java" />
-            	    <include name="org/gk/database/util/*.java" />
-            		<include name="org/gk/graphEditor/*.java" />
-            	    <include name="org/gk/property/*.java" />
-            	    <include name="org/gk/render/*.java" />
-            	    <include name="org/gk/slicing/*.java" />
-            	    <include name="org/gk/gkCurator/*.java" />
-            		<include name="org/gk/gkEditor/*.java" />
-            		<include name="org/gk/elv/*.java" />
-            		<include name="org/gk/gkCurator/authorTool/*.java" />
-            		<include name="org/gk/pathwaylayout/*.java" />
+            	    <include name="**/**.java" />
         	</fileset>
         </jar>
     </target>
