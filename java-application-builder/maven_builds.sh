@@ -1,5 +1,7 @@
 #! /bin/bash
-cd /gitroot/CuratorTool/ant && ant -buildfile ReactomeJar.xml
+cd /gitroot/CuratorTool/ant && \
+ant -buildfile ReactomeJar.xml && \
+ant -buildfile CuratorToolBuild.xml \
 # cd /gitroot/libsbgn && ant && \
 # cd /gitroot/Pathway-Exchange \
 # && mvn install:install-file -Dfile=/gitroot/libsbgn/dist/org.sbgn.jar -DartifactId=sbgn -DgroupId=org.sbgn -Dpackaging=jar -Dversion=milestone2 \
