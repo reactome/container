@@ -8,7 +8,7 @@
     <name>ReactomeRESTfulAPI</name>
     <properties>
         <spring.version>3.0.0.RELEASE</spring.version>
-	<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <build>
         <plugins>
@@ -17,8 +17,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.6.1</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -38,15 +38,42 @@
                                 <include>WEB-INF/lib/resources/*</include>
                             </includes>
                         </resource>
-                        <resource>
-                            <directory>src</directory>
-                            <filtering>true</filtering>
-                            <includes>
-                                <include>ReactomePostMapperConfiguration.xml</include>
-                            </includes>
-                        </resource>
+                        <!-- <resource>
+                        <directory>src</directory>
+                        <filtering>true</filtering>
+                        <includes>
+                            <include>ReactomePostMapperConfiguration.xml</include>
+                        </includes>
+                        </resource> -->
                     </webResources>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                            <!-- here the phase you need -->
+                            <phase>validate</phase>
+                            <goals>
+                              <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                              <outputDirectory>${basedir}/target/classes</outputDirectory>
+                              <resources>
+                                <resource>
+                                  <directory>src</directory>
+                                  <filtering>true</filtering>
+                                  <includes>
+                                      <include>ReactomePostMapperConfiguration.xml</include>
+                                      <include>log4j.properties</include>
+                                  </includes>
+                                </resource>
+                              </resources>
+                            </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -65,18 +92,23 @@
             <groupId>org.reactome</groupId>
             <artifactId>Pathway-Exchange</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-            </dependency>
+        </dependency>
         <dependency>
             <groupId>org.reactome</groupId>
-            <artifactId>ReactomeJar</artifactId>
-            <systemPath>/gitroot/CuratorTool/reactome.jar</systemPath>
-            <scope>system</scope>
+            <artifactId>Reactome</artifactId>
+            <!-- <systemPath>/gitroot/CuratorTool/reactome.jar</systemPath>
+            <scope>system</scope> -->
             <version>UNKNOWN_VERSION</version>
         </dependency>
         <dependency>
             <groupId>org.acegisecurity</groupId>
             <artifactId>acegi-security</artifactId>
             <version>1.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>6.0.6</version>
         </dependency>
         <dependency>
             <groupId>aopalliance</groupId>
@@ -134,7 +166,6 @@
             <artifactId>spring-aop</artifactId>
             <version>${spring.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-asm</artifactId>
@@ -235,11 +266,10 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.7.2</version>
         </dependency>
-
         <!--<dependency>
-            <groupId>org.reactome.server</groupId>
-            <artifactId>reactome-core</artifactId>
-            <version>1.0.2</version>
+        <groupId>org.reactome.server</groupId>
+        <artifactId>reactome-core</artifactId>
+        <version>1.0.2</version>
         </dependency>-->
         <dependency>
             <groupId>psidev.psi.mi</groupId>
@@ -261,7 +291,6 @@
             <artifactId>micluster</artifactId>
             <version>1.7.3</version>
         </dependency>
-
         <!-- install sbgn as: mvn install:install-file -Dfile=web/WEB-INF/lib/org.sbgn.jar -DgroupId=org.sgbn -DartifactId=sgbn -Dpackaging=jar -Dversion=milestone2 -->
         <!-- or: mvn install:install-file -Dfile=./libsbgn/dist/org.sbgn.jar -DartifactId=sbgn -DgroupId=org.sbgn -Dpackaging=jar -Dversion=milestone2 -->
         <dependency>
@@ -307,4 +336,4 @@
             </releases>
         </repository>
     </repositories>
-</project>
+    </project>
