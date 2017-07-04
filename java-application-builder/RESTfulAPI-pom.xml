@@ -6,6 +6,7 @@
     <packaging>war</packaging>
     <version>0.0.1-SNAPSHOT</version>
     <properties>
+        <spring.version>3.0.0.RELEASE</spring.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <name>ReactomeRESTfulAPI</name>
@@ -26,17 +27,38 @@
                 <version>3.1.0</version>
                 <configuration>
                     <webXml>${project.basedir}/web/WEB-INF/web.xml</webXml>
+                    <webResources>
+                        <resource>
+                            <directory>web</directory>
+                            <filtering>true</filtering>
+                            <includes>
+                                <include>**/*.html</include>
+                                <include>**/*.css</include>
+                                <include>WEB-INF/*.xml</include>
+                                <include>WEB-INF/lib/resources/*</include>
+                            </includes>
+                        </resource>
+                        <resource>
+                            <directory>src</directory>
+                            <filtering>true</filtering>
+                            <includes>
+                                <include>ReactomePostMapperConfiguration.xml</include>
+                            </includes>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <finalName>ReactomeRESTfulAPI</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>
         </plugins>
         <sourceDirectory>src</sourceDirectory>
         <finalName>ReactomeRESTfulAPI</finalName>
-        <resources>
-            <resource>
-                <directory>web</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
     </build>
     <dependencies>
         <dependency>
@@ -95,7 +117,73 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>2.5.6</version>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-asm</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-expression</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-instrument</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jms</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-oxm</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>${spring.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
@@ -138,16 +226,26 @@
             <version>1.2.14</version>
         </dependency>
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>1.7.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.2</version>
+        </dependency>
+
+        <!--<dependency>
             <groupId>org.reactome.server</groupId>
             <artifactId>reactome-core</artifactId>
             <version>1.0.2</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>psidev.psi.mi</groupId>
             <artifactId>psi25-xml</artifactId>
             <version>1.8.3</version>
         </dependency>
-
         <dependency>
             <groupId>psidev.psi.mi</groupId>
             <artifactId>psimitab</artifactId>
@@ -163,6 +261,7 @@
             <artifactId>micluster</artifactId>
             <version>1.7.3</version>
         </dependency>
+
         <!-- install sbgn as: mvn install:install-file -Dfile=web/WEB-INF/lib/org.sbgn.jar -DgroupId=org.sgbn -DartifactId=sgbn -Dpackaging=jar -Dversion=milestone2 -->
         <!-- or: mvn install:install-file -Dfile=./libsbgn/dist/org.sbgn.jar -DartifactId=sbgn -DgroupId=org.sbgn -Dpackaging=jar -Dversion=milestone2 -->
         <dependency>
@@ -171,9 +270,7 @@
             <version>milestone2</version>
         </dependency>
     </dependencies>
-
     <repositories>
-
         <repository>
             <id>central-ebi-repo</id>
             <name>central-ebi-repo</name>
@@ -210,4 +307,4 @@
             </releases>
         </repository>
     </repositories>
-    </project>
+</project>

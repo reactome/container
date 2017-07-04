@@ -127,10 +127,22 @@ mvn install:install-file -Dfile=./lib/protege/protege-owl.jar -Dversion=3.2 -Dgr
             <artifactId>protege-owl</artifactId>
             <version>3.2</version>
         </dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>org.reactome.server</groupId>
             <artifactId>reactome-core</artifactId>
             <version>1.0.2</version>
+        </dependency> -->
+        <dependency>
+            <groupId>org.reactome</groupId>
+            <artifactId>ReactomeJar</artifactId>
+            <systemPath>/gitroot/CuratorTool/reactome.jar</systemPath>
+            <scope>system</scope>
+            <version>UNKNOWN_VERSION</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.5</version>
         </dependency>
         <!--
 mvn install:install-file -Dfile=lib/sbml/jsbml-0.8-rc1-with-dependencies.jar -DgroupId=org.sbml -DartifactId=jsbml -Dversion=0.8-rc1 -Dpackaging=jar
