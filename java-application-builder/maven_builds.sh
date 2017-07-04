@@ -1,7 +1,7 @@
 #! /bin/bash
 cd /gitroot/CuratorTool/ant && \
 ant -buildfile ReactomeJar.xml && \
-ant -buildfile CuratorToolBuild.xml \
+ant -buildfile CuratorToolBuild.xml &&\
 # cd /gitroot/libsbgn && ant && \
 # cd /gitroot/Pathway-Exchange \
 # && mvn install:install-file -Dfile=/gitroot/libsbgn/dist/org.sbgn.jar -DartifactId=sbgn -DgroupId=org.sbgn -Dpackaging=jar -Dversion=milestone2 \
@@ -13,6 +13,7 @@ ant -buildfile CuratorToolBuild.xml \
 # && mvn install:install-file -Dfile=./lib/sbml/libsbmlj.jar -DgroupId=org.sbml -DartifactId=libsbml -Dpackaging=jar -Dversion=0.8-rc1 \
 # && pwd && mvn compile package install && \
 cd /gitroot/RESTfulAPI/ \
+&& mvn install:install-file -Dfile=/gitroot/CuratorTool/reactome.jar -DartifactId=Reactome -DgroupId=org.reactome -Dpackaging=jar -Dversion=UNKNOWN_VERSION \
 && ls /gitroot/RESTfulAPI/ -lht \
 && pwd && mvn package \
 # && cd /gitroot/browser && mvn package && \

@@ -8,6 +8,8 @@
     structure as present in git folder.
 
     Date: 1 July, 2017
+    Author: Guanming
+    Modified by: Ayushya Chitransh
      ====================================================================== -->
 <project name="ReactomeJar" default="jar" basedir="..">
 	<property name="destDir" value="${basedir}" />

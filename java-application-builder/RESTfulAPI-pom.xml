@@ -43,6 +43,13 @@
             <groupId>org.reactome</groupId>
             <artifactId>Pathway-Exchange</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+            </dependency>
+        <dependency>
+            <groupId>org.reactome</groupId>
+            <artifactId>ReactomeJar</artifactId>
+            <systemPath>/gitroot/CuratorTool/reactome.jar</systemPath>
+            <scope>system</scope>
+            <version>UNKNOWN_VERSION</version>
         </dependency>
         <dependency>
             <groupId>org.acegisecurity</groupId>

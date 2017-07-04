@@ -50,3 +50,4 @@ RUN apt-get update && apt-get install ant -y && rm -rf /var/lib/apt/lists/*
 
 # Add ReactomeJar.xml to CuratorTool for building reactome.jar
 COPY ReactomeJar.xml /gitroot/CuratorTool/
+COPY ReactomeJar.xml /gitroot/RESTfulAPI/ant/
