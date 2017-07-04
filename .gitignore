@@ -1,2 +1,3 @@
 webapps/*
-*.log
+mysql/tomcat_data/*.gz
+tomcat/logs/*

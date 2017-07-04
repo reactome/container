@@ -1,13 +1,11 @@
 #! /bin/bash
 
 cd /gitroot/libsbgn && ant && \
-cd /gitroot/CuratorTool/ &&  mkdir -p /gitroot/CuratorTool/classes && mkdir -p /gitroot/temp/curatorTool && \
-ant -buildfile ./ant/CuratorToolBuild.xml && \
-ant -buildfile ./ant/ReactomeAPIPackaging.xml && \
-ant -buildfile ./ant/ReactomeJar.xml && \
-cp /gitroot/CuratorTool/reactome.jar /gitroot/RESTfulAPI/reactome.jar && \
-cd /gitroot/RESTfulAPI/ && \
-mvn install:install-file -Dfile=/gitroot/RESTfulAPI/reactome.jar -DgroupId=org.reactome -DartifactId=reactome -Dversion=UNKNOWN_VERSION -Dpackaging=jar && \
+cd /gitroot/CuratorTool/ant && \
+ant -buildfile ReactomeJar.xml && \
+ant -buildfile CuratorToolBuild.xml && \
+cd /gitroot/RESTfulAPI/ \
+&& mvn install:install-file -Dfile=/gitroot/CuratorTool/reactome.jar -DartifactId=Reactome -DgroupId=org.reactome -Dpackaging=jar -Dversion=UNKNOWN_VERSION \
 cd /gitroot/Pathway-Exchange \
 && mvn install:install-file -Dfile=/gitroot/libsbgn/dist/org.sbgn.jar -DartifactId=sbgn -DgroupId=org.sbgn -Dpackaging=jar -Dversion=milestone2 \
 && mvn install:install-file -Dfile=./lib/celldesigner/celldesigner.jar -DgroupId=celldesigner -DartifactId=celldesigner -Dversion=UNKNOWN_VERSION -Dpackaging=jar \
