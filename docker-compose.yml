@@ -12,6 +12,7 @@ services:
     entrypoint: /wait-for.sh mysql-for-tomcat:3306 -t 360 -- catalina.sh run
     volumes:
       - ./tomcat/webapps/ReactomeRESTfulAPI:/usr/local/tomcat/webapps/ReactomeRESTfulAPI #it  has been copied from feature/build-web-applications after building webapps
+      - ./tomcat/webapps/PathwayBrowser:/usr/local/tomcat/webapps/PathwayBrowser
       - ./logs/tomcat/:/usr/local/tomcat/logs/ #to save logs inside host directory of tomcat/logs/
       - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
       - ./release/scripts/:/usr/local/bin/perl/scripts
