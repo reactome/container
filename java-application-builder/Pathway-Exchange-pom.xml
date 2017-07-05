@@ -16,8 +16,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.6.1</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <compilerArgs>
                         <arg>-XDignore.symbol.file</arg>
                     </compilerArgs>
@@ -127,10 +127,22 @@ mvn install:install-file -Dfile=./lib/protege/protege-owl.jar -Dversion=3.2 -Dgr
             <artifactId>protege-owl</artifactId>
             <version>3.2</version>
         </dependency>
-        <dependency>
+        <!-- <dependency>
             <groupId>org.reactome.server</groupId>
             <artifactId>reactome-core</artifactId>
             <version>1.0.2</version>
+        </dependency> -->
+        <dependency>
+            <groupId>org.reactome</groupId>
+            <artifactId>Reactome</artifactId>
+            <!-- <systemPath>/gitroot/CuratorTool/reactome.jar</systemPath>
+            <scope>system</scope> -->
+            <version>UNKNOWN_VERSION</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.5</version>
         </dependency>
         <!--
 mvn install:install-file -Dfile=lib/sbml/jsbml-0.8-rc1-with-dependencies.jar -DgroupId=org.sbml -DartifactId=jsbml -Dversion=0.8-rc1 -Dpackaging=jar

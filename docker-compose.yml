@@ -2,57 +2,72 @@ version: '3'
 services:
 
   tomcat:
-    image: tomcat:7.0
+    image: reactome-tomcat
     container_name: tomcat-server
+    build:
+      context: ./tomcat
+      dockerfile: tomcat.dockerfile
     depends_on:
-      - mysql-database
+      - mysql-for-tomcat
+    entrypoint: /wait-for.sh mysql-for-tomcat:3306 -t 360 -- catalina.sh run
     volumes:
-      - ./webapps/:/usr/local/tomcat/webapps/ #it  has been copied from feature/build-web-applications after building webapps
+      - ./tomcat/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
+      - ./tomcat/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war
+      - ./logs/tomcat/:/usr/local/tomcat/logs/ #to save logs inside host directory of tomcat/logs/
       - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
       - ./release/scripts/:/usr/local/bin/perl/scripts
+      - ./wait-for.sh:/wait-for.sh
+      - ./tomcat/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
     env_file:
-      - .env
+      - tomcat.env
     ports:
       - 8082:8080
 
-  apache-server:
-    image: httpd:2.4
-    container_name: apache-server
-    volumes:
-      - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
-      - ./release/scripts/:/usr/local/bin/perl/scripts
+  # apache-server:
+  #   image: httpd:2.4
+  #   container_name: apache-server
+  #   volumes:
+  #     - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
+  #     - ./release/scripts/:/usr/local/bin/perl/scripts
 
-  mysql-database:
+  mysql-for-tomcat:
     image: mysql
-    container_name: mysql-database
-    volumes:
-      - ./mysql/docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d
+    container_name: mysql-for-tomcat
     env_file:
-      - .env
+      - tomcat.env
+    volumes:
+      - ./mysql/tomcat_data/:/docker-entrypoint-initdb.d
     ports:
       - 3306:3306
 
-  wordpress-sites:
-    image: wordpress:with-netcat
-    build:
-      context: ./wordpress
-      dockerfile: wordpress.dockerfile
-    container_name: wordpress-sites
-    links:
-      - mysql-database
-    depends_on:
-      - mysql-database
-      - apache-server
-      - tomcat
-    env_file:
-      - .env
-    ports:
-      - 8080:80
-    entrypoint: /wait-for.sh mysql-database:3306 -t 90 -- /usr/local/bin/docker-entrypoint.sh apache2-foreground
-    volumes:
-      - ./wordpress/wait-for.sh:/wait-for.sh
-      - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
-      - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wordpress/wp-content/plugins
-      # WordPress will copy from /usr/src/wordpress/ so we need to inject our content into there.
-    #   - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/usr/src/wordpress/wp-content/themes/HS_OICR_2013
-    #   - ./release/website/html/wordpress/wp-content/plugins:/usr/src/wordpress/wp-content/plugins
+  # mysql-database:
+  #   image: mysql
+  #   container_name: mysql-database
+  #   volumes:
+  #     - ./mysql/wordpress_data/:/docker-entrypoint-initdb.d
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - 3306:3306
+
+  # wordpress-sites:
+  #   image: wordpress:with-netcat
+  #   build:
+  #     context: ./wordpress
+  #     dockerfile: wordpress.dockerfile
+  #   container_name: wordpress-sites
+  #   links:
+  #     - mysql-database
+  #   depends_on:
+  #     - mysql-database
+  #     - apache-server
+  #     - tomcat
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - 8080:80
+  #   entrypoint: /wait-for.sh mysql-database:3306 -t 90 -- /usr/local/bin/docker-entrypoint.sh apache2-foreground
+  #   volumes:
+  #     - ./wordpress/wait-for.sh:/wait-for.sh
+  #     - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
+  #     - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wordpress/wp-content/plugins

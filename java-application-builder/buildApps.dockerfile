@@ -34,9 +34,10 @@ RUN git checkout $ANALYSIS_SERVICE_VERSION
 WORKDIR /gitroot/
 RUN git clone https://github.com/reactome/Pathway-Exchange.git
 
-# then we'll need libsbgn and that requires ant
+# then we'll need libsbgn and CuratorTool and they both requires ant
 WORKDIR /gitroot/
 RUN git clone https://github.com/sbgn/libsbgn.git
+RUN git clone https://github.com/reactome/CuratorTool.git
 WORKDIR /gitroot/libsbgn
 RUN git checkout milestone2
 
@@ -45,4 +46,8 @@ RUN git clone https://github.com/reactome/RESTfulAPI.git
 WORKDIR /gitroot/RESTfulAPI
 RUN git checkout master
 
-RUN apt-get update && apt-get install ant -y
+RUN apt-get update && apt-get install ant -y && rm -rf /var/lib/apt/lists/*
+
+# Add ReactomeJar.xml to CuratorTool for building reactome.jar
+COPY ReactomeJar.xml /gitroot/CuratorTool/
+COPY ReactomeJar.xml /gitroot/RESTfulAPI/ant/
