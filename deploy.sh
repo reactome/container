@@ -6,7 +6,7 @@ then
   echo "                   Building webapps using reactome-app-builder"
   echo "==========================================================================="
   cd ./java-application-builder
-  ./build_webapps.sh
+  bash ./build_webapps.sh
   cd ..
   echo "Reactome-app-builder exits here."
 fi
