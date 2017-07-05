@@ -17,12 +17,12 @@ cd /gitroot/RESTfulAPI/ \
 && pwd && mvn compile package install \
 && cd /gitroot/RESTfulAPI/ -lht \
 && pwd && mvn package \
-# && cd /gitroot/browser && mvn package && \
-# cd /gitroot/diagram-exporter && mvn install && \
+&& cd /gitroot/browser && mvn package && \
+cd /gitroot/diagram-exporter && mvn install && \
 # cd /gitroot/content-service && mvn package && \
 # cd /gitroot/AnalysisTools/Core && mvn package install && \
 # cd /gitroot/AnalysisTools/Service && mvn package && \
-# cp /gitroot/browser/target/PathwayBrowser*.war /webapps/PathwayBrowser.war && \
+cp /gitroot/browser/target/PathwayBrowser*.war /webapps/PathwayBrowser.war && \
 # cp /gitroot/content-service/target/ContentService*.war /webapps/ContentService.war && \
 # cp /gitroot/AnalysisTools/Service/target/analysis-service*.war /webapps/analysis-service.war && \
 cp /gitroot/RESTfulAPI/target/ReactomeRESTfulAPI*.war /webapps/ReactomeRESTfulAPI.war
