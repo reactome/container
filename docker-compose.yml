@@ -11,13 +11,15 @@ services:
       - mysql-for-tomcat
     entrypoint: /wait-for.sh mysql-for-tomcat:3306 -t 360 -- catalina.sh run
     volumes:
-      - ./tomcat/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
-      - ./tomcat/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war
-      - ./fireworks:/usr/local/tomcat/webapps/download/current/fireworks
-      - ./diagram:/usr/local/tomcat/webapps/download/current/diagram
+      # - ./tomcat/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
+      # - ./tomcat/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war
+      - ./tomcat/webapps/analysis-service.war:/usr/local/tomcat/webapps/analysis-service.war
+      # - ./tomcat/webapps/ContentService.war:/usr/local/tomcat/webapps/ContentService.war
+      # - ./fireworks:/usr/local/tomcat/webapps/download/current/fireworks
+      # - ./diagram:/usr/local/tomcat/webapps/download/current/diagram
       - ./logs/tomcat/:/usr/local/tomcat/logs/ #to save logs inside host directory of tomcat/logs/
-      - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
-      - ./release/scripts/:/usr/local/bin/perl/scripts
+      # - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
+      # - ./release/scripts/:/usr/local/bin/perl/scripts
       - ./wait-for.sh:/wait-for.sh
       - ./tomcat/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
     env_file:
@@ -40,31 +42,32 @@ services:
     volumes:
       - ./mysql/tomcat_data/:/docker-entrypoint-initdb.d
 
-  mysql-database:
-    image: mysql
-    container_name: mysql-database
-    volumes:
-      - ./mysql/wordpress_data/:/docker-entrypoint-initdb.d
-    env_file:
-      - .env
+  # mysql-database:
+  #   image: mysql
+  #   container_name: mysql-database
+  #   volumes:
+  #     - ./mysql/wordpress_data/:/docker-entrypoint-initdb.d
+  #   env_file:
+  #     - .env
 
-  wordpress-sites:
-    image: wordpress:with-netcat
-    build:
-      context: ./wordpress
-      dockerfile: wordpress.dockerfile
-    container_name: wordpress-sites
-    links:
-      - mysql-database
-    depends_on:
-      - mysql-database
-      - tomcat
-    env_file:
-      - .env
-    ports:
-      - 8080:80
-    entrypoint: /wait-for.sh mysql-database:3306 -t 90 -- /usr/local/bin/docker-entrypoint.sh apache2-foreground
-    volumes:
-      - ./wordpress/wait-for.sh:/wait-for.sh
-      - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
-      - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wordpress/wp-content/plugins
+  # wordpress-sites:
+  #   image: wordpress:with-netcat
+  #   build:
+  #     context: ./wordpress
+  #     dockerfile: wordpress.dockerfile
+  #   container_name: wordpress-sites
+  #   links:
+  #     - mysql-database
+  #   depends_on:
+  #     - mysql-database
+  #     - tomcat
+  #   env_file:
+  #     - .env
+  #   ports:
+  #     - 8080:80
+  #   entrypoint: /wait-for.sh mysql-database:3306 -t 90 -- /usr/local/bin/docker-entrypoint.sh apache2-foreground
+  #   volumes:
+  #     - ./wordpress/wait-for.sh:/wait-for.sh
+  #     - ./wordpress/htaccess:/var/www/html/.htaccess
+  #     - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
+  #     - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wordpress/wp-content/plugins
