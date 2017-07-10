@@ -43,4 +43,4 @@ cd /gitroot/AnalysisTools/Service && mvn package \
 # && cp /gitroot/content-service/target/ContentService*.war /webapps/ContentService.war \
 # && cp /gitroot/AnalysisTools/Service/target/analysis-service*.war /webapps/analysis-service.war \
 # && cp /gitroot/RESTfulAPI/target/ReactomeRESTfulAPI*.war /webapps/ReactomeRESTfulAPI.war
-cp /gitroot/AnalysisTools/Service/target/*.war /webapps/
+cp /gitroot/AnalysisTools/Service/target/analysis-service*.war /webapps/

@@ -1,5 +1,5 @@
 webapps/*
 mysql/tomcat_data/*.gz
-tomcat/logs/*
+logs/*
 fireworks/*
 diagram/*
