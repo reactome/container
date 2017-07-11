@@ -3,3 +3,4 @@ mysql/tomcat_data/*.gz
 tomcat/logs/*
 fireworks/*
 diagram/*
+logs/*

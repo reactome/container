@@ -2,8 +2,8 @@
 <IfModule mod_rewrite.c>
 	RewriteEngine On
 	RewriteBase /
-	RewriteRule ^index\.php$ - [L]
-	RewriteRule http://localhost:8080/PathwayBrowser http://localhost:8082/PathwayBrowser [R,L]
+	#RewriteRule ^index\.php$ - [L]
+	RewriteRule ^.*PathwayBrowser/(.*)$ http://localhost:8082/PathwayBrowser/$1 [R,L]
 
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d
