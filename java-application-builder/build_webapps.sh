@@ -1,8 +1,20 @@
 #! /bin/bash
 # Build the container - this also builds the applications.
-docker build -t reactome-app-builder  -f buildApps.dockerfile .
-# Copy the webapps to the shared directory ./webapps
+# docker build -t reactome-app-builder  -f buildApps.dockerfile .
+
+# Running Analysis Service requires a working database,
+# we are using the tomcat database: gk_current
+# using defaults from mysql-for-tomcat container
 set -x
+echo "Starting mysql container:"
+docker run -it \
+	--name=mysql-for-webapps --rm \
+	-v "$(dirname `pwd`)/mysql/tomcat_data/:/docker-entrypoint-initdb.d" \
+	--env-file $(dirname `pwd`)/tomcat.env mysql bash -c "docker-entrypoint.sh"
+echo "Exiting mysql container"
+exit
+
+# Build the java applications
 docker run -it --name=java-webapp-builder --rm -v "$(pwd)/webapps:/webapps" \
 	-v "$(pwd)/mounts/Pathway-Exchange-pom.xml:/gitroot/Pathway-Exchange/pom.xml" \
 	-v "$(pwd)/mounts/AnalysisTools-Core-pom.xml:/gitroot/AnalysisTools/Core/pom.xml" \

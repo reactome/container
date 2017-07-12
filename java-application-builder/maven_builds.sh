@@ -31,8 +31,18 @@
 # ---------------------------------------------------------------------------------------
 # Analysis Tools requires core and service, building and installing core first
 cd /gitroot/AnalysisTools/Core && mvn package install \
-&& echo "Follpwing files were generated in Core/target" \
+&& echo "Following files were generated in Core/target" \
 && ls -a /gitroot/AnalysisTools/Core/target/ \
+&& cd -a /gitroot/AnalysisTools/Core/target/ \
+&& echo "Building analysis.bin, required for running analysis service:" \
+&& java -jar tools-jar-with-dependencies.jar build \
+      -h mysql-for-webapps \
+      -d gk_current \
+      -u root \
+      -p root \
+      -o ./analysis.bin \
+      -g /gitroot/AnalysisTools/interactors.db \
+&& cp ./analysis.bin /webapps/
 #
 # Build AnalysisTools service
 cd /gitroot/AnalysisTools/Service && mvn package \
