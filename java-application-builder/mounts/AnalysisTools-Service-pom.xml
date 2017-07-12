@@ -8,6 +8,22 @@
     <name>AnalysisService</name>
     <description>Pathway enrichment and expression analysis as well as species comparison tool</description>
 
+    <profiles>
+        <profile>
+            <id>AnalysisService-Local</id>
+            <properties>
+                <!-- Analysis -->
+                <analysis.structure.file>/analysis.bin</analysis.structure.file>
+                <analysis.result.root>/usr/local/AnalysisService/analysis-results</analysis.result.root>
+                <analysis.report.log>/usr/local/AnalysisService/analysis-reports</analysis.report.log>
+                <!-- Logging -->
+                <log4j.root>/usr/local/AnalysisService/log</log4j.root>
+                <!-- Reactome Server to query header and footer -->
+                <template.server>http://reactomedev.oicr.on.ca/</template.server>
+            </properties>
+        </profile>
+    </profiles>
+
     <properties>
         <spring.version>4.2.5.RELEASE</spring.version>
         <deploymentPath>/</deploymentPath>

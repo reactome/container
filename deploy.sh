@@ -10,16 +10,18 @@ then
   cd ..
   echo "Reactome-app-builder exits here."
 fi
-echo
-echo
+
+echo -e "\n\n"
 echo "==========================================================================="
 echo "Copying war files from java-application-builder/webapps to tomcat/webapps/"
 echo "==========================================================================="
 echo "Files to be copied:"
 ls ./java-application-builder/webapps/
 cp --verbose -u ./java-application-builder/webapps/*.war ./tomcat/webapps/
-echo
-echo
+# Don't forget: also need the analysis.bin file for AnalysisService!
+cp --verbose -u ./java-application-builder/webapps/analysis.bin ./tomcat/webapps/
+
+echo -e "\n\n"
 echo "==========================================================================="
 echo "                        Starting docker containers"
 echo "==========================================================================="

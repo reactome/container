@@ -13,7 +13,6 @@ docker run -itd --rm \
 	--volume "$(dirname `pwd`)/mysql/tomcat_data/:/docker-entrypoint-initdb.d" \
 	--env-file $(dirname `pwd`)/tomcat.env mysql
 
-set -x
 # Build the java applications
 docker run -it --name=java-webapp-builder --rm -v "$(pwd)/webapps:/webapps" \
     --network=isolated_nw \
@@ -34,4 +33,3 @@ docker run -it --name=java-webapp-builder --rm -v "$(pwd)/webapps:/webapps" \
 	-v "$(pwd)/maven_builds.sh:/maven_builds.sh" \
 	--entrypoint="/maven_builds.sh" \
 	reactome-app-builder
-set +x
