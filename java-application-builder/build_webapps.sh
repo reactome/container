@@ -5,17 +5,16 @@
 # Running Analysis Service requires a working database,
 # we are using the tomcat database: gk_current
 # using defaults from mysql-for-tomcat container
-set -x
-echo "Starting mysql container:"
-docker run -it \
-	--name=mysql-for-webapps --rm \
-	-v "$(dirname `pwd`)/mysql/tomcat_data/:/docker-entrypoint-initdb.d" \
-	--env-file $(dirname `pwd`)/tomcat.env mysql bash -c "docker-entrypoint.sh"
-echo "Exiting mysql container"
+docker run -itd \
+	--name=mysql-for-webapps \
+	--rm \
+	--volume "$(dirname `pwd`)/mysql/tomcat_data/:/docker-entrypoint-initdb.d" \
+	--env-file $(dirname `pwd`)/tomcat.env mysql
+docker ps -a
 exit
-
+set -x
 # Build the java applications
-docker run -it --name=java-webapp-builder --rm -v "$(pwd)/webapps:/webapps" \
+docker run -itd --name=java-webapp-builder --rm -v "$(pwd)/webapps:/webapps" \
 	-v "$(pwd)/mounts/Pathway-Exchange-pom.xml:/gitroot/Pathway-Exchange/pom.xml" \
 	-v "$(pwd)/mounts/AnalysisTools-Core-pom.xml:/gitroot/AnalysisTools/Core/pom.xml" \
 	-v "$(pwd)/mounts/AnalysisTools-Service-pom.xml:/gitroot/AnalysisTools/Service/pom.xml" \
