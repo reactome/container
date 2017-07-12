@@ -31,6 +31,7 @@ docker run -it --name=java-webapp-builder --rm -v "$(pwd)/webapps:/webapps" \
 	-v "$(pwd)/m2-cache:/root/.m2" \
 	-v "$(pwd)/mounts/applicationContext.xml:/gitroot/RESTfulAPI/web/WEB-INF/applicationContext.xml" \
 	-v "$(pwd)/mounts/applicationContext.xml:/gitroot/Pathway-Exchange/web/WEB-INF/applicationContext.xml" \
-	reactome-app-builder \
-	/bin/bash  -c "$(cat ./maven_builds.sh)"
+	-v "$(pwd)/maven_builds.sh:/maven_builds.sh" \
+	--entrypoint="/maven_builds.sh" \
+	reactome-app-builder
 set +x
