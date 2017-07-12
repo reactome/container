@@ -33,10 +33,10 @@
 cd /gitroot/AnalysisTools/Core && mvn package install \
 && echo "Following files were generated in Core/target" \
 && ls -a /gitroot/AnalysisTools/Core/target/ \
-&& cd -a /gitroot/AnalysisTools/Core/target/ \
+&& cd /gitroot/AnalysisTools/Core/target/ \
 && echo "Building analysis.bin, required for running analysis service:" \
 && java -jar tools-jar-with-dependencies.jar build \
-      -h mysql-for-webapps \
+      -h 172.25.3.3 \
       -d gk_current \
       -u root \
       -p root \
