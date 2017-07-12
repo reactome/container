@@ -23,8 +23,8 @@ services:
       # - ./release/scripts/:/usr/local/bin/perl/scripts
       - ./wait-for.sh:/wait-for.sh
       - ./tomcat/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
-      - ./tomcat/analysis-servce/results:/usr/local/AnalysisService/analysis-results
-      - ./tomcat/analysis-servce/reports:/usr/local/AnalysisService/analysis-reports
+      - ./tomcat/analysis-service/results:/usr/local/AnalysisService/analysis-results
+      - ./tomcat/analysis-service/reports:/usr/local/AnalysisService/analysis-reports
       - ./logs/applications/AnalysisService:/usr/local/AnalysisService/log
     env_file:
       - tomcat.env
