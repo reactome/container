@@ -59,13 +59,16 @@ AnalysisBin ()
 {
   cd /gitroot/AnalysisTools/Core/target/
   echo "Building analysis.bin, required for running analysis service:"
+  if ! [[ -f /downloads/interactors.db ]]; then
+    InteractorsCore
+  fi
   time java -jar tools-jar-with-dependencies.jar build \
         -h 172.25.3.3 \
         -d gk_current \
         -u root \
         -p root \
         -o ./analysis.bin \
-        -g /gitroot/AnalysisTools/interactors.db
+        -g /downloads/interactors.db
   cp ./analysis.bin /downloads/
 }
 
@@ -78,7 +81,7 @@ AnalysisToolsService ()
 
 InteractorsCore ()
 {
-  echo "Creating interactors.db ..." \
+  echo "Creating interactors.db ..."
   cd /gitroot/interactors-core/ \
   && mvn package -DskipTests
   # if container has already been run once then the file would be present, we shall use that file

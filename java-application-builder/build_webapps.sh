@@ -21,7 +21,6 @@ docker run -it --name=java-webapp-builder --rm -v "$(pwd)/webapps:/webapps" \
 	-v "$(pwd)/mounts/AnalysisTools-Core-pom.xml:/gitroot/AnalysisTools/Core/pom.xml" \
 	-v "$(pwd)/mounts/AnalysisTools-Service-pom.xml:/gitroot/AnalysisTools/Service/pom.xml" \
 	-v "$(pwd)/mounts/AnalysisTools-Service-web.xml:/gitroot/AnalysisTools/Service/src/main/webapp/WEB-INF/web.xml" \
-	-v "$(pwd)/mounts/interactors.db:/gitroot/AnalysisTools/interactors.db" \
 	-v "$(pwd)/mounts/ReactomeJar.xml:/gitroot/CuratorTool/ant/ReactomeJar.xml" \
 	-v "$(pwd)/mounts/JavaBuildPackaging.xml:/gitroot/CuratorTool/ant/JavaBuildPackaging.xml" \
 	-v "$(pwd)/mounts/CuratorToolBuild.xml:/gitroot/CuratorTool/ant/CuratorToolBuild.xml" \
