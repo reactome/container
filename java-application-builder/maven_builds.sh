@@ -1,5 +1,4 @@
 #! /bin/bash
-set -e
 CuratorTool ()
 {
   # Build Curator Tool
@@ -11,6 +10,7 @@ CuratorTool ()
 
 PathwayExchange ()
 {
+  CuratorTool
   # Build Pathway Exchange
   cd /gitroot/Pathway-Exchange \
   && mvn install:install-file -Dfile=/gitroot/libsbgn/dist/org.sbgn.jar -DartifactId=sbgn -DgroupId=org.sbgn -Dpackaging=jar -Dversion=milestone2 \
@@ -75,7 +75,26 @@ AnalysisToolsService ()
   cp /gitroot/AnalysisTools/Service/target/analysis-service*.war /webapps/
 }
 
-declare -A app_list=( ["CuratorTool"]=ready ["PathwayExchange"]=ready ["RESTfulAPI"]=ready ["PathwayBrowser"]=ready ["ContentService"]=ready ["AnalysisToolsCore"]=ready ["AnalysisToolsService"]=developing ["AnalysisBin"]=ready )
+InteractorsCore ()
+{
+  echo "Creating interactors.db ..." \
+  cd /gitroot/interactors-core/ \
+  && mvn package -DskipTests \
+  && java -jar target/InteractorsParser-jar-with-dependencies.jar -g interactors.db -d \
+  && mvn package -Dinteractors.SQLite=interactors.db \
+  && cp interactors.db /webapps/
+  echo "Successfully created interactors.db"
+}
+declare -A app_list
+# app_list+=( ["CuratorTool"]=ready )
+# app_list+=( ["PathwayExchange"]=ready )
+# app_list+=( ["RESTfulAPI"]=ready )
+# app_list+=( ["PathwayBrowser"]=ready )
+# app_list+=( ["ContentService"]=ready )
+# app_list+=( ["AnalysisToolsCore"]=notready )
+# app_list+=( ["AnalysisToolsService"]=developing )
+# app_list+=( ["AnalysisBin"]=ready )
+app_list+=( ["InteractorsCore"]=notready )
 
 for app in "${!app_list[@]}";
 do
@@ -87,4 +106,3 @@ do
     ${app}
   fi
 done
-set +e
