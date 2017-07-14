@@ -16,6 +16,7 @@ docker run -itd --rm \
 # Build the java applications
 docker run -it --name=java-webapp-builder --rm -v "$(pwd)/webapps:/webapps" \
     --network=isolated_nw \
+    -v "$(pwd)/downloads:/downloads" \
 	-v "$(pwd)/mounts/Pathway-Exchange-pom.xml:/gitroot/Pathway-Exchange/pom.xml" \
 	-v "$(pwd)/mounts/AnalysisTools-Core-pom.xml:/gitroot/AnalysisTools/Core/pom.xml" \
 	-v "$(pwd)/mounts/AnalysisTools-Service-pom.xml:/gitroot/AnalysisTools/Service/pom.xml" \

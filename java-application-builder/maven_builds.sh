@@ -1,4 +1,5 @@
 #! /bin/bash
+set -e
 CuratorTool ()
 {
   # Build Curator Tool
@@ -65,7 +66,7 @@ AnalysisBin ()
         -p root \
         -o ./analysis.bin \
         -g /gitroot/AnalysisTools/interactors.db
-  cp ./analysis.bin /webapps/
+  cp ./analysis.bin /downloads/
 }
 
 AnalysisToolsService ()
@@ -79,10 +80,17 @@ InteractorsCore ()
 {
   echo "Creating interactors.db ..." \
   cd /gitroot/interactors-core/ \
-  && mvn package -DskipTests \
-  && java -jar target/InteractorsParser-jar-with-dependencies.jar -g interactors.db -d \
-  && mvn package -Dinteractors.SQLite=interactors.db \
-  && cp interactors.db /webapps/
+  && mvn package -DskipTests
+  # if container has already been run once then the file would be present, we shall use that file
+  if [[ -f /downloads/intact-micluster.txt ]]; then
+    java -jar target/InteractorsParser-jar-with-dependencies.jar -g interactors.db -f /downloads/intact-micluster.txt
+  else
+    # else we need to download the intact-micluster.txt file (currently 315MB)
+    java -jar target/InteractorsParser-jar-with-dependencies.jar -g interactors.db -d -t /downloads
+  fi
+  # Running tests
+  mvn package -Dinteractors.SQLite=interactors.db \
+  && cp interactors.db /downloads/
   echo "Successfully created interactors.db"
 }
 declare -A app_list
@@ -106,3 +114,4 @@ do
     ${app}
   fi
 done
+set +e
