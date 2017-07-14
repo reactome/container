@@ -1,6 +1,6 @@
 #! /bin/bash
 # Build the container - this also builds the applications.
-docker build -t reactome-app-builder  -f buildApps.dockerfile .
+docker build -t reactome-app-builder -f buildApps.dockerfile .
 
 echo "Running Analysis Service requires a working database"
 # we are using the tomcat database: gk_current
@@ -33,3 +33,5 @@ docker run -it --name=java-webapp-builder --rm -v "$(pwd)/webapps:/webapps" \
 	-v "$(pwd)/maven_builds.sh:/maven_builds.sh" \
 	--entrypoint="/maven_builds.sh" \
 	reactome-app-builder
+echo "java-webapp-builder exited, stopping mysql-for-webapps..."
+docker stop mysql-for-webapps
