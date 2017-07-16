@@ -14,7 +14,7 @@ services:
       - ./tomcat/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
       - ./tomcat/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war
       - ./tomcat/webapps/analysis-service.war:/usr/local/tomcat/webapps/analysis-service.war
-      - ./java-application-builder/webapps/analysis.bin:/analysis.bin
+      - ./java-application-builder/downloads/analysis.bin:/analysis.bin
       # - ./tomcat/webapps/ContentService.war:/usr/local/tomcat/webapps/ContentService.war
       - ./fireworks:/usr/local/tomcat/webapps/download/current/fireworks
       - ./diagram:/usr/local/tomcat/webapps/download/current/diagram

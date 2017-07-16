@@ -26,10 +26,12 @@ PathwayExchange ()
 
 RESTfulAPI ()
 {
+  CuratorTool
   # Build RESTfulAPI
   cd /gitroot/RESTfulAPI/ -lht \
   && mvn install:install-file -Dfile=/gitroot/CuratorTool/reactome.jar -DartifactId=Reactome -DgroupId=org.reactome -Dpackaging=jar -Dversion=UNKNOWN_VERSION \
-  && pwd && mvn package
+  && pwd && mvn package \
+  && cp /gitroot/RESTfulAPI/target/ReactomeRESTfulAPI*.war /webapps/ReactomeRESTfulAPI.war
 }
 
 PathwayBrowser ()
@@ -57,6 +59,7 @@ AnalysisToolsCore ()
 
 AnalysisBin ()
 {
+  AnalysisToolsCore
   cd /gitroot/AnalysisTools/Core/target/
   echo "Building analysis.bin, required for running analysis service:"
   if ! [[ -f /downloads/interactors.db ]]; then
@@ -68,12 +71,13 @@ AnalysisBin ()
         -u root \
         -p root \
         -o ./analysis.bin \
-        -g /downloads/interactors.db
+        -g /downloads/intact-miclustereractors.db
   cp ./analysis.bin /downloads/
 }
 
 AnalysisToolsService ()
 {
+  AnalysisToolsCore
   # Build AnalysisTools service using the "AnalysisService-Local" profile.
   cd /gitroot/AnalysisTools/Service && mvn package -P AnalysisService-Local
   cp /gitroot/AnalysisTools/Service/target/analysis-service*.war /webapps/
@@ -96,16 +100,17 @@ InteractorsCore ()
   && cp interactors.db /downloads/
   echo "Successfully created interactors.db"
 }
+
 declare -A app_list
 # app_list+=( ["CuratorTool"]=ready )
-# app_list+=( ["PathwayExchange"]=ready )
-# app_list+=( ["RESTfulAPI"]=ready )
-# app_list+=( ["PathwayBrowser"]=ready )
-# app_list+=( ["ContentService"]=ready )
+app_list+=( ["PathwayExchange"]=ready )
+app_list+=( ["RESTfulAPI"]=notready )
+app_list+=( ["PathwayBrowser"]=notready )
+app_list+=( ["ContentService"]=notready )
 # app_list+=( ["AnalysisToolsCore"]=notready )
-# app_list+=( ["AnalysisToolsService"]=developing )
+app_list+=( ["AnalysisToolsService"]=developing )
 # app_list+=( ["AnalysisBin"]=ready )
-app_list+=( ["InteractorsCore"]=notready )
+# app_list+=( ["InteractorsCore"]=notready )
 
 for app in "${!app_list[@]}";
 do
