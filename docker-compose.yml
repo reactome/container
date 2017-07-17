@@ -9,6 +9,10 @@ services:
       dockerfile: tomcat.dockerfile
     depends_on:
       - mysql-for-tomcat
+      - wordpress-sites
+    links:
+      - mysql-for-tomcat
+      - wordpress-sites
     entrypoint: /wait-for.sh mysql-for-tomcat:3306 -t 360 -- catalina.sh run
     volumes:
       - ./tomcat/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
@@ -23,6 +27,8 @@ services:
       # - ./release/scripts/:/usr/local/bin/perl/scripts
       - ./wait-for.sh:/wait-for.sh
       - ./tomcat/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
+      - ./tomcat/tomcat-server.xml:/usr/local/tomcat/conf/server.xml
+      - ./tomcat/rewrite.config:/usr/local/tomcat/conf/Catalina/localhost/rewrite.config
       - ./tomcat/analysis-service/results:/usr/local/AnalysisService/analysis-results
       - ./tomcat/analysis-service/reports:/usr/local/AnalysisService/analysis-reports
       - ./logs/applications/AnalysisService:/usr/local/AnalysisService/log
@@ -65,7 +71,7 @@ services:
       - mysql-database
     depends_on:
       - mysql-database
-      - tomcat
+    #   - tomcat
     env_file:
       - .env
     ports:
@@ -74,6 +80,7 @@ services:
     volumes:
       - ./wordpress/wait-for.sh:/wait-for.sh
       - ./wordpress/htaccess:/var/www/html/.htaccess
+      - ./wordpress/header.php:/var/www/html/header.php
+      - ./wordpress/footer.php:/var/www/html/footer.php
       - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
       - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wordpress/wp-content/plugins
-
