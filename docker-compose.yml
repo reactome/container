@@ -26,6 +26,7 @@ services:
       # - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
       # - ./release/scripts/:/usr/local/bin/perl/scripts
       - ./wait-for.sh:/wait-for.sh
+      - ./tomcat/rewrite.config:/usr/local/tomcat/conf/Catalina/localhost/rewrite.config
       - ./tomcat/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
       - ./tomcat/tomcat-server.xml:/usr/local/tomcat/conf/server.xml
       - ./tomcat/rewrite.config:/usr/local/tomcat/conf/Catalina/localhost/rewrite.config
