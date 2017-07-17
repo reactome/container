@@ -13,13 +13,19 @@ services:
     volumes:
       - ./tomcat/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
       - ./tomcat/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war
+      - ./tomcat/webapps/analysis-service.war:/usr/local/tomcat/webapps/analysis-service.war
+      - ./java-application-builder/downloads/analysis.bin:/analysis.bin
+      # - ./tomcat/webapps/ContentService.war:/usr/local/tomcat/webapps/ContentService.war
       - ./fireworks:/usr/local/tomcat/webapps/download/current/fireworks
       - ./diagram:/usr/local/tomcat/webapps/download/current/diagram
       - ./logs/tomcat/:/usr/local/tomcat/logs/ #to save logs inside host directory of tomcat/logs/
-      - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
-      - ./release/scripts/:/usr/local/bin/perl/scripts
+      # - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
+      # - ./release/scripts/:/usr/local/bin/perl/scripts
       - ./wait-for.sh:/wait-for.sh
       - ./tomcat/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
+      - ./tomcat/analysis-service/results:/usr/local/AnalysisService/analysis-results
+      - ./tomcat/analysis-service/reports:/usr/local/AnalysisService/analysis-reports
+      - ./logs/applications/AnalysisService:/usr/local/AnalysisService/log
     env_file:
       - tomcat.env
     ports:
@@ -48,6 +54,7 @@ services:
     env_file:
       - .env
 
+
   wordpress-sites:
     image: wordpress:with-netcat
     build:
@@ -69,3 +76,4 @@ services:
       - ./wordpress/htaccess:/var/www/html/.htaccess
       - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
       - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wordpress/wp-content/plugins
+

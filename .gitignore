@@ -1,6 +1,7 @@
 webapps/*
 mysql/tomcat_data/*.gz
-tomcat/logs/*
+logs/*
 fireworks/*
 diagram/*
-logs/*
+tomcat/analysis-service
+java-application-builder/downloads/*

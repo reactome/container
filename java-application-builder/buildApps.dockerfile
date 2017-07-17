@@ -46,8 +46,10 @@ RUN git clone https://github.com/reactome/RESTfulAPI.git
 WORKDIR /gitroot/RESTfulAPI
 RUN git checkout master
 
-RUN apt-get update && apt-get install ant -y && rm -rf /var/lib/apt/lists/*
+# We need interactors-core to build interactors.db
+WORKDIR /gitroot/
+RUN git clone https://github.com/reactome-pwp/interactors-core.git
+WORKDIR /gitroot/interactors-core
+RUN git checkout master
 
-# Add ReactomeJar.xml to CuratorTool for building reactome.jar
-COPY ReactomeJar.xml /gitroot/CuratorTool/
-COPY ReactomeJar.xml /gitroot/RESTfulAPI/ant/
+RUN apt-get update && apt-get install ant -y && rm -rf /var/lib/apt/lists/*
