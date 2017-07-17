@@ -28,6 +28,7 @@ services:
       - ./wait-for.sh:/wait-for.sh
       - ./tomcat/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
       - ./tomcat/tomcat-server.xml:/usr/local/tomcat/conf/server.xml
+      - ./tomcat/tomcat-manager.xml:/usr/local/tomcat/conf/Catalina/localhost/manager.xml
       - ./tomcat/rewrite.config:/usr/local/tomcat/conf/Catalina/localhost/rewrite.config
       - ./tomcat/analysis-service/results:/usr/local/AnalysisService/analysis-results
       - ./tomcat/analysis-service/reports:/usr/local/AnalysisService/analysis-reports
