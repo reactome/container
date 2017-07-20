@@ -46,9 +46,10 @@ services:
 # #   #     - ./release/scripts/:/usr/local/bin/perl/scripts
 
   solr:
-    image: solr
+    image: solr:6.6.0
+    container_name: solr-for-reactome
     ports:
-     - "8983:8983"
+      - "8983:8983"
     volumes:
       - ./solr/data:/opt/solr/server/solr/mycores
     entrypoint:
