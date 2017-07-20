@@ -54,7 +54,7 @@ services:
     entrypoint:
       - docker-entrypoint.sh
       - solr-precreate
-      - mycore
+      - reactome
 
 #   neo4j-db:
 #     image: neo4j
