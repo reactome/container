@@ -1,99 +1,110 @@
 version: '3'
 services:
 
-  tomcat:
-    image: reactome-tomcat
-    container_name: tomcat-server
-    build:
-      context: ./tomcat
-      dockerfile: tomcat.dockerfile
-    depends_on:
-      - mysql-for-tomcat
-      - wordpress-sites
-      - neo4j-db
-    links:
-      - mysql-for-tomcat
-      - wordpress-sites
-      - neo4j-db
-    entrypoint: bash -c "/wait-for.sh mysql-for-tomcat:3306 -t 360 ; /wait-for.sh wordpress-sites:80 -t 360 ; /wait-for.sh neo4j-db:7687 -t 360 ; catalina.sh run"
-    volumes:
-      - ./tomcat/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
-      - ./tomcat/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war
-      - ./tomcat/webapps/analysis-service.war:/usr/local/tomcat/webapps/analysis-service.war
-      - ./java-application-builder/downloads/analysis.bin:/analysis.bin
-      # - ./tomcat/webapps/ContentService.war:/usr/local/tomcat/webapps/ContentService.war
-      - ./fireworks:/usr/local/tomcat/webapps/download/current/fireworks
-      - ./diagram:/usr/local/tomcat/webapps/download/current/diagram
-      - ./wait-for.sh:/wait-for.sh
-      - ./tomcat/rewrite.config:/usr/local/tomcat/conf/Catalina/localhost/rewrite.config
-      - ./tomcat/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
-      - ./tomcat/tomcat-server.xml:/usr/local/tomcat/conf/server.xml
-      - ./tomcat/tomcat-manager.xml:/usr/local/tomcat/conf/Catalina/localhost/manager.xml
-      - ./tomcat/analysis-service/results:/usr/local/AnalysisService/analysis-results
-      - ./tomcat/analysis-service/reports:/usr/local/AnalysisService/analysis-reports
-      - ./logs/applications/AnalysisService:/usr/local/AnalysisService/log
-      - ./logs/tomcat/:/usr/local/tomcat/logs/ #to save logs inside host directory of tomcat/logs/
-    env_file:
-      - tomcat.env
+#   tomcat:
+#     image: reactome-tomcat
+#     container_name: tomcat-server
+#     build:
+#       context: ./tomcat
+#       dockerfile: tomcat.dockerfile
+#     depends_on:
+#       - mysql-for-tomcat
+#       - wordpress-sites
+#       - neo4j-db
+#     links:
+#       - mysql-for-tomcat
+#       - wordpress-sites
+#       - neo4j-db
+#     entrypoint: bash -c "/wait-for.sh mysql-for-tomcat:3306 -t 360 ; /wait-for.sh wordpress-sites:80 -t 360 ; /wait-for.sh neo4j-db:7687 -t 360 ; catalina.sh run"
+#     volumes:
+#       - ./tomcat/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
+#       - ./tomcat/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war
+#       - ./tomcat/webapps/analysis-service.war:/usr/local/tomcat/webapps/analysis-service.war
+#       - ./java-application-builder/downloads/analysis.bin:/analysis.bin
+#       # - ./tomcat/webapps/ContentService.war:/usr/local/tomcat/webapps/ContentService.war
+#       - ./fireworks:/usr/local/tomcat/webapps/download/current/fireworks
+#       - ./diagram:/usr/local/tomcat/webapps/download/current/diagram
+#       - ./wait-for.sh:/wait-for.sh
+#       - ./tomcat/rewrite.config:/usr/local/tomcat/conf/Catalina/localhost/rewrite.config
+#       - ./tomcat/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
+#       - ./tomcat/tomcat-server.xml:/usr/local/tomcat/conf/server.xml
+#       - ./tomcat/tomcat-manager.xml:/usr/local/tomcat/conf/Catalina/localhost/manager.xml
+#       - ./tomcat/analysis-service/results:/usr/local/AnalysisService/analysis-results
+#       - ./tomcat/analysis-service/reports:/usr/local/AnalysisService/analysis-reports
+#       - ./logs/applications/AnalysisService:/usr/local/AnalysisService/log
+#       - ./logs/tomcat/:/usr/local/tomcat/logs/ #to save logs inside host directory of tomcat/logs/
+#     env_file:
+#       - tomcat.env
+#     ports:
+#       - 8082:8080
+
+# #   # apache-server:
+# #   #   image: httpd:2.4
+# #   #   container_name: apache-server
+# #   #   volumes:
+# #   #     - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
+# #   #     - ./release/scripts/:/usr/local/bin/perl/scripts
+
+  solr:
+    image: solr
     ports:
-      - 8082:8080
-
-#   # apache-server:
-#   #   image: httpd:2.4
-#   #   container_name: apache-server
-#   #   volumes:
-#   #     - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
-#   #     - ./release/scripts/:/usr/local/bin/perl/scripts
-
-  neo4j-db:
-    image: neo4j
-    container_name: neo4j-db
-    environment:
-     - EXTENSION_SCRIPT=/data/neo4j-init.sh
+     - "8983:8983"
     volumes:
-      - ./neo4j/data:/var/lib/neo4j/data/databases
-      - ./neo4j/neo4j-init.sh:/data/neo4j-init.sh
-      - ./neo4j/conf/:/var/lib/neo4j/conf/
-    ports:
-      - 7474:7474
-      - 7687:7687
+      - ./solr/data:/opt/solr/server/solr/mycores
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr-precreate
+      - mycore
 
-  mysql-for-tomcat:
-    image: mysql
-    container_name: mysql-for-tomcat
-    env_file:
-      - tomcat.env
-    volumes:
-      - ./mysql/tomcat_data/:/docker-entrypoint-initdb.d
+#   neo4j-db:
+#     image: neo4j
+#     container_name: neo4j-db
+#     environment:
+#      - EXTENSION_SCRIPT=/data/neo4j-init.sh
+#     volumes:
+#       - ./neo4j/data:/var/lib/neo4j/data/databases
+#       - ./neo4j/neo4j-init.sh:/data/neo4j-init.sh
+#       - ./neo4j/conf/:/var/lib/neo4j/conf/
+#     ports:
+#       - 7474:7474
+#       - 7687:7687
 
-  mysql-database:
-    image: mysql
-    container_name: mysql-database
-    volumes:
-      - ./mysql/wordpress_data/:/docker-entrypoint-initdb.d
-    env_file:
-      - .env
+#   mysql-for-tomcat:
+#     image: mysql
+#     container_name: mysql-for-tomcat
+#     env_file:
+#       - tomcat.env
+#     volumes:
+#       - ./mysql/tomcat_data/:/docker-entrypoint-initdb.d
+
+#   mysql-database:
+#     image: mysql
+#     container_name: mysql-database
+#     volumes:
+#       - ./mysql/wordpress_data/:/docker-entrypoint-initdb.d
+#     env_file:
+#       - .env
 
 
-  wordpress-sites:
-    image: wordpress:with-netcat
-    build:
-      context: ./wordpress
-      dockerfile: wordpress.dockerfile
-    container_name: wordpress-sites
-    links:
-      - mysql-database
-    depends_on:
-      - mysql-database
-    env_file:
-      - .env
-    ports:
-      - 8080:80
-    entrypoint: /wait-for.sh mysql-database:3306 -t 90 -- /usr/local/bin/docker-entrypoint.sh apache2-foreground
-    volumes:
-      - ./wordpress/wait-for.sh:/wait-for.sh
-      - ./wordpress/htaccess:/var/www/html/.htaccess
-      - ./wordpress/header.php:/var/www/html/header.php
-      - ./wordpress/footer.php:/var/www/html/footer.php
-      - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
-      - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wordpress/wp-content/plugins
+#   wordpress-sites:
+#     image: wordpress:with-netcat
+#     build:
+#       context: ./wordpress
+#       dockerfile: wordpress.dockerfile
+#     container_name: wordpress-sites
+#     links:
+#       - mysql-database
+#     depends_on:
+#       - mysql-database
+#     env_file:
+#       - .env
+#     ports:
+#       - 8080:80
+#     entrypoint: /wait-for.sh mysql-database:3306 -t 90 -- /usr/local/bin/docker-entrypoint.sh apache2-foreground
+#     volumes:
+#       - ./wordpress/wait-for.sh:/wait-for.sh
+#       - ./wordpress/htaccess:/var/www/html/.htaccess
+#       - ./wordpress/header.php:/var/www/html/header.php
+#       - ./wordpress/footer.php:/var/www/html/footer.php
+#       - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
+#       - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wordpress/wp-content/plugins
