@@ -22,6 +22,24 @@ RUN git clone https://github.com/reactome/content-service.git
 WORKDIR /gitroot/content-service
 RUN git checkout $CONTENT_SERVICE_VERSION
 
+ENV DATA_CONTENT_VERSION=master
+WORKDIR /gitroot/
+RUN git clone https://github.com/reactome/data-content.git
+WORKDIR /gitroot/data-content
+RUN git checkout $DATA_CONTENT_VERSION
+
+# search-core library is needed by data-content, but the *correct version*
+# doesn't seem to be in any online repos.
+# The repo:
+# http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-repo/org/reactome/server/search/search-core/
+# only has version 1.0.0.
+ENV SEARCH_CORE_VERSION=master
+WORKDIR /gitroot/
+RUN git clone https://github.com/reactome/search-core.git
+WORKDIR /gitroot/search-core
+RUN git checkout $SEARCH_CORE_VERSION
+
+
 # Build the AnalysisService application
 ENV ANALYSIS_SERVICE_VERSION=master
 WORKDIR /gitroot/
