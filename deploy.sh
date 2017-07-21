@@ -45,8 +45,10 @@ if [ $? -eq 0 ]; then
     echo "Remote Size: " $remote_file_size
     echo "Local Size:  " $local_file_size
 
-    if [[ $local_file_size -eq $remote_file_size && $remote_file_size -ne 0 ]]; then
+    if [[ $local_file_size -eq $remote_file_size ]]; then
         echo "Database up to date. Update not required"
+    elif [[ $remote_file_size -eq 0 ]]; then
+        echo "Remote file not acccessible. Not updating!"
     else
       echo "Database needs to be updated!"
       echo "Removing old file if it exists!"
