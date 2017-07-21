@@ -37,7 +37,7 @@ do
   local_file_size=$(stat -c %s -- $file_path)
   echo "==========================================================================="
   echo "==========================================================================="
-  echo "Filename: " $file_name
+  echo "Filename:    " $file_name
   echo "Remote Size: " $remote_file_size
   echo "Local Size:  " $local_file_size
 
@@ -46,39 +46,19 @@ do
   else
     echo "Database needs to be updated!"
     echo "Removing old file if it exists!"
-    rm filethatdoesntexist 2> /dev/null # 2> /dev/null is to ignore error if file not found
+    rm $file_path 2> /dev/null # 2> /dev/null is to ignore error if file not found
     echo "Downloading newer version"
-    # To resume partially completed download, use --continue flag and comment out "rm filethatdoesntexist 2> /dev/null"
+    # To resume partially completed download, use --continue flag and comment out "rm $file_path 2> /dev/null"
     wget -O $file_path $URL
   fi
   echo
   echo
 done
 
-echo "-----------------------Script Under development-----------------------------"
-exit
-
-
-echo "Initialting downloads..."
-# wget --timestamping --directory-prefix=mysql/tomcat_data $URL_tomcat_db
-# wget --timestamping --directory-prefix=mysql/wordpress_data $URL_wordpress_db
-# wget --timestamping --directory-prefix=neo4j/data $URL_neo4j_db
-
-remote_file_size=$(curl -sI $URL_tomcat_db | grep -i content-length | awk '{print $2}')
-local_file_size=$(ls -l ./mysql/tomcat_data/gk_current.sql.gz | awk '{print $5}')
-echo $remote_file_size
-echo $local_file_size
-echo "----------------------------------------------------------------------------"
-if [[ "$local_file_size"=="$remote_file_size" ]]; then
-    echo "Database up to date. Update not required"
-else
-    echo "Database needs to be updated!"
-    wget --continue --directory-prefix=mysql/tomcat_data $URL_tomcat_db
-fi
-
-read -p "Build webapps? Press y/n" -n 1 -r
+read -p "Build webapps? Press [y/n]" -n 1 -r
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
+  echo
   echo "==========================================================================="
   echo "                   Building webapps using reactome-app-builder"
   echo "==========================================================================="
