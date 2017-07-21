@@ -38,19 +38,6 @@ services:
     ports:
       - 8082:8080
 
-  # apache-server:
-  #   image: httpd:2.4
-  #     container_name: apache-server
-  #     volumes:
-  #       - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
-  #       - ./release/scripts/:/usr/local/bin/perl/scripts
-
-  # perl:
-  #   build:
-  #     context: ./perl
-  #     dockerfile: dockerfile
-  #   container_name: perl-components
-
   neo4j-db:
     image: neo4j
     container_name: neo4j-db
@@ -84,7 +71,8 @@ services:
 
 
   wordpress-sites:
-    image: wordpress:with-netcat
+    hostname: wordpress-sites
+    image: wordpress:4.8.0_for_reactome
     build:
       context: ./wordpress
       dockerfile: wordpress.dockerfile
@@ -104,11 +92,11 @@ services:
       - ./wordpress/000-default.conf:/etc/apache2/sites-enabled/000-default.conf
       - ./wordpress/header.php:/var/www/html/header.php
       - ./wordpress/footer.php:/var/www/html/footer.php
+      - ./wordpress/Secrets.pm:/usr/local/gkb/modules/GKB/Secrets.pm
+      - ./wordpress/cgi.load:/etc/apache2/mods-enabled/cgi.load
       - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
       - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wordpress/wp-content/plugins
       - ./release/website/cgi-bin:/usr/lib/cgi-bin
-      - ./release/modules/GKB:/usr/local/gkb/modules/GKB
-      - ./wordpress/Secrets.pm:/usr/local/gkb/modules/GKB/Secrets.pm
-      - ./toc_files:/usr/local/gkb/website/html/img-fp/gk_current/
-      - ./wordpress/cgi.load:/etc/apache2/mods-enabled/cgi.load
       - ./release/website/html/instructionlibrary.xml:/usr/local/gkb/website/html/instructionlibrary.xml
+      - ./release/modules/GKB:/usr/local/gkb/modules/GKB
+      - ./toc_files:/usr/local/gkb/website/html/img-fp/gk_current/:rw

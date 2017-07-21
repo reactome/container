@@ -1,4 +1,4 @@
-FROM wordpress
+FROM wordpress:4.8.0
 RUN apt-get update && apt-get install -y \
     netcat cpanminus wget \
     liblog-log4perl-perl libdbi-perl  libwww-search-perl \
@@ -7,6 +7,6 @@ RUN apt-get update && apt-get install -y \
     liburi-encode-perl libdbd-mysql-perl
 RUN rm -rf /var/lib/apt/lists/*
 RUN apt-get autoremove
-RUN  cpanm Bio::Perl --notest
+RUN cpanm Bio::Perl --notest
 RUN ln -s /usr/local/gkb/modules/ /usr/modules
 RUN ln -s /usr/bin/perl /usr/local/bin/perl
