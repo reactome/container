@@ -1,1 +1,9 @@
+webapps/*
+mysql/tomcat_data/*.gz
+logs/*
+fireworks/*
+diagram/*
+tomcat/analysis-service
+java-application-builder/downloads/*
+neo4j/data/*
 .fuse*
