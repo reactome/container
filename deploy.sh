@@ -14,6 +14,7 @@ echo "->java-application-builder/downloads/analysis_v61.bin.gz"
 echo "->java-application-builder/downloads/interactors.db.gz"
 echo "---------------------------------------------------------------------------"
 
+# The first value in the list is the filepath in host directory and second value is the download link
 declare -A file_list
 file_list+=( ["mysql/tomcat_data/gk_current.sql.gz"]="http://www.reactome.org/download/current/databases/gk_current.sql.gz" ) # tomcat_data
 file_list+=( ["neo4j/data/reactome.graphdb.tgz"]="http://reactome.org/download/current/reactome.graphdb.tgz" ) # neo4j data
@@ -21,34 +22,37 @@ file_list+=( ["solr/data/solr_data.tgz"]="https://reactome.org/download/current/
 file_list+=( ["java-application-builder/downloads/analysis_v61.bin.gz"]="https://reactome.org/download/current/analysis_v61.bin.gz" ) # Analysis.bin for analysis service
 file_list+=( ["java-application-builder/downloads/interactors.db.gz"]="https://reactome.org/download/current/interactors.db.gz" ) # interactors.db required to create analysis.bin
 file_list+=( ["java-application-builder/downloads/diagrams_and_fireworks.tgz"]="https://reactome.org/download/current/diagrams_and_fireworks.tgz" )
-file_list+=( ["mysql/wordpress_data/reactome-wordpress.sql.gz"]="http://www.reactome.org/download/current/databases/gk_wordpress.sql.gz")
+# file_list+=( ["mysql/wordpress_data/reactome-wordpress.sql.gz"]="http://www.reactome.org/download/current/databases/gk_wordpress.sql.gz")
 
 for db_file in "${!file_list[@]}";
 do
+  # Initialization before prepairing download
   URL=${file_list[${db_file}]}
-  file_location=${db_file}
-  echo "==========================================================================="
-  echo "==========================================================================="
-  # mkdir -p $file_location
+  file_path=${db_file}
+  file_name=$(basename $file_path)
+  mkdir -p $(dirname $file_path)
+
+  # Get size information
   remote_file_size=$(curl -sI $URL | tr -d '\r' | grep -i content-length | awk '{print $2}')
-  local_file_size=$(stat -c %s -- $file_location)
+  local_file_size=$(stat -c %s -- $file_path)
+  echo "==========================================================================="
+  echo "==========================================================================="
+  echo "Filename: " $file_name
+  echo "Remote Size: " $remote_file_size
+  echo "Local Size:  " $local_file_size
+
   if [[ $local_file_size -eq $remote_file_size ]]; then
       echo "Database up to date. Update not required"
   else
-      echo "Database needs to be updated! Downloading newer version"
-      wget --continue -O $file_location $URL
+    echo "Database needs to be updated!"
+    echo "Removing old file if it exists!"
+    rm filethatdoesntexist 2> /dev/null # 2> /dev/null is to ignore error if file not found
+    echo "Downloading newer version"
+    # To resume partially completed download, use --continue flag and comment out "rm filethatdoesntexist 2> /dev/null"
+    wget -O $file_path $URL
   fi
   echo
-  echo $URL "=" $remote_file_size
-  echo $file_location "=" $local_file_size
   echo
-  # if [[  == "ready" ]];
-  # then
-  #   echo ${app} " ready! Skippinig ahead"
-  # else
-  #   echo "Developing " ${app} "In phase=" ${app_list[${app}]}
-  #   ${app}
-  # fi
 done
 
 echo "-----------------------Script Under development-----------------------------"
