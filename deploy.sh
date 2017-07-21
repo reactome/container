@@ -1,19 +1,59 @@
 #!/bin/bash
 echo -e "\n\n"
 echo "==========================================================================="
-echo "                        Collecting databases"
+echo "                           Verifying databases"
 echo "==========================================================================="
 echo "Details of databases to be collected are:"
-echo "In mysql-------------------------------------------------------------------"
-echo "->mysql/tomcat_data/gk_current.sql.gz"
+echo "---------------------------------------------------------------------------"
+# wordpress_data is a smaller database and its modified version is available in the repo itself.
 echo "->mysql/wordpress_data/reactome-wordpress.sql.gz"
-echo
-echo "In neo4j-------------------------------------------------------------------"
+echo "->mysql/tomcat_data/gk_current.sql.gz"
 echo "->neo4j/data/reactome.graphdb.tgz"
-# cd ./mysql/
-URL_tomcat_db=http://www.reactome.org/download/current/databases/gk_current.sql.gz
-URL_wordpress_db=http://www.reactome.org/download/current/databases/gk_wordpress.sql.gz
-URL_neo4j_db=http://reactome.org/download/current/reactome.graphdb.tgz
+echo "->solr/data/solr_data.tgz"
+echo "->java-application-builder/downloads/analysis_v61.bin.gz"
+echo "->java-application-builder/downloads/interactors.db.gz"
+echo "---------------------------------------------------------------------------"
+
+declare -A file_list
+file_list+=( ["mysql/tomcat_data/gk_current.sql.gz"]="http://www.reactome.org/download/current/databases/gk_current.sql.gz" ) # tomcat_data
+file_list+=( ["neo4j/data/reactome.graphdb.tgz"]="http://reactome.org/download/current/reactome.graphdb.tgz" ) # neo4j data
+file_list+=( ["solr/data/solr_data.tgz"]="https://reactome.org/download/current/solr_data.tgz" ) # solr data
+file_list+=( ["java-application-builder/downloads/analysis_v61.bin.gz"]="https://reactome.org/download/current/analysis_v61.bin.gz" ) # Analysis.bin for analysis service
+file_list+=( ["java-application-builder/downloads/interactors.db.gz"]="https://reactome.org/download/current/interactors.db.gz" ) # interactors.db required to create analysis.bin
+file_list+=( ["java-application-builder/downloads/diagrams_and_fireworks.tgz"]="https://reactome.org/download/current/diagrams_and_fireworks.tgz" )
+file_list+=( ["mysql/wordpress_data/reactome-wordpress.sql.gz"]="http://www.reactome.org/download/current/databases/gk_wordpress.sql.gz")
+
+for db_file in "${!file_list[@]}";
+do
+  URL=${file_list[${db_file}]}
+  file_location=${db_file}
+  echo "==========================================================================="
+  echo "==========================================================================="
+  # mkdir -p $file_location
+  remote_file_size=$(curl -sI $URL | tr -d '\r' | grep -i content-length | awk '{print $2}')
+  local_file_size=$(stat -c %s -- $file_location)
+  if [[ $local_file_size -eq $remote_file_size ]]; then
+      echo "Database up to date. Update not required"
+  else
+      echo "Database needs to be updated! Downloading newer version"
+      wget --continue -O $file_location $URL
+  fi
+  echo
+  echo $URL "=" $remote_file_size
+  echo $file_location "=" $local_file_size
+  echo
+  # if [[  == "ready" ]];
+  # then
+  #   echo ${app} " ready! Skippinig ahead"
+  # else
+  #   echo "Developing " ${app} "In phase=" ${app_list[${app}]}
+  #   ${app}
+  # fi
+done
+
+echo "-----------------------Script Under development-----------------------------"
+exit
+
 
 echo "Initialting downloads..."
 # wget --timestamping --directory-prefix=mysql/tomcat_data $URL_tomcat_db
@@ -31,8 +71,6 @@ else
     echo "Database needs to be updated!"
     wget --continue --directory-prefix=mysql/tomcat_data $URL_tomcat_db
 fi
-echo "-----------------------Script Under development-----------------------------"
-exit
 
 read -p "Build webapps? Press y/n" -n 1 -r
 if [[ $REPLY =~ ^[Yy]$ ]]
