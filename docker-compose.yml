@@ -51,7 +51,8 @@ services:
     ports:
       - "8983:8983"
     volumes:
-      - ./solr/data:/opt/solr/server/solr/mycores
+      - ./solr/data/solr_data:/opt/solr/server/solr/mycores
+      - ./solr/solrconfig.xml:/opt/solr/server/solr/mycores/reactome/conf/solrconfig.xml
     entrypoint:
       - docker-entrypoint.sh
       - solr-precreate
