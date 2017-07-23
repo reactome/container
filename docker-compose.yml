@@ -22,8 +22,8 @@ services:
       - ./tomcat/webapps/analysis-service.war:/usr/local/tomcat/webapps/analysis-service.war
       - ./java-application-builder/downloads/analysis.bin:/analysis.bin
       # - ./tomcat/webapps/ContentService.war:/usr/local/tomcat/webapps/ContentService.war
-      - ./fireworks:/usr/local/tomcat/webapps/download/current/fireworks
-      - ./diagram:/usr/local/tomcat/webapps/download/current/diagram
+      - ./java-application-builder/downloads/diagrams_and_fireworks/fireworks:/usr/local/tomcat/webapps/download/current/fireworks
+      - ./java-application-builder/downloads/diagrams_and_fireworks/diagram:/usr/local/tomcat/webapps/download/current/diagram
       - ./wait-for.sh:/wait-for.sh
       - ./tomcat/rewrite.config:/usr/local/tomcat/conf/Catalina/localhost/rewrite.config
       - ./tomcat/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
