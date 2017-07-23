@@ -1,0 +1,746 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config>
+    <luceneMatchVersion>4.7</luceneMatchVersion>
+
+    <lib dir="../../../contrib/extraction/lib" regex=".*\.jar"/>
+    <lib dir="../../../dist/" regex="solr-cell-\d.*\.jar"/>
+    <lib dir="../../../contrib/clustering/lib/" regex=".*\.jar"/>
+    <lib dir="../../../dist/" regex="solr-clustering-\d.*\.jar"/>
+    <lib dir="../../../contrib/langid/lib/" regex=".*\.jar"/>
+    <lib dir="../../../dist/" regex="solr-langid-\d.*\.jar"/>
+    <lib dir="../../../contrib/velocity/lib" regex=".*\.jar"/>
+    <lib dir="../../../dist/" regex="solr-velocity-\d.*\.jar"/>
+
+    <dataDir>${solr.data.dir:}</dataDir>
+
+    <directoryFactory name="DirectoryFactory" class="${solr.directoryFactory:solr.NRTCachingDirectoryFactory}"/>
+
+    <codecFactory class="solr.SchemaCodecFactory"/>
+
+    <schemaFactory class="ClassicIndexSchemaFactory"/>
+
+    <indexConfig>
+        <!-- ramBufferSizeMB sets the amount of RAM that may be used by Lucene
+             indexing for buffering added documents and deletions before they are
+             flushed to the Directory.
+             maxBufferedDocs sets a limit on the number of documents buffered
+             before flushing.
+             If both ramBufferSizeMB and maxBufferedDocs is set, then
+             Lucene will flush based on whichever limit is hit first.
+             The default is 100 MB.  -->
+        <ramBufferSizeMB>128</ramBufferSizeMB>
+        <!-- Merge Factor
+             The merge factor controls how many segments will get merged at a time.
+             For TieredMergePolicy, mergeFactor is a convenience parameter which
+             will set both MaxMergeAtOnce and SegmentsPerTier at once.
+             For LogByteSizeMergePolicy, mergeFactor decides how many new segments
+             will be allowed before they are merged into one.
+             Default is 10 for both merge policies.
+          -->
+
+        <mergeFactor>2</mergeFactor>
+
+
+        <lockType>${solr.lock.type:native}</lockType>
+        <infoStream>true</infoStream>
+    </indexConfig>
+
+    <!-- The default high-performance update handler -->
+    <updateHandler class="solr.DirectUpdateHandler2">
+        <updateLog>
+            <str name="dir">${solr.ulog.dir:}</str>
+        </updateLog>
+        <autoCommit>
+            <maxTime>-1</maxTime>
+            <openSearcher>false</openSearcher>
+        </autoCommit>
+        <autoSoftCommit>
+            <maxTime>-1</maxTime>
+            <openSearcher>false</openSearcher>
+        </autoSoftCommit>
+    </updateHandler>
+
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         Query section - these settings control query time things like caches
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
+    <query>
+        <maxBooleanClauses>1024</maxBooleanClauses>
+        <filterCache class="solr.FastLRUCache"
+                     size="512"
+                     initialSize="512"
+                     autowarmCount="0"/>
+        <queryResultCache class="solr.LRUCache"
+                          size="512"
+                          initialSize="512"
+                          autowarmCount="0"/>
+        <documentCache class="solr.LRUCache"
+                       size="512"
+                       initialSize="512"
+                       autowarmCount="0"/>
+
+        <!--
+                        <filterCache
+                              class="solr.FastLRUCache"
+                              size="64"
+                              initialSize="64"
+                              autowarmCount="4"
+                              cleanupThread="true"
+                            />
+
+                        <queryResultCache
+                              class="solr.FastLRUCache"
+                              size="512"
+                              initialSize="512"
+                              autowarmCount="8"
+                              cleanupThread="true"
+                            />
+
+                        <documentCache
+                              class="solr.FastLRUCache"
+                              size="16384"
+                              initialSize="4096"
+                              cleanupThread="true"
+                            />  -->
+
+        <cache name="perSegFilter"
+               class="solr.search.LRUCache"
+               size="10"
+               initialSize="0"
+               autowarmCount="10"
+               regenerator="solr.NoOpRegenerator"/>
+        <enableLazyFieldLoading>true</enableLazyFieldLoading>
+        <queryResultWindowSize>100</queryResultWindowSize>
+        <queryResultMaxDocsCached>200</queryResultMaxDocsCached>
+
+        <!-- Query Related Event Listeners
+
+             Various IndexSearcher related events can trigger Listeners to
+             take actions.
+
+             newSearcher - fired whenever a new searcher is being prepared
+             and there is a current searcher handling requests (aka
+             registered).  It can be used to prime certain caches to
+             prevent long request times for certain requests.
+
+             firstSearcher - fired whenever a new searcher is being
+             prepared but there is no current registered searcher to handle
+             requests or to gain autowarming data from.
+
+
+          -->
+        <listener event="newSearcher" class="solr.QuerySenderListener">
+            <arr name="queries">
+            </arr>
+        </listener>
+        <listener event="firstSearcher" class="solr.QuerySenderListener">
+            <arr name="queries">
+                <lst>
+                    <str name="q">static firstSearcher warming in solrconfig.xml</str>
+                </lst>
+            </arr>
+        </listener>
+        <useColdSearcher>false</useColdSearcher>
+        <maxWarmingSearchers>2</maxWarmingSearchers>
+    </query>
+
+    <requestDispatcher handleSelect="false">
+        <requestParsers enableRemoteStreaming="true"
+                        multipartUploadLimitInKB="2048000"
+                        formdataUploadLimitInKB="2048"
+                        addHttpRequestToContext="false"/>
+        <httpCaching never304="true"/>
+    </requestDispatcher>
+
+    <requestHandler name="/select" class="solr.SearchHandler">
+        <lst name="defaults">
+            <str name="echoParams">explicit</str>
+            <int name="rows">10</int>
+            <str name="df">name</str>
+        </lst>
+    </requestHandler>
+
+    <!--This request handler will provide general faceting information, it is supposed to be used with a *:* query -->
+    <!--and will return the absolute numbers of entries within the different facets-->
+    <requestHandler name="/facetall" class="solr.SearchHandler">
+        <lst name="defaults">
+            <str name="echoParams">explicit</str>
+            <int name="start">0</int>
+            <!--no search results returned because we are only interested in faceting information-->
+            <int name="rows">0</int>
+            <!--no search results returned because we are only interested in faceting information-->
+            <str name="facet">on</str>
+            <!-- activates Faceting-->
+            <str name="facet.mincount">1</str>
+            <!--minimum count of a facet field to be returned (eliminates null values)-->
+            <str name="facet.field">species_facet</str>
+            <!--fields selected for faceting-->
+            <str name="facet.field">type_facet</str>
+            <!--fields selected for faceting-->
+            <str name="facet.field">compartment_facet</str>
+            <!--fields selected for faceting-->
+            <str name="facet.field">keywords_facet</str>
+            <!--fields selected for faceting-->
+        </lst>
+    </requestHandler>
+
+    <!--This request handler will provide faceting information on a specific query. It has the same parameters as the standard-->
+    <!--request handler used to query with addition to faceting and exception of spellchecking information and result grouping-->
+    <requestHandler name="/facet" class="solr.SearchHandler">
+        <lst name="defaults">
+            <str name="echoParams">explicit</str>
+            <str name="defType">edismax</str>
+            <int name="start">0</int>
+            <!--no search results returned because we are only interested in faceting information-->
+            <int name="rows">0</int>
+            <!--no search results returned because we are only interested in faceting information-->
+            <str name="mm">50%</str>
+            <!--minimum match (at least 50% of the query string has to be matched in order to be displayed)-->
+            <str name="q.alt">*:*</str>
+            <!--alternative query parameter-->
+            <str name="df">name</str>
+            <!-- default query field -->
+            <str name="tie">0.1</str>
+            <!-- tiebreaker if fields have the same exact score-->
+            <str name="bq">species:"Homo sapiens"^0.8</str>
+            <!-- boost query to ensure human entries rank higher than the corresponding computationally inferred entries-->
+            <str name="qf">  <!-- query fields: all fields to query in and their individual boosts-->
+                dbId^100.0
+                oldStId^100.0
+                stId^100.0
+                name_exact^2000000.0
+                name^2000000.0
+                keywords^0.1
+                species^1.0
+                relatedSpecies^1.0
+                type^1.0
+                synonyms^1.0
+                summation^0.1
+                literatureReferenceTitle^1.0
+                literatureReferenceAuthor^1.0
+                literatureReferencePubMedId^1.0
+                literatureReferenceIsbn^1.0
+                compartmentName^5.0
+                goBiologicalProcessName^1.0
+                goCellularComponentName^1.0
+                goMolecularFunctionName^1.0
+                compartmentAccession^5.0
+                goBiologicalProcessAccessions^1.0
+                goCellularComponentAccessions^1.0
+                goMolecularFunctionAccession^1.0
+                referenceName^100.0
+                referenceIdentifiers^100.0
+                referenceSynonyms^50
+                referenceOtherIdentifier^1.0
+		        referenceSecondaryIdentifier^20
+                referenceGeneNames^1.0
+                crossReferences^1.0
+                referenceCrossReferences^1.0
+                regulator^1.0
+                regulatedEntity^1.0
+                diseaseId^1.0
+                diseaseName^1.0
+                diseaseSynonyms^1.0
+            </str>
+            <str name="facet">on</str>
+            <!-- activates Faceting-->
+            <str name="facet.mincount">1</str>
+            <!--minimum count of a facet field to be returned (eliminates null values)-->
+            <str name="facet.field">{!ex=sf}species_facet</str>
+            <!--fields selected for faceting, {!ex=sf} excludes species filter when faceting for species-->
+            <str name="facet.field">{!ex=tf}type_facet</str>
+            <!--fields selected for faceting, {!ex=tf} excludes type filter when faceting for types-->
+            <str name="facet.field">{!ex=cf}compartment_facet</str>
+            <!--fields selected for faceting, {!ex=cf} excludes species compartment when faceting for compartments-->
+            <str name="facet.field">{!ex=kf}keywords_facet</str>
+            <!--fields selected for faceting, {!ex=kf} excludes keywords filter when faceting for keywords-->
+        </lst>
+    </requestHandler>
+
+    <!--This request handler will check whether there are results for a specific query. It has the same parameters as the standard-->
+    <!--request handler used to query before adding a "suggestion" in the "did you mean..." field -->
+    <requestHandler name="/exists" class="solr.SearchHandler">
+        <lst name="defaults">
+            <str name="echoParams">explicit</str>
+            <str name="defType">edismax</str>
+
+            <str name="mm">50%</str>
+            <str name="q.alt">*:*</str>
+            <str name="df">name</str>
+
+            <int name="start">0</int>
+            <!--no search results returned because we are only interested in faceting information-->
+            <int name="rows">0</int>
+            <!--no search results returned because we are only interested in faceting information-->
+            <str name="qf">  <!-- query fields: all fields to query in and their individual boosts-->
+                dbId^100.0
+                oldStId^100.0
+                stId^100.0
+                name_exact^2000000.0
+                name^2000000.0
+                keywords^0.1
+                species^1.0
+                relatedSpecies^1.0
+                type^1.0
+                synonyms^1.0
+                summation^0.1
+                literatureReferenceTitle^1.0
+                literatureReferenceAuthor^1.0
+                literatureReferencePubMedId^1.0
+                literatureReferenceIsbn^1.0
+                compartmentName^5.0
+                goBiologicalProcessName^1.0
+                goCellularComponentName^1.0
+                goMolecularFunctionName^1.0
+                compartmentAccession^5.0
+                goBiologicalProcessAccessions^1.0
+                goCellularComponentAccessions^1.0
+                goMolecularFunctionAccession^1.0
+                referenceName^100.0
+                referenceIdentifiers^100.0
+                referenceSynonyms^50
+                referenceOtherIdentifier^1.0
+		        referenceSecondaryIdentifier^20
+                referenceGeneNames^1.0
+                crossReferences^1.0
+                referenceCrossReferences^1.0
+                regulator^1.0
+                regulatedEntity^1.0
+                diseaseId^1.0
+                diseaseName^1.0
+                diseaseSynonyms^1.0
+            </str>
+        </lst>
+    </requestHandler>
+
+    <!--this request handler is used for searching without grouping the result-->
+    <requestHandler name="/search" class="solr.SearchHandler">
+
+        <lst name="defaults">
+            <str name="echoParams">explicit</str>
+            <str name="defType">edismax</str>
+
+            <!-- general Parameters -->
+            <str name="mm">50%</str>
+            <str name="q.alt">*:*</str>
+            <str name="df">name</str>
+
+            <!-- scoring parameters-->
+            <str name="tie">0.1</str>
+            <str name="bq">species_facet:"Homo sapiens"^0.8</str>
+
+            <str name="qf">  <!-- query fields: all fields to query in and their individual boosts-->
+                dbId^100.0
+                oldStId^100.0
+                stId^100.0
+                name_exact^2000000.0
+                name^2000000.0
+                keywords^0.1
+                species^1.0
+                relatedSpecies^1.0
+                type^1.0
+                synonyms^1.0
+                summation^0.1
+                literatureReferenceTitle^1.0
+                literatureReferenceAuthor^1.0
+                literatureReferencePubMedId^1.0
+                literatureReferenceIsbn^1.0
+                compartmentName^5.0
+                goBiologicalProcessName^1.0
+                goCellularComponentName^1.0
+                goMolecularFunctionName^1.0
+                compartmentAccession^5.0
+                goBiologicalProcessAccessions^1.0
+                goCellularComponentAccessions^1.0
+                goMolecularFunctionAccession^1.0
+                referenceName^100.0
+                referenceIdentifiers^100.0
+                referenceSynonyms^50
+                referenceOtherIdentifier^1.0
+		        referenceSecondaryIdentifier^20
+                referenceGeneNames^1.0
+                crossReferences^1.0
+                referenceCrossReferences^1.0
+                regulator^1.0
+                regulatedEntity^1.0
+                diseaseId^1.0
+                diseaseName^1.0
+                diseaseSynonyms^1.0
+            </str>
+
+            <!-- Highlighting -->
+            <str name="hl">true</str>
+            <!-- activates highlighting-->
+            <str name="hl.fl">name, summation, inferredSummation, referenceName, referenceIdentifiers, regulator,
+                regulatedEntity
+            </str>
+            <!-- fields that should be highlighted-->
+            <str name="hl.requireFieldMatch">true</str>
+            <!-- a field will only be highlighted if the query matched in this particular field-->
+            <str name="hl.preserveMulti">true</str>
+            <!-- Preserve order of values in a multiValued list. -->
+            <str name="hl.fragsize">0</str>
+            <!-- The size, in characters, of the snippets (aka fragments) created by the highlighter. In the original Highlighter, "0" indicates that the whole field value should be used with no fragmenting-->
+            <str name="hl.simple.pre">&lt;span class=&quot;highlighting&quot; &gt;</str>
+            <!--The text which appears before and after a highlighted term when using the simple formatter.-->
+            <str name="hl.simple.post">&lt;/span&gt;</str>
+            <!--The text which appears before and after a highlighted term when using the simple formatter.-->
+        </lst>
+    </requestHandler>
+
+    <!--this is the default search handler with highlighting and grouped results -->
+    <requestHandler name="/browse" class="solr.SearchHandler">
+
+        <lst name="defaults">
+            <str name="echoParams">explicit</str>
+            <str name="defType">edismax</str>
+
+            <!-- general Parameters -->
+            <str name="mm">50%</str>
+            <str name="q.alt">*:*</str>
+            <str name="df">name</str>
+
+            <!-- scoring parameters-->
+            <str name="tie">0.1</str>
+            <str name="bq">species_facet:"Homo sapiens"^0.8</str>
+
+            <str name="qf">  <!-- query fields: all fields to query in and their individual boosts-->
+                dbId^100.0
+                oldStId^100.0
+                stId^100.0
+                name_exact^100.0
+                name^50.0
+                name_gram^1.0
+                name_stem^1.0
+                keywords^0.1
+                species^1.0
+                relatedSpecies^1.0
+                type^1.0
+                synonyms^1.0
+                summation^0.1
+                literatureReferenceTitle^1.0
+                literatureReferenceAuthor^1.0
+                literatureReferencePubMedId^1.0
+                literatureReferenceIsbn^1.0
+                compartmentName^5.0
+                goBiologicalProcessName^1.0
+                goCellularComponentName^1.0
+                goMolecularFunctionName^1.0
+                compartmentAccession^5.0
+                goBiologicalProcessAccessions^1.0
+                goCellularComponentAccessions^1.0
+                goMolecularFunctionAccession^1.0
+                referenceName^100.0
+                referenceIdentifiers^100.0
+                referenceSynonyms^50
+                referenceOtherIdentifier^1.0
+		        referenceSecondaryIdentifier^20
+                referenceGeneNames^1.0
+                crossReferences^1.0
+                referenceCrossReferences^1.0
+                regulator^1.0
+                regulatedEntity^1.0
+                diseaseId^1.0
+                diseaseName^1.0
+                diseaseSynonyms^1.0
+            </str>
+
+            <!-- Grouping -->
+            <str name="group">true</str>
+            <!-- activates result grouping-->
+            <str name="group.field">type_facet</str>
+            <!-- field on which values the grouping will be performed-->
+            <str name="group.facet">true</str>
+            <!-- returns faceting information additional to the grouped results-->
+            <str name="group.ngroups">true</str>
+            <!-- includes the number of groups that have matched the query in the response-->
+            <str name="group.limit">5</str>
+            <!-- 	Specifies the number of results to return for each group. this parameter is changed later on in the searcher-->
+
+            <!-- Highlighting -->
+            <str name="hl">true</str>
+            <str name="hl.fl">name, summation, inferredSummation, referenceName, referenceIdentifiers, regulator,
+                regulatedEntity
+            </str>
+            <str name="hl.requireFieldMatch">true</str>
+            <str name="hl.preserveMulti">true</str>
+            <str name="hl.fragsize">0</str>
+            <str name="hl.simple.pre">&lt;span class=&quot;highlighting&quot; &gt;</str>
+            <str name="hl.simple.post">&lt;/span&gt;</str>
+        </lst>
+    </requestHandler>
+
+    <!--this request handler is used to generate spellcheck suggestions if a the query did not provide any results-->
+    <requestHandler class="org.apache.solr.handler.component.SearchHandler" name="/spellcheck">
+        <lst name="defaults">
+            <str name="defType">dismax</str>
+            <str name="q.op">AND</str>
+            <str name="spellcheck.dictionary">default</str>
+            <!--The name of the spellchecker to use-->
+            <str name="spellcheck.dictionary">wordbreak</str>
+            <!--The name of the spellchecker to use-->
+            <str name="spellcheck">on</str>
+            <!--Activates spellcheck component-->
+            <str name="spellcheck.count">6</str>
+            <str name="spellcheck.collate">true</str>
+
+            <str name="spellcheck.collate">true</str>
+            <str name="spellcheck.maxCollations">6</str>
+            <str name="spellcheck.maxCollationTries">1000</str>
+            <str name="spellcheck.extendedResults">true</str>
+            <str name="spellcheck.collateParam.mm">100%</str>
+            <str name="spellcheck.collateParam.op">AND</str>
+            <str name="spellcheck.collateParam.q.op">AND</str>
+        </lst>
+        <arr name="components">
+            <str>spellcheck</str>
+        </arr>
+    </requestHandler>
+
+    <!--this request handler is used for generating autosuggest suggestions for a small snippet of the query-->
+    <requestHandler class="org.apache.solr.handler.component.SearchHandler" name="/suggest">
+        <lst name="defaults">
+            <str name="q.op">AND</str>
+            <str name="spellcheck.collateParam.q.op">AND</str>
+            <str name="spellcheck">true</str>
+            <!--Activates spellcheck component-->
+            <str name="spellcheck.dictionary">suggest</str>  <!--The name of the spellchecker to use-->
+            
+            <str name="spellcheck.onlyMorePopular">false</str>
+            <!--disable showing only more popular results-->
+            <str name="spellcheck.count">10</str>
+            <!-- maximum number of suggestions allowed-->
+            <str name="spellcheck.collate">true</str>
+            <!-- a spellchecker provides suggestions to each word, collate tries to construct a new query out of those suggestions-->
+            <str name="spellcheck.maxCollations">10</str>
+            <!-- maximum number of collations returned -->
+            <str name="spellcheck.collateMaxCollectDocs">100</str>
+            <str name="spellcheck.maxCollationTries">10</str>
+            <str name="spellcheck.maxResultsForSuggest">10</str>
+            <!-- The maximum number of results the query can return while still triggering spelling suggestions-->
+        </lst>
+        <arr name="components">
+            <str>suggest</str>
+        </arr>
+    </requestHandler>
+
+
+   <requestHandler name="/intactdetail" class="solr.SearchHandler">
+        <lst name="defaults">
+            <str name="echoParams">explicit</str>
+            <str name="defType">edismax</str>
+            <int name="start">0</int>
+            <int name="rows">1</int>
+            <str name="mm">100%</str>
+            <str name="df">dbId</str>
+            <str name="qf">dbId^1.0</str>
+            <str name="fq">exactType:Interactor</str>
+        </lst>
+    </requestHandler>
+
+    <!--this request handler is used for searching on FIRE -->
+    <requestHandler name="/fireworks" class="solr.SearchHandler">
+
+        <lst name="defaults">
+            <str name="echoParams">explicit</str>
+            <str name="defType">edismax</str>
+
+            <!-- general Parameters -->
+            <str name="mm">50%</str>
+            <str name="q.alt">*:*</str>
+            <str name="df">name</str>
+
+            <str name="qf">
+                dbId^100.0
+                oldStId^90.0
+                stId^80.0
+                name_exact^100.0
+                name^50.0
+                name_gram^1.0
+                name_stem^1.0
+                keywords^0.1
+                species^1.0
+                relatedSpecies^1.0
+                type^1.0
+                synonyms^1.0
+                goBiologicalProcessName^1.0
+                goCellularComponentName^1.0
+                goMolecularFunctionName^1.0
+                goBiologicalProcessAccessions^1.0
+                goCellularComponentAccessions^1.0
+                goMolecularFunctionAccession^1.0
+                referenceName^1.0
+                referenceIdentifiers^1.0
+                referenceSynonyms^710
+                referenceOtherIdentifier^510
+                referenceGeneNames^1.0
+                crossReferences^1.0
+                referenceCrossReferences^1.0
+                regulator^1.0
+                regulatedEntity^1.0
+                diseaseId^1.0
+                diseaseName^1.0
+                diseaseSynonyms^1.0
+            </str>
+
+            <!-- Highlighting -->
+            <str name="hl">true</str>
+            <!-- activates highlighting-->
+            <str name="hl.fl">name, referenceName, referenceIdentifiers, regulator, regulatedEntity</str>
+            <!-- fields that should be highlighted-->
+            <str name="hl.requireFieldMatch">true</str>
+            <!-- a field will only be highlighted if the query matched in this particular field-->
+            <str name="hl.preserveMulti">true</str>
+            <!-- Preserve order of values in a multiValued list. -->
+            <str name="hl.fragsize">0</str>
+            <!-- The size, in characters, of the snippets (aka fragments) created by the highlighter. In the original Highlighter, "0" indicates that the whole field value should be used with no fragmenting-->
+            <str name="hl.simple.pre">&lt;span class=&quot;highlighting&quot; &gt;</str>
+            <!--The text which appears before and after a highlighted term when using the simple formatter.-->
+            <str name="hl.simple.post">&lt;/span&gt;</str>
+            <!--The text which appears before and after a highlighted term when using the simple formatter.-->
+
+            <str name="facet">on</str>
+            <!-- activates Faceting-->
+            <str name="facet.mincount">1</str>
+            <!--minimum count of a facet field to be returned (eliminates null values)-->
+            <str name="facet.field">{!ex=tf}type_facet</str>
+            <!--fields selected for faceting, {!ex=tf} excludes type filter when faceting for types-->
+        </lst>
+    </requestHandler>
+
+    <requestHandler name="/update" class="solr.UpdateRequestHandler"></requestHandler>
+
+    <!-- Field Analysis Request Handler analyses the filed given in the query-->
+
+    <requestHandler name="/analysis/field"
+                    startup="lazy"
+                    class="solr.FieldAnalysisRequestHandler"/>
+
+
+    <!-- Document Analysis Handler analyses a single document -->
+
+    <requestHandler name="/analysis/document"
+                    class="solr.DocumentAnalysisRequestHandler"
+                    startup="lazy"/>
+
+    <!-- Admin Handlers - This will register all the standard admin RequestHandlers. -->
+    <!-- <requestHandler name="/admin/"
+                    class="solr.admin.AdminHandlers"/> -->
+
+    <!-- ping/healthcheck -->
+    <requestHandler name="/admin/ping" class="solr.PingRequestHandler">
+        <lst name="invariants">
+            <str name="q">solrpingquery</str>
+        </lst>
+        <lst name="defaults">
+            <str name="echoParams">all</str>
+        </lst>
+    </requestHandler>
+
+    <!-- Echo the request contents back to the client -->
+    <requestHandler name="/debug/dump" class="solr.DumpRequestHandler">
+        <lst name="defaults">
+            <str name="echoParams">explicit</str>
+            <str name="echoHandler">true</str>
+        </lst>
+    </requestHandler>
+
+    <!-- Solr Replication Index Replication distributes complete copies of a master index to one or more slave servers. The master 				server continues to 	  	manage updates to the index. All querying is handled by the slaves. This division of labor enables 
+			Solr to scale to provide 		 			adequate responsiveness to queries against large search volumes.-->
+
+    <requestHandler name="/replication" class="solr.ReplicationHandler"/>
+
+    <!-- Spell Check
+         The spell check component can return a list of alternative spelling
+         suggestions.
+      -->
+    <!-- A request handler for demonstrating the terms component -->
+    <requestHandler name="/terms" class="solr.SearchHandler" startup="lazy">
+        <lst name="defaults">
+            <bool name="terms">true</bool>
+            <bool name="distrib">false</bool>
+        </lst>
+        <arr name="components">
+            <str>terms</str>
+        </arr>
+    </requestHandler>
+
+    <!--search component for spellchecking-->
+    <searchComponent name="spellcheck" class="solr.SpellCheckComponent">
+
+        <str name="queryAnalyzerFieldType">text_general</str>
+
+        <!--standard spellchecker using the values in specific fields to build up a dictionary from them -->
+        <lst name="spellchecker">
+            <str name="name">default</str>
+            <!-- name of the spellcheck component-->
+            <str name="field">spellcheck</str>
+            <!--  field that the spellchecker applies to -->
+            <str name="classname">solr.DirectSolrSpellChecker</str>
+            <!-- the spellcheck distance measure used, the default is the internal levenshtein -->
+            <str name="distanceMeasure">internal</str>
+            <!-- minimum accuracy needed to be considered a valid spellcheck suggestion -->
+            <float name="accuracy">0.5</float>
+            <!-- the maximum #edits we consider when enumerating terms: can be 1 or 2 -->
+            <int name="maxEdits">2</int>
+            <!-- the minimum shared prefix when enumerating terms -->
+            <int name="minPrefix">1</int>
+            <!-- maximum number of inspections per result. -->
+            <int name="maxInspections">5</int>
+            <!-- minimum length of a query term to be considered for correction -->
+            <int name="minQueryLength">4</int>
+            <!-- maximum threshold of documents a query term can appear to be considered for correction -->
+            <float name="maxQueryFrequency">0.01</float>
+            <!-- uncomment this to require suggestions to occur in 1% of the documents
+                <float name="thresholdTokenFrequency">.01</float>
+            -->
+            <str name="buildOnCommit">true</str>
+            <!-- this spellcheck dictionary will be build upon optimization (his will take away workload from commiting and will improve index speed-->
+        </lst>
+
+        <!-- a spellchecker that can break or combine words.  See "/spell" handler below for usage -->
+        <lst name="spellchecker">
+            <str name="name">wordbreak</str>
+            <!-- name of the spellcheck component-->
+            <str name="classname">solr.WordBreakSolrSpellChecker</str>
+            <!-- this spellchecker is used for breaking or combining words-->
+            <str name="field">spellcheck</str>
+            <!--  field that the spellchecker applies to -->
+            <str name="combineWords">true</str>
+            <!-- allows to combine Words-->
+            <str name="breakWords">true</str>
+            <!-- allows to break Words-->
+            <int name="maxChanges">10</int>
+            <!-- maximum number of changes made to be matched-->
+            <str name="buildOnCommit">true</str>
+            <!-- not sure if this is the optimal way to do it-->
+        </lst>
+    </searchComponent>
+    <searchComponent name="terms" class="solr.TermsComponent"/>
+
+    <!--spellcheck component for autosuggestions, this spellchecker creates a dictionary using the values in specific fields-->
+    <searchComponent class="solr.SpellCheckComponent" name="suggest">
+        <lst name="spellchecker">
+            <str name="name">suggest</str>
+            <!-- name of the spellcheck component-->
+            <str name="classname">org.apache.solr.spelling.suggest.Suggester</str>
+            <!-- component -->
+            <str name="lookupImpl">org.apache.solr.spelling.suggest.fst.WFSTLookupFactory</str>
+            <!-- spellchecker implementation-->
+            <str name="field">spellcheck</str>
+            <!-- the indexed field to derive suggestions from -->
+            <float name="threshold">0</float>
+            <!-- threshold is a value in [0..1] representing the minimum fraction of documents (of the total) where a term should appear, in order to be added to the lookup dictionary.  Interesting question: difference between good results when looking for eg a singe letter or specific results
+            eg 0.05 = value must be in 5% of all entries to get into the dictionary
+            -->
+            <str name="buildOnCommit">true</str>
+            <!-- this spellcheck dictionary will be build upon optimization (his will take away workload from commiting and will improve index speed-->
+        </lst>
+    </searchComponent>
+
+    <admin>
+        <defaultQuery>*:*</defaultQuery>
+    </admin>
+
+</config>
