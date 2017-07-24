@@ -4,6 +4,7 @@
 	RewriteBase /
 	#RewriteRule ^index\.php$ - [L]
 	RewriteRule ^.*PathwayBrowser/(.*)$ http://localhost:8082/PathwayBrowser/$1 [R,L]
+	RewriteRule ^.*AnalysisService/(.*)$ http://localhost:8082/analysis-service/$1 [R,L]
 
 	RewriteRule ^.*common/header\.php$ /header.php [L]
 	RewriteRule ^.*common/footer\.php$ /footer.php [L]
