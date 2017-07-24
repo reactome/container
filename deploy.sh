@@ -75,6 +75,12 @@ if [[ ! -f solr/data/solr_data_extracted.flag ]]; then
   rm -rf solr/solr_data
   tar -xvzf solr/data/solr_data.tgz -C solr/data
   touch solr/data/solr_data_extracted.flag
+  chmod a+w solr/data/solr_data/reactome
+  chmod a+w solr/data/solr_data/reactome/data
+  chmod a+w solr/data/solr_data/reactome/data/index/write.lock
+  chmod a+w solr/data/solr_data/reactome/data/index
+  chmod a+w -R solr/data/solr_data/reactome/data/tlog
+
 else
   echo "solr_data already unpacked"
 fi

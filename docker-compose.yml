@@ -11,11 +11,12 @@ services:
       - mysql-for-tomcat
       - wordpress-sites
       - neo4j-db
+      - solr
     links:
       - mysql-for-tomcat
       - wordpress-sites
       - neo4j-db
-    entrypoint: bash -c "/wait-for.sh mysql-for-tomcat:3306 -t 360 ; /wait-for.sh wordpress-sites:80 -t 360 ; /wait-for.sh neo4j-db:7687 -t 360 ; catalina.sh run"
+    entrypoint: bash -c "/wait-for.sh neo4j-db:7687 -t 360 && /wait-for.sh solr-for-reactome:8983 -t 360 && /wait-for.sh mysql-for-tomcat:3306 -t 360 && /wait-for.sh wordpress-sites:80 -t 360 && catalina.sh run"
     volumes:
       - ./tomcat/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
       - ./tomcat/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war

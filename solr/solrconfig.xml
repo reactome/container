@@ -3,14 +3,14 @@
 <config>
     <luceneMatchVersion>4.7</luceneMatchVersion>
 
-    <lib dir="../../../contrib/extraction/lib" regex=".*\.jar"/>
-    <lib dir="../../../dist/" regex="solr-cell-\d.*\.jar"/>
-    <lib dir="../../../contrib/clustering/lib/" regex=".*\.jar"/>
-    <lib dir="../../../dist/" regex="solr-clustering-\d.*\.jar"/>
-    <lib dir="../../../contrib/langid/lib/" regex=".*\.jar"/>
-    <lib dir="../../../dist/" regex="solr-langid-\d.*\.jar"/>
-    <lib dir="../../../contrib/velocity/lib" regex=".*\.jar"/>
-    <lib dir="../../../dist/" regex="solr-velocity-\d.*\.jar"/>
+    <lib dir="/opt/solr/contrib/extraction/lib" regex=".*\.jar"/>
+    <lib dir="/opt/solr/dist/" regex="solr-cell-\d.*\.jar"/>
+    <lib dir="/opt/solr/contrib/clustering/lib/" regex=".*\.jar"/>
+    <lib dir="/opt/solr/dist/" regex="solr-clustering-\d.*\.jar"/>
+    <lib dir="/opt/solr/contrib/langid/lib/" regex=".*\.jar"/>
+    <lib dir="/opt/solr/dist/" regex="solr-langid-\d.*\.jar"/>
+    <lib dir="/opt/solr/contrib/velocity/lib" regex=".*\.jar"/>
+    <lib dir="/opt/solr/dist/" regex="solr-velocity-\d.*\.jar"/>
 
     <dataDir>${solr.data.dir:}</dataDir>
 
@@ -506,7 +506,7 @@
             <str name="spellcheck">true</str>
             <!--Activates spellcheck component-->
             <str name="spellcheck.dictionary">suggest</str>  <!--The name of the spellchecker to use-->
-            
+
             <str name="spellcheck.onlyMorePopular">false</str>
             <!--disable showing only more popular results-->
             <str name="spellcheck.count">10</str>
@@ -646,7 +646,7 @@
         </lst>
     </requestHandler>
 
-    <!-- Solr Replication Index Replication distributes complete copies of a master index to one or more slave servers. The master 				server continues to 	  	manage updates to the index. All querying is handled by the slaves. This division of labor enables 
+    <!-- Solr Replication Index Replication distributes complete copies of a master index to one or more slave servers. The master 				server continues to 	  	manage updates to the index. All querying is handled by the slaves. This division of labor enables
 			Solr to scale to provide 		 			adequate responsiveness to queries against large search volumes.-->
 
     <requestHandler name="/replication" class="solr.ReplicationHandler"/>
