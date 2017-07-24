@@ -117,3 +117,7 @@ services:
       - ./wordpress/cgi.load:/etc/apache2/mods-enabled/cgi.load
       - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
       - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wordpress/wp-content/plugins
+      - ./release/website/cgi-bin:/usr/lib/cgi-bin
+      - ./release/modules/GKB:/usr/local/gkb/modules/GKB
+      - ./release/website/html/instructionlibrary.xml:/usr/local/gkb/website/html/instructionlibrary.xml
+      - ./toc_files:/usr/local/gkb/website/html/img-fp/gk_current/
