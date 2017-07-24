@@ -80,6 +80,7 @@ if [[ ! -f solr/data/solr_data_extracted.flag ]]; then
   chmod a+w solr/data/solr_data/reactome/data/index/write.lock
   chmod a+w solr/data/solr_data/reactome/data/index
   chmod a+w -R solr/data/solr_data/reactome/data/tlog
+
 else
   echo "solr_data already unpacked"
 fi
