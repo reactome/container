@@ -32,7 +32,7 @@ wait_for() {
   for i in `seq $TIMEOUT` ; do
 
     if [ $(( $i % 30 )) -eq 0 ] ; then
-      echo "Waited $i seconds out of $TIMEOUT..."
+      echo "Waited $i seconds out of $TIMEOUT for $HOST:$PORT..."
     fi
 
     nc -z "$HOST" "$PORT" > /dev/null 2>&1
@@ -41,6 +41,7 @@ wait_for() {
       if [ -n "$command" ] ; then
         exec $command
       fi
+      echo "Got a response from $HOST:$PORT"
       exit 0
     fi
     sleep 1
