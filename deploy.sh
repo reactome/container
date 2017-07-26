@@ -1,4 +1,6 @@
 #!/bin/bash
+if [[ $1 == "-u" ]]; then
+  #statements
 echo -e "GET http://google.com HTTP/1.0\n\n" | nc google.com 80 > /dev/null 2>&1
 
 if [ $? -eq 0 ]; then
@@ -63,6 +65,7 @@ if [ $? -eq 0 ]; then
   done
 else
     echo "No internet access! Not verifying databases!"
+fi
 fi
 
 
