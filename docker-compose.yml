@@ -16,14 +16,14 @@ services:
       - mysql-for-tomcat
       - wordpress-sites
       - neo4j-db
-    entrypoint: bash -c "/wait-for.sh neo4j-db:7687 -t 360 && /wait-for.sh solr-for-reactome:8983 -t 360 && /wait-for.sh mysql-for-tomcat:3306 -t 360 && /wait-for.sh wordpress-sites:80 -t 360 && catalina.sh run"
+    entrypoint: bash -c "/wait-for.sh neo4j-db:7687 -t 360 && /wait-for.sh solr-for-reactome:8983 -t 360 && /wait-for.sh wordpress-sites:80 -t 360 && /wait-for.sh mysql-for-tomcat:3306 -t 360 && catalina.sh run"
     volumes:
-      - ./tomcat/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
-      - ./tomcat/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war
-      - ./tomcat/webapps/analysis-service.war:/usr/local/tomcat/webapps/analysis-service.war
-      - ./tomcat/webapps/interators.db:/interactors.db
+      # - ./tomcat/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
+      # - ./tomcat/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war
+      # - ./tomcat/webapps/analysis-service.war:/usr/local/tomcat/webapps/analysis-service.war
+      - ./tomcat/webapps/ContentService.war:/usr/local/tomcat/webapps/ContentService.war
+      - ./java-application-builder/downloads/interactors.db:/interactors.db
       - ./java-application-builder/downloads/analysis.bin:/analysis.bin
-      # - ./tomcat/webapps/ContentService.war:/usr/local/tomcat/webapps/ContentService.war
       - ./java-application-builder/downloads/diagrams_and_fireworks/fireworks:/usr/local/tomcat/webapps/download/current/fireworks
       - ./java-application-builder/downloads/diagrams_and_fireworks/diagram:/usr/local/tomcat/webapps/download/current/diagram
       - ./wait-for.sh:/wait-for.sh
