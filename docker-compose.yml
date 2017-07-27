@@ -22,8 +22,9 @@ services:
       # - ./tomcat/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war
       # - ./tomcat/webapps/analysis-service.war:/usr/local/tomcat/webapps/analysis-service.war
       - ./tomcat/webapps/ContentService.war:/usr/local/tomcat/webapps/ContentService.war
-      - ./java-application-builder/downloads/interactors.db:/interactors.db
-      - ./java-application-builder/downloads/analysis.bin:/analysis.bin
+      # - ./tomcat/webapps/ContentService.war:/usr/local/tomcat/webapps/content.war
+      - ./tomcat/webapps/interactors.db:/interactors.db
+      - ./tomcat/webapps/analysis.bin:/analysis.bin
       - ./java-application-builder/downloads/diagrams_and_fireworks/fireworks:/usr/local/tomcat/webapps/download/current/fireworks
       - ./java-application-builder/downloads/diagrams_and_fireworks/diagram:/usr/local/tomcat/webapps/download/current/diagram
       - ./wait-for.sh:/wait-for.sh
@@ -104,7 +105,7 @@ services:
       - .env
     ports:
       - 8080:80
-    entrypoint: /wait-for.sh mysql-database:3306 -t 90 -- /usr/local/bin/docker-entrypoint.sh apache2-foreground
+    entrypoint: /wait-for.sh mysql-database:3306 -t 120 -- /usr/local/bin/docker-entrypoint.sh apache2-foreground
     volumes:
       - ./wordpress/wait-for.sh:/wait-for.sh
       - ./wordpress/htaccess:/var/www/html/.htaccess

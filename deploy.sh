@@ -1,6 +1,8 @@
 #!/bin/bash
+
+# If you want to update databases then use "-u" flag 
+# ./deploy -u
 if [[ $1 == "-u" ]]; then
-  #statements
 echo -e "GET http://google.com HTTP/1.0\n\n" | nc google.com 80 > /dev/null 2>&1
 
 if [ $? -eq 0 ]; then
@@ -143,14 +145,16 @@ echo "Copying war files from java-application-builder/webapps to tomcat/webapps/
 echo "==========================================================================="
 echo "Files to be copied:"
 ls ./java-application-builder/webapps/
+echo "Deleting empty directories..."
+# rm 
 cp --verbose -u ./java-application-builder/webapps/*.war ./tomcat/webapps/
 # Don't forget: also need the analysis.bin file for AnalysisService!
-cp --verbose -u ./java-application-builder/webapps/analysis.bin ./tomcat/webapps/
-cp ./java-application-builder/downloads/interactors.db ./tomcat/webapps/
+cp --verbose -u ./java-application-builder/downloads/analysis*.bin ./tomcat/webapps/analysis.bin
+cp --verbose -u ./java-application-builder/downloads/interactors.db ./tomcat/webapps/
 
 echo -e "\n\n"
 echo "==========================================================================="
 echo "                        Starting docker containers"
 echo "==========================================================================="
 docker-compose up
-docker-compose down
+# docker-compose down
