@@ -4,6 +4,7 @@ services:
   tomcat:
     image: reactome-tomcat
     container_name: tomcat-server
+    hostname: tomcat-server
     build:
       context: ./tomcat
       dockerfile: tomcat.dockerfile
@@ -111,10 +112,12 @@ services:
       - ./wordpress/wait-for.sh:/wait-for.sh
       - ./wordpress/htaccess:/var/www/html/.htaccess
       - ./wordpress/000-default.conf:/etc/apache2/sites-enabled/000-default.conf
-      - ./wordpress/header.php:/var/www/html/header.php
-      - ./wordpress/footer.php:/var/www/html/footer.php
+      - ./wordpress/header.php:/var/www/html/common/header.php
+      - ./wordpress/footer.php:/var/www/html/common/footer.php
       - ./wordpress/Secrets.pm:/usr/local/gkb/modules/GKB/Secrets.pm
       - ./wordpress/cgi.load:/etc/apache2/mods-enabled/cgi.load
+      - ./wordpress/proxy.load:/etc/apache2/mods-enabled/proxy.load
+      - ./wordpress/proxy_http.load:/etc/apache2/mods-enabled/proxy_http.load
       - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
       - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wordpress/wp-content/plugins
       - ./release/website/cgi-bin:/usr/lib/cgi-bin
