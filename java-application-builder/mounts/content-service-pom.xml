@@ -20,7 +20,7 @@
 		    <id>ContentService-Local</id>
 		    <properties>
 		        <!-- Neo4j Configuration -->
-		        <neo4j.host>http://neo4j-db</neo4j.host>
+		        <neo4j.host>neo4j-db</neo4j.host>
 		        <neo4j.port>7474</neo4j.port>
 		        <neo4j.user>neo4j</neo4j.user>
 		        <neo4j.password>neo4j</neo4j.password>

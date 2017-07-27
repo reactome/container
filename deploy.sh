@@ -146,7 +146,7 @@ echo "==========================================================================
 echo "Files to be copied:"
 ls ./java-application-builder/webapps/
 echo "Deleting empty directories..."
-# rm 
+rm -rvf ./tomcat/webapps/*
 cp --verbose -u ./java-application-builder/webapps/*.war ./tomcat/webapps/
 # Don't forget: also need the analysis.bin file for AnalysisService!
 cp --verbose -u ./java-application-builder/downloads/analysis*.bin ./tomcat/webapps/analysis.bin
