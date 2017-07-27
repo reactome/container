@@ -144,6 +144,9 @@ cp --verbose -u ./java-application-builder/webapps/*.war ./tomcat/webapps/
 # Don't forget: also need the analysis.bin file for AnalysisService!
 cp --verbose -u ./java-application-builder/webapps/analysis.bin ./tomcat/webapps/
 
+# Ensure scripts are executable.
+chmod a+x ./release/website/cgi-bin/*
+
 echo -e "\n\n"
 echo "==========================================================================="
 echo "                        Starting docker containers"
