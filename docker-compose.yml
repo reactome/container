@@ -35,6 +35,7 @@ services:
       - ./tomcat/analysis-service/results:/usr/local/AnalysisService/analysis-results
       - ./tomcat/analysis-service/reports:/usr/local/AnalysisService/analysis-reports
       - ./logs/applications/AnalysisService:/usr/local/AnalysisService/log
+      - ./logs/applications/ContentService:/usr/local/search/log/content-service
       - ./logs/tomcat/:/usr/local/tomcat/logs/ #to save logs inside host directory of tomcat/logs/
     env_file:
       - tomcat.env
