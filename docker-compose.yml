@@ -57,6 +57,7 @@ services:
     volumes:
       - ./solr/data/solr_data:/opt/solr/server/solr/mycores
       - ./solr/solrconfig.xml:/opt/solr/server/solr/mycores/reactome/conf/solrconfig.xml
+      - ./logs/solr/:/opt/solr/server/logs/
     entrypoint:
       - docker-entrypoint.sh
       - solr-precreate
@@ -71,6 +72,7 @@ services:
       - ./neo4j/data:/var/lib/neo4j/data/databases
       - ./neo4j/neo4j-init.sh:/data/neo4j-init.sh
       - ./neo4j/conf/:/var/lib/neo4j/conf/
+      - ./logs/neo4j/:/var/lib/neo4j/logs/
     ports:
       - 7474:7474
       - 7687:7687
@@ -114,3 +116,4 @@ services:
       - ./wordpress/footer.php:/var/www/html/footer.php
       - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
       - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wordpress/wp-content/plugins
+      - ./logs/apache/:/var/log/apache2
