@@ -34,7 +34,7 @@
 		        <interactors.SQLite>/interactors.db</interactors.SQLite>
 
 		        <!-- Logging -->
-				<logging.dir>/usr/local/search/log</logging.dir>
+				<logging.dir>/usr/local/search/log/content-service</logging.dir>
 		        <logging.database>${logging.dir}/search.db</logging.database>
 
 		        <!-- Mail Configuration, using FakeSMTP -->
