@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# If you want to update databases then use "-u" flag 
+# If you want to update databases then use "-u" flag
 # ./deploy -u
 if [[ $1 == "-u" ]]; then
 echo -e "GET http://google.com HTTP/1.0\n\n" | nc google.com 80 > /dev/null 2>&1
@@ -85,6 +85,7 @@ if [[ ! -f solr/data/solr_data_extracted.flag ]]; then
   chmod a+w solr/data/solr_data/reactome/data/index/write.lock
   chmod a+w solr/data/solr_data/reactome/data/index
   chmod a+w -R solr/data/solr_data/reactome/data/tlog
+  mkdir -p logs/solr
   chmod a+w logs/solr
 
 else
