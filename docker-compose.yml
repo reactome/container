@@ -21,8 +21,11 @@ services:
       - ./tomcat/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
       - ./tomcat/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war
       - ./tomcat/webapps/analysis-service.war:/usr/local/tomcat/webapps/analysis-service.war
-      - ./java-application-builder/downloads/analysis.bin:/analysis.bin
-      # - ./tomcat/webapps/ContentService.war:/usr/local/tomcat/webapps/ContentService.war
+      - ./tomcat/webapps/ContentService.war:/usr/local/tomcat/webapps/ContentService.war
+      - ./tomcat/webapps/content.war:/usr/local/tomcat/webapps/content.war
+      # - ./tomcat/webapps/ContentService.war:/usr/local/tomcat/webapps/content.war
+      - ./tomcat/webapps/interactors.db:/interactors.db
+      - ./tomcat/webapps/analysis.bin:/analysis.bin
       - ./java-application-builder/downloads/diagrams_and_fireworks/fireworks:/usr/local/tomcat/webapps/download/current/fireworks
       - ./java-application-builder/downloads/diagrams_and_fireworks/diagram:/usr/local/tomcat/webapps/download/current/diagram
       - ./wait-for.sh:/wait-for.sh
@@ -33,6 +36,7 @@ services:
       - ./tomcat/analysis-service/results:/usr/local/AnalysisService/analysis-results
       - ./tomcat/analysis-service/reports:/usr/local/AnalysisService/analysis-reports
       - ./logs/applications/AnalysisService:/usr/local/AnalysisService/log
+      - ./logs/applications/ContentService:/usr/local/search/log/content-service
       - ./logs/tomcat/:/usr/local/tomcat/logs/ #to save logs inside host directory of tomcat/logs/
     env_file:
       - tomcat.env
@@ -54,6 +58,7 @@ services:
     volumes:
       - ./solr/data/solr_data:/opt/solr/server/solr/mycores
       - ./solr/solrconfig.xml:/opt/solr/server/solr/mycores/reactome/conf/solrconfig.xml
+      - ./logs/solr/:/opt/solr/server/logs/
     entrypoint:
       - docker-entrypoint.sh
       - solr-precreate
@@ -62,12 +67,13 @@ services:
   neo4j-db:
     image: neo4j
     container_name: neo4j-db
-    environment:
-     - EXTENSION_SCRIPT=/data/neo4j-init.sh
+    env_file:
+      - neo4j.env
     volumes:
       - ./neo4j/data:/var/lib/neo4j/data/databases
       - ./neo4j/neo4j-init.sh:/data/neo4j-init.sh
       - ./neo4j/conf/:/var/lib/neo4j/conf/
+      - ./logs/neo4j/:/var/lib/neo4j/logs/
     ports:
       - 7474:7474
       - 7687:7687
@@ -111,3 +117,4 @@ services:
       - ./wordpress/footer.php:/var/www/html/footer.php
       - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
       - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wordpress/wp-content/plugins
+      - ./logs/apache/:/var/log/apache2

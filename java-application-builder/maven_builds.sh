@@ -83,6 +83,13 @@ AnalysisToolsService ()
   cp /gitroot/AnalysisTools/Service/target/analysis-service*.war /webapps/
 }
 
+SearchIndexer()
+{
+    cd /gitroot/search-indexer
+    mvn package
+    cp /gitroot/search-indexer/target/Indexer*.jar /webapps/
+}
+
 InteractorsCore ()
 {
   echo "Creating interactors.db ..."
@@ -102,19 +109,20 @@ InteractorsCore ()
 }
 
 declare -A app_list
-# app_list+=( ["CuratorTool"]=ready )
+app_list+=( ["CuratorTool"]=ready )
 app_list+=( ["PathwayExchange"]=ready )
-app_list+=( ["RESTfulAPI"]=notready )
-app_list+=( ["PathwayBrowser"]=notready )
-app_list+=( ["ContentService"]=notready )
-# app_list+=( ["AnalysisToolsCore"]=notready )
-app_list+=( ["AnalysisToolsService"]=developing )
-# app_list+=( ["AnalysisBin"]=ready )
-# app_list+=( ["InteractorsCore"]=notready )
+app_list+=( ["RESTfulAPI"]=ready )
+app_list+=( ["PathwayBrowser"]=ready )
+app_list+=( ["ContentService"]=ready )
+app_list+=( ["AnalysisToolsCore"]=ready )
+app_list+=( ["AnalysisToolsService"]=ready )
+app_list+=( ["AnalysisBin"]=ready )
+app_list+=( ["InteractorsCore"]=ready )
+app_list+=( ["SearchIndexer"]=developing )
 
 for app in "${!app_list[@]}";
 do
-  if [[ ${app_list[${app}]} == "ready" ]]; 
+  if [[ ${app_list[${app}]} == "ready" ]];
   then
     echo ${app} " ready! Skippinig ahead"
   else
