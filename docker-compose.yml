@@ -18,9 +18,9 @@ services:
       - neo4j-db
     entrypoint: bash -c "/wait-for.sh neo4j-db:7687 -t 360 && /wait-for.sh solr-for-reactome:8983 -t 360 && /wait-for.sh wordpress-sites:80 -t 360 && /wait-for.sh mysql-for-tomcat:3306 -t 360 && catalina.sh run"
     volumes:
-      # - ./tomcat/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
-      # - ./tomcat/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war
-      # - ./tomcat/webapps/analysis-service.war:/usr/local/tomcat/webapps/analysis-service.war
+      - ./tomcat/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
+      - ./tomcat/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war
+      - ./tomcat/webapps/analysis-service.war:/usr/local/tomcat/webapps/analysis-service.war
       - ./tomcat/webapps/ContentService.war:/usr/local/tomcat/webapps/ContentService.war
       - ./tomcat/webapps/content.war:/usr/local/tomcat/webapps/content.war
       - ./tomcat/webapps/interactors.db:/interactors.db
@@ -53,6 +53,7 @@ services:
   solr:
     image: solr:6.6.0
     container_name: solr-for-reactome
+    hostname: solr-for-reactome
     ports:
       - "8983:8983"
     volumes:
