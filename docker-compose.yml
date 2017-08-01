@@ -69,6 +69,7 @@ services:
   neo4j-db:
     image: neo4j
     container_name: neo4j-db
+    hostname: neo4j-db
     env_file:
       - neo4j.env
     volumes:
@@ -119,8 +120,8 @@ services:
       - ./wordpress/wait-for.sh:/wait-for.sh
       - ./wordpress/htaccess:/var/www/html/.htaccess
       - ./wordpress/000-default.conf:/etc/apache2/sites-enabled/000-default.conf
-      - ./wordpress/header.php:/var/www/html/common/header.php
-      - ./wordpress/footer.php:/var/www/html/common/footer.php
+      - ./wordpress/header.php:/var/www/html/header.php
+      - ./wordpress/footer.php:/var/www/html/footer.php
       - ./wordpress/Secrets.pm:/usr/local/gkb/modules/GKB/Secrets.pm
       - ./wordpress/cgi.load:/etc/apache2/mods-enabled/cgi.load
       - ./wordpress/proxy.load:/etc/apache2/mods-enabled/proxy.load
