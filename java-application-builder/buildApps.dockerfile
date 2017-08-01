@@ -52,4 +52,10 @@ RUN git clone https://github.com/reactome-pwp/interactors-core.git
 WORKDIR /gitroot/interactors-core
 RUN git checkout master
 
-RUN apt-get update && apt-get install ant -y && rm -rf /var/lib/apt/lists/*
+# For building the Reactome solr index
+WORKDIR /gitroot/
+RUN git clone https://github.com/reactome/search-indexer.git
+WORKDIR /gitroot/search-indexer
+RUN git checkout master
+
+RUN apt-get update && apt-get install ant netcat -y && rm -rf /var/lib/apt/lists/*
