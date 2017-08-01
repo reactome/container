@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# If you want to update databases then use "-u" flag
+# ./deploy -u
+if [[ $1 == "-u" ]]; then
 echo -e "GET http://google.com HTTP/1.0\n\n" | nc google.com 80 > /dev/null 2>&1
 
 if [ $? -eq 0 ]; then
@@ -24,7 +28,7 @@ if [ $? -eq 0 ]; then
   file_list+=( ["mysql/tomcat_data/gk_current.sql.gz"]="http://www.reactome.org/download/current/databases/gk_current.sql.gz" ) # tomcat_data
   file_list+=( ["neo4j/data/reactome.graphdb.tgz"]="http://reactome.org/download/current/reactome.graphdb.tgz" ) # neo4j data
   file_list+=( ["solr/data/solr_data.tgz"]="https://reactome.org/download/current/solr_data.tgz" ) # solr data
-  file_list+=( ["java-application-builder/downloads/analysis_v61.bin.gz"]="https://reactome.org/download/current/analysis_v61.bin.gz" ) # Analysis.bin for analysis service
+  file_list+=( ["java-application-builder/downloads/analysis.bin.gz"]="https://reactome.org/download/current/analysis_v61.bin.gz" ) # Analysis.bin for analysis service
   file_list+=( ["java-application-builder/downloads/interactors.db.gz"]="https://reactome.org/download/current/interactors.db.gz" ) # interactors.db required to create analysis.bin
   file_list+=( ["java-application-builder/downloads/diagrams_and_fireworks.tgz"]="https://reactome.org/download/current/diagrams_and_fireworks.tgz" )
   # file_list+=( ["mysql/wordpress_data/reactome-wordpress.sql.gz"]="http://www.reactome.org/download/current/databases/gk_wordpress.sql.gz")
@@ -37,32 +41,37 @@ if [ $? -eq 0 ]; then
     file_name=$(basename $file_path)
     mkdir -p $(dirname $file_path)
 
-    # Get size information
-    typeset -i remote_file_size=$(curl -sI $URL | tr -d '\r' | grep -i content-length | awk '{print $2}')
-    typeset -i local_file_size=$(stat -c %s -- $file_path)
-    echo "======================================================================="
-    echo "======================================================================="
-    echo "Filename:    " $file_name
-    echo "Remote Size: " $remote_file_size
-    echo "Local Size:  " $local_file_size
+    if [ -f $file_path ] ; then
+        # Get size information
+        typeset -i remote_file_size=$(curl -sI $URL | tr -d '\r' | grep -i content-length | awk '{print $2}')
+        typeset -i local_file_size=$(stat -c %s -- $file_path)
+        echo "======================================================================="
+        echo "======================================================================="
+        echo "Filename:    " $file_name
+        echo "Remote Size: " $remote_file_size
+        echo "Local Size:  " $local_file_size
 
-    if [[ $local_file_size -eq $remote_file_size ]]; then
-      echo "Database up to date. Update not required"
-    elif [[ $remote_file_size -eq 0 ]]; then
-      echo "Remote file not acccessible. Not updating!"
+        if [[ $local_file_size -eq $remote_file_size ]]; then
+          echo "Database up to date. Update not required"
+        elif [[ $remote_file_size -eq 0 ]]; then
+          echo "Remote file not acccessible. Not updating!"
+        else
+          echo "Database needs to be updated!"
+          echo "Removing old file if it exists!"
+          rm $file_path 2> /dev/null # 2> /dev/null is to ignore error if file not found
+          echo "Downloading newer version"
+          # To resume partially completed download, use --continue flag and comment out "rm $file_path 2> /dev/null"
+          wget -O $file_path $URL
+        fi
     else
-      echo "Database needs to be updated!"
-      echo "Removing old file if it exists!"
-      rm $file_path 2> /dev/null # 2> /dev/null is to ignore error if file not found
-      echo "Downloading newer version"
-      # To resume partially completed download, use --continue flag and comment out "rm $file_path 2> /dev/null"
-      wget -O $file_path $URL
+        echo "File $file_path does not exist. Will download now."
+        wget -O $file_path $URL
     fi
-    echo
-    echo
+    echo -e "\n\n"
   done
 else
     echo "No internet access! Not verifying databases!"
+fi
 fi
 
 
@@ -80,6 +89,8 @@ if [[ ! -f solr/data/solr_data_extracted.flag ]]; then
   chmod a+w solr/data/solr_data/reactome/data/index/write.lock
   chmod a+w solr/data/solr_data/reactome/data/index
   chmod a+w -R solr/data/solr_data/reactome/data/tlog
+  mkdir -p logs/solr
+  chmod a+w logs/solr
 
 else
   echo "solr_data already unpacked"
@@ -109,15 +120,15 @@ else
   echo "interactors.db already unpacked"
 fi
 
-if [[ ! -f analysis_v61.bin_extracted.flag ]]; then
-  rm -rf analysis_v61.bin
+if [[ ! -f analysis.bin_extracted.flag ]]; then
+  rm -rf analysis.bin
   echo "Extracting analysis.bin"
   set -e
-  gzip -dk analysis_v61.bin.gz
-  touch analysis_v61.bin_extracted.flag
+  gzip -dk analysis.bin.gz
+  touch analysis.bin_extracted.flag
   set +e
 else
-  echo "analysis_v61.bin already unpacked"
+  echo "analysis.bin already unpacked"
 fi
 
 cd ../..
@@ -140,9 +151,12 @@ echo "Copying war files from java-application-builder/webapps to tomcat/webapps/
 echo "==========================================================================="
 echo "Files to be copied:"
 ls ./java-application-builder/webapps/
+echo "Deleting empty directories..."
+rm -rvf ./tomcat/webapps/*
 cp --verbose -u ./java-application-builder/webapps/*.war ./tomcat/webapps/
 # Don't forget: also need the analysis.bin file for AnalysisService!
-cp --verbose -u ./java-application-builder/webapps/analysis.bin ./tomcat/webapps/
+cp --verbose -u ./java-application-builder/downloads/analysis*.bin ./tomcat/webapps/
+cp --verbose -u ./java-application-builder/downloads/interactors.db ./tomcat/webapps/
 
 # Ensure scripts are executable.
 chmod a+x ./release/website/cgi-bin/*
@@ -152,4 +166,4 @@ echo "==========================================================================
 echo "                        Starting docker containers"
 echo "==========================================================================="
 docker-compose up
-docker-compose down
+# docker-compose down
