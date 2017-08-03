@@ -158,6 +158,12 @@ cp --verbose -u ./java-application-builder/webapps/*.war ./tomcat/webapps/
 cp --verbose -u ./java-application-builder/downloads/analysis*.bin ./tomcat/webapps/
 cp --verbose -u ./java-application-builder/downloads/interactors.db ./tomcat/webapps/
 
+# Link mysql logs (Testing...)
+mkdir ./logs/mysql/wordpress
+mkdir ./logs/mysql/tomcat
+ln $(docker volume inspect --format '{{ .Mountpoint }}' container_mysql-for-tomcat-Logs)/error.log $(pwd)/logs/mysql/wordpress/error.log
+ln $(docker volume inspect --format '{{ .Mountpoint }}' container_mysql-for-wordpress-Logs)/error.log ./logs/mysql/tomcat/error.log
+
 echo -e "\n\n"
 echo "==========================================================================="
 echo "                        Starting docker containers"
