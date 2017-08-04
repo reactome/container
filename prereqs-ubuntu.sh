@@ -38,6 +38,10 @@ sudo apt-get update
 echo "# Installing GitHub"
 sudo apt-get -y install git
 
+# Install CURL
+echo "# Installing CURL"
+sudo apt-get -y install curl
+
 # Ensure that CA certificates are installed
 sudo apt-get -y install apt-transport-https ca-certificates
 
