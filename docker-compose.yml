@@ -83,8 +83,10 @@ services:
     container_name: mysql-database
     volumes:
       - ./mysql/wordpress_data/:/docker-entrypoint-initdb.d
-      - ./mysql/test.cnf:/etc/mysql/mysql.conf.d/test.cnf
-      - mysql-for-wordpress-Logs:/var/log/mysql
+      - ./mysql/init.sh:/init.sh
+      - ./logs/mysql/wordpress:/var/log/mysql
+      - mysql-for-wordpress-log:/backup
+    command: bash -c "/init.sh && exec /entrypoint.sh mysqld"
     env_file:
       - .env
 
@@ -114,5 +116,5 @@ services:
       - ./logs/apache/:/var/log/apache2 
 
 volumes:
-  mysql-for-wordpress-Logs:
-  mysql-for-tomcat-Logs:
+  mysql-for-wordpress-log:
+  mysql-for-tomcat-log:
