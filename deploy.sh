@@ -158,11 +158,24 @@ cp --verbose -u ./java-application-builder/webapps/*.war ./tomcat/webapps/
 cp --verbose -u ./java-application-builder/downloads/analysis*.bin ./tomcat/webapps/
 cp --verbose -u ./java-application-builder/downloads/interactors.db ./tomcat/webapps/
 
-# Link mysql logs (Testing...)
-mkdir ./logs/mysql/wordpress
-mkdir ./logs/mysql/tomcat
-ln $(docker volume inspect --format '{{ .Mountpoint }}' container_mysql-for-tomcat-Logs)/error.log $(pwd)/logs/mysql/wordpress/error.log
-ln $(docker volume inspect --format '{{ .Mountpoint }}' container_mysql-for-wordpress-Logs)/error.log ./logs/mysql/tomcat/error.log
+# Link mysql logs
+mkdir -p ./logs/mysql/wordpress
+mkdir -p ./logs/mysql/tomcat
+sudo chown -vR 999:999 ./logs/mysql
+owner=$(ls -ld ./logs/mysql | awk 'NR==1 {print $3}')
+if ! [[ $owner == 999 || $owner == 'mysql' ]]; then
+  # Permissions remain unchanged, logs will reside in internal docker volumes
+  # if it is first run of this script, volumes do not exist, we need to create them before providing its link
+  # this docker run will exit immidiately due to errors on startup, since we have not supplied root password
+  docker run --rm -itd \
+  -v "container_mysql-for-tomcat-log:/random/location" \
+  -v "container_mysql-for-wordpress-log:/another/random" mysql:5.7
+
+  # Volumes are created, now we can link those volumes to /backup inside container
+  sudo ln -s $(docker volume inspect --format '{{ .Mountpoint }}' container_mysql-for-tomcat-log) $(pwd)/logs/mysql/wordpress/Link_to_internal_log
+  sudo ln -s $(docker volume inspect --format '{{ .Mountpoint }}' container_mysql-for-wordpress-log) $(pwd)/logs/mysql/tomcat/Link_to_internal_log
+  # Use sudo to view content inside the linked directory.
+fi
 
 echo -e "\n\n"
 echo "==========================================================================="
