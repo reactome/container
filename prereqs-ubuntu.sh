@@ -34,10 +34,6 @@ fi
 echo "# Updating package lists"
 sudo apt-get update
 
-# Install Git
-echo "# Installing GitHub"
-sudo apt-get -y install git
-
 # Install CURL
 echo "# Installing CURL"
 sudo apt-get -y install curl
