@@ -1,5 +1,4 @@
 chown -vR 999:999 /var/log/mysql
-chmod 600 /var/log/mysql
 owner=$(ls -ld /var/log/mysql | awk 'NR==1 {print $3}')
 echo "Owner=" $owner
 log_location="/var/log/mysql"
