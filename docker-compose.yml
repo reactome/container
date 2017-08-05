@@ -1,94 +1,94 @@
 version: '3.2'
 services:
 
-#   tomcat:
-#     image: reactome-tomcat
-#     container_name: tomcat-server
-#     build:
-#       context: ./tomcat
-#       dockerfile: tomcat.dockerfile
-#     depends_on:
-#       - mysql-for-tomcat
-#       - wordpress-sites
-#       - neo4j-db
-#       - solr
-#     links:
-#       - mysql-for-tomcat
-#       - wordpress-sites
-#       - neo4j-db
-#     entrypoint: bash -c "/wait-for.sh neo4j-db:7687 -t 360 && /wait-for.sh solr-for-reactome:8983 -t 360 && /wait-for.sh mysql-for-tomcat:3306 -t 360 && /wait-for.sh wordpress-sites:80 -t 360 && catalina.sh run"
-#     volumes:
-#       - ./java-application-builder/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
-#       - ./java-application-builder/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war
-#       - ./java-application-builder/webapps/analysis-service.war:/usr/local/tomcat/webapps/analysis-service.war
-#       - ./java-application-builder/webapps/ContentService.war:/usr/local/tomcat/webapps/ContentService.war
-#       - ./java-application-builder/webapps/content.war:/usr/local/tomcat/webapps/content.war
-#       - ./java-application-builder/downloads/analysis.bin:/analysis.bin
-#       - ./java-application-builder/downloads/diagrams_and_fireworks/fireworks:/usr/local/tomcat/webapps/download/current/fireworks
-#       - ./java-application-builder/downloads/diagrams_and_fireworks/diagram:/usr/local/tomcat/webapps/download/current/diagram
-#       - ./wait-for.sh:/wait-for.sh
-#       - ./tomcat/rewrite.config:/usr/local/tomcat/conf/Catalina/localhost/rewrite.config
-#       - ./tomcat/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
-#       - ./tomcat/tomcat-server.xml:/usr/local/tomcat/conf/server.xml
-#       - ./tomcat/tomcat-manager.xml:/usr/local/tomcat/conf/Catalina/localhost/manager.xml
-#       - ./tomcat/analysis-service/results:/usr/local/AnalysisService/analysis-results
-#       - ./tomcat/analysis-service/reports:/usr/local/AnalysisService/analysis-reports
-#       - ./logs/applications/AnalysisService:/usr/local/AnalysisService/log
-#       - ./logs/tomcat/:/usr/local/tomcat/logs/ #to save logs inside host directory of tomcat/logs/
-#     env_file:
-#       - tomcat.env
-#     ports:
-#       - 8082:8080
+  tomcat:
+    image: reactome-tomcat
+    container_name: tomcat-server
+    build:
+      context: ./tomcat
+      dockerfile: tomcat.dockerfile
+    depends_on:
+      - mysql-for-tomcat
+      - wordpress-sites
+      - neo4j-db
+      - solr
+    links:
+      - mysql-for-tomcat
+      - wordpress-sites
+      - neo4j-db
+    entrypoint: bash -c "/wait-for.sh neo4j-db:7687 -t 360 && /wait-for.sh solr-for-reactome:8983 -t 360 && /wait-for.sh mysql-for-tomcat:3306 -t 360 && /wait-for.sh wordpress-sites:80 -t 360 && catalina.sh run"
+    volumes:
+      - ./java-application-builder/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
+      - ./java-application-builder/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war
+      - ./java-application-builder/webapps/analysis-service.war:/usr/local/tomcat/webapps/analysis-service.war
+      - ./java-application-builder/webapps/ContentService.war:/usr/local/tomcat/webapps/ContentService.war
+      - ./java-application-builder/webapps/content.war:/usr/local/tomcat/webapps/content.war
+      - ./java-application-builder/downloads/analysis.bin:/analysis.bin
+      - ./java-application-builder/downloads/diagrams_and_fireworks/fireworks:/usr/local/tomcat/webapps/download/current/fireworks
+      - ./java-application-builder/downloads/diagrams_and_fireworks/diagram:/usr/local/tomcat/webapps/download/current/diagram
+      - ./wait-for.sh:/wait-for.sh
+      - ./tomcat/rewrite.config:/usr/local/tomcat/conf/Catalina/localhost/rewrite.config
+      - ./tomcat/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
+      - ./tomcat/tomcat-server.xml:/usr/local/tomcat/conf/server.xml
+      - ./tomcat/tomcat-manager.xml:/usr/local/tomcat/conf/Catalina/localhost/manager.xml
+      - ./tomcat/analysis-service/results:/usr/local/AnalysisService/analysis-results
+      - ./tomcat/analysis-service/reports:/usr/local/AnalysisService/analysis-reports
+      - ./logs/applications/AnalysisService:/usr/local/AnalysisService/log
+      - ./logs/tomcat/:/usr/local/tomcat/logs/ #to save logs inside host directory of tomcat/logs/
+    env_file:
+      - tomcat.env
+    ports:
+      - 8082:8080
 
-#   solr:
-#     image: solr:6.6.0
-#     container_name: solr-for-reactome
-#     ports:
-#       - "8983:8983"
-#     volumes:
-#       - ./solr/data/solr_data:/opt/solr/server/solr/mycores
-#       - ./solr/solrconfig.xml:/opt/solr/server/solr/mycores/reactome/conf/solrconfig.xml
-#     entrypoint:
-#       - docker-entrypoint.sh
-#       - solr-precreate
-#       - reactome
+  solr:
+    image: solr:6.6.0
+    container_name: solr-for-reactome
+    ports:
+      - "8983:8983"
+    volumes:
+      - ./solr/data/solr_data:/opt/solr/server/solr/mycores
+      - ./solr/solrconfig.xml:/opt/solr/server/solr/mycores/reactome/conf/solrconfig.xml
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr-precreate
+      - reactome
 
-#   neo4j-db:
-#     image: neo4j
-#     container_name: neo4j-db
-#     environment:
-#      - EXTENSION_SCRIPT=/data/neo4j-init.sh
-#     volumes:
-#       - ./neo4j/data:/var/lib/neo4j/data/databases
-#       - ./neo4j/neo4j-init.sh:/data/neo4j-init.sh
-#       - ./neo4j/conf/:/var/lib/neo4j/conf/
-#     ports:
-#       - 7474:7474
-#       - 7687:7687
+  neo4j-db:
+    image: neo4j
+    container_name: neo4j-db
+    environment:
+     - EXTENSION_SCRIPT=/data/neo4j-init.sh
+    volumes:
+      - ./neo4j/data:/var/lib/neo4j/data/databases
+      - ./neo4j/neo4j-init.sh:/data/neo4j-init.sh
+      - ./neo4j/conf/:/var/lib/neo4j/conf/
+    ports:
+      - 7474:7474
+      - 7687:7687
 
-  # mysql-for-tomcat:
-  #   image: mysql
-  #   container_name: mysql-for-tomcat
-  #   env_file:
-  #     - tomcat.env
-  #   volumes:
-  #     - ./mysql/tomcat_data/:/docker-entrypoint-initdb.d
-  #     - ./mysql/test.cnf:/etc/mysql/mysql.conf.d/test.cnf
-  #     - ./logs/mysql/tomcat:/var/log/mysql
-  #   entrypoint:
-  #   command: bash -c "chown -R mysql:mysql /var/log/mysql && exec /entrypoint.sh"
+  mysql-for-tomcat:
+    image: mysql
+    container_name: mysql-for-tomcat
+    env_file:
+      - tomcat.env
+    volumes:
+      - ./mysql/tomcat_data/:/docker-entrypoint-initdb.d
+      - ./mysql/init.sh:/init.sh
+      - ./logs/mysql/tomcat:/var/log/mysql
+      - mysql-for-tomcat-log:/backup
+    command: bash -c "/init.sh && exec /entrypoint.sh mysqld"
 
   mysql-database:
     image: mysql
     container_name: mysql-database
+    env_file:
+      - wordpress.env
     volumes:
       - ./mysql/wordpress_data/:/docker-entrypoint-initdb.d
       - ./mysql/init.sh:/init.sh
       - ./logs/mysql/wordpress:/var/log/mysql
       - mysql-for-wordpress-log:/backup
     command: bash -c "/init.sh && exec /entrypoint.sh mysqld"
-    env_file:
-      - .env
 
 
   wordpress-sites:
