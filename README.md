@@ -8,29 +8,32 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
-
-```
-Give examples
-```
+The things you need to install are packed in the file [prereqs-ubuntu.sh](https://github.com/reactome/container/blob/master/prereqs-ubuntu.sh) and you can begin by cloning this repo, and then you may proceed with installing prerequisites with the help of [prereqs-ubuntu.sh](https://github.com/reactome/container/blob/master/prereqs-ubuntu.sh).
 
 ### Installing
 
-A step by step series of examples that tell you have to get a development env running
 
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
+You can copy following commands to get started. Installation file prereqs-ubuntu.sh uses sudo permissions for a brief moment, so you may be prompted for your password when you execute these commands.
 
 ```
-until finished
+git clone https://github.com/reactome/container.git
+cd container
+./prereqs-ubuntu.sh
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+The script provided installs prerequisites on ubuntu. In case you are on a different platform, you can install these components manually. Following packages are installed by the script:
+
+1. Curl
+2. [Docker-CE](https://docs.docker.com/engine/installation/linux/docker-ce/ubuntu/#install-docker-ce): Version [17.06.0](https://github.com/docker/docker-ce/releases)
+3. [Docker-Compose](https://docs.docker.com/compose/install/): Version [1.15.0](https://github.com/docker/compose/releases)
+
+If you are installing or have already installed them, please verify their versions.
+
+```
+docker-compose --version # Should be 1.10.0+
+docker --version # Also known as docker engine, should be 1.13.0+
+```
+We are using V3 of compose file format, which was intoduced in [Compose release 1.10.0](https://github.com/docker/compose/releases/tag/1.10.0). As per [compatibility matrix](https://docs.docker.com/compose/compose-file/compose-versioning/#compatibility-matrix), it requires docker-engine 1.13.0 or higher.
 
 ## Running the tests
 
