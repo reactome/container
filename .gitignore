@@ -8,3 +8,5 @@ java-application-builder/downloads/*
 neo4j/data/*
 solr/data/*
 neo4j/conf/neo4j.conf
+tmp_files
+toc_files
