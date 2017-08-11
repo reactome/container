@@ -45,8 +45,26 @@ PathwayBrowser ()
 ContentService ()
 {
   # Build Content-service
-  cd /gitroot/content-service && mvn package \
-  && cp /gitroot/content-service/target/ContentService*.war /webapps/ContentService.war
+  cd /gitroot/content-service
+  mvn package -P ContentService-Local
+  cp /gitroot/content-service/target/ContentService*.war /webapps/ContentService.war
+}
+
+SearchCore()
+{
+  echo "building/installing search-core..."
+  # build and install search-core
+  cd /gitroot/search-core
+  mvn package install -DskipTests=true
+}
+
+DataContent ()
+{
+  # Build data-content application
+  SearchCore
+  cd /gitroot/data-content
+  mvn package install -P DataContent-Local
+  cp /gitroot/data-content/target/content*.war /webapps/content.war
 }
 
 AnalysisToolsCore ()
@@ -71,7 +89,7 @@ AnalysisBin ()
         -u root \
         -p root \
         -o ./analysis.bin \
-        -g /downloads/intact-miclustereractors.db
+        -g /downloads/interactors.db
   cp ./analysis.bin /downloads/
 }
 
@@ -103,7 +121,7 @@ InteractorsCore ()
     java -jar target/InteractorsParser-jar-with-dependencies.jar -g interactors.db -d -t /downloads
   fi
   # Running tests
-  mvn package -Dinteractors.SQLite=interactors.db \
+  mvn package install -Dinteractors.SQLite=interactors.db \
   && cp interactors.db /downloads/
   echo "Successfully created interactors.db"
 }
@@ -113,7 +131,9 @@ app_list+=( ["CuratorTool"]=ready )
 app_list+=( ["PathwayExchange"]=ready )
 app_list+=( ["RESTfulAPI"]=ready )
 app_list+=( ["PathwayBrowser"]=ready )
+app_list+=( ["DataContent"]=ready )
 app_list+=( ["ContentService"]=ready )
+app_list+=( ["InteractorsCore"]=ready )
 app_list+=( ["AnalysisToolsCore"]=ready )
 app_list+=( ["AnalysisToolsService"]=ready )
 app_list+=( ["AnalysisBin"]=ready )
