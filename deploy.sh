@@ -142,7 +142,7 @@ function downloadAllNewArchives()
   local declare -A file_list
   file_list+=( ["java-application-builder/downloads/analysis.bin.gz"]="https://reactome.org/download/current/analysis_v61.bin.gz" ) # Analysis.bin for analysis service
   file_list+=( ["java-application-builder/downloads/interactors.db.gz"]="https://reactome.org/download/current/interactors.db.gz" ) # interactors.db required to create analysis.bin
-
+  
   for db_file in "${!file_list[@]}";
   do
     # Initialization before prepairing download
@@ -238,51 +238,158 @@ function unpackArchives()
   fi
 }
 
-echo "Changing directory to:"
-cd ../..
-pwd
+function startUp()
+{
+  echo "Changing directory to:"
+  cd ../..
+  pwd
 
-read -p "Build webapps? Press [y/n]" -n 1 -r
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-  echo
-  echo "========================================================================="
-  echo "                Building webapps using reactome-app-builder"
-  echo "========================================================================="
-  cd ./java-application-builder
-  bash ./build_webapps.sh |& tee ../logs/build_webapps.log
-  cd ..
-  echo "Reactome-app-builder exits here."
-fi
+  read -p "Build webapps? Press [y/n]" -n 1 -r
+  if [[ $REPLY =~ ^[Yy]$ ]]
+  then
+    echo
+    echo "========================================================================="
+    echo "                Building webapps using reactome-app-builder"
+    echo "========================================================================="
+    cd ./java-application-builder
+    bash ./build_webapps.sh |& tee ../logs/build_webapps.log
+    cd ..
+    echo "Reactome-app-builder exits here."
+  fi
 
-echo -e "\n\n"
-echo "==========================================================================="
-echo "                      Linking mysql Logs"
-echo "==========================================================================="
+  echo -e "\n\n"
+  echo "==========================================================================="
+  echo "                      Linking mysql Logs"
+  echo "==========================================================================="
 
-# Link mysql logs
-mkdir -p ./logs/mysql/wordpress
-mkdir -p ./logs/mysql/tomcat
-sudo chown -vR 999:999 ./logs/mysql
-owner=$(ls -ld ./logs/mysql | awk 'NR==1 {print $3}')
-if ! [[ $owner == 999 || $owner == 'mysql' ]]; then
-  # Permissions remain unchanged, logs will reside in internal docker volumes
-  # if it is first run of this script, volumes do not exist, we need to create them before providing its link
-  # this docker run will exit immidiately due to errors on startup, since we have not supplied root password
-  docker run --rm -itd \
-  -v "container_mysql-for-tomcat-log:/random/location" \
-  -v "container_mysql-for-wordpress-log:/another/random" mysql:5.7
+  # Link mysql logs
+  mkdir -p ./logs/mysql/wordpress
+  mkdir -p ./logs/mysql/tomcat
+  sudo chown -vR 999:999 ./logs/mysql
+  owner=$(ls -ld ./logs/mysql | awk 'NR==1 {print $3}')
+  if ! [[ $owner == 999 || $owner == 'mysql' ]]; then
+    # Permissions remain unchanged, logs will reside in internal docker volumes
+    # if it is first run of this script, volumes do not exist, we need to create them before providing its link
+    # this docker run will exit immidiately due to errors on startup, since we have not supplied root password
+    docker run --rm -itd \
+    -v "container_mysql-for-tomcat-log:/random/location" \
+    -v "container_mysql-for-wordpress-log:/another/random" mysql:5.7
 
-  # Volumes are created, now we can link those volumes to /backup inside container
-  sudo ln -s $(docker volume inspect --format '{{ .Mountpoint }}' container_mysql-for-tomcat-log) $(pwd)/logs/mysql/wordpress/Link_to_internal_log
-  sudo ln -s $(docker volume inspect --format '{{ .Mountpoint }}' container_mysql-for-wordpress-log) $(pwd)/logs/mysql/tomcat/Link_to_internal_log
-  # Use sudo to view content inside the linked directory.
-fi
+    # Volumes are created, now we can link those volumes to /backup inside container
+    sudo ln -s $(docker volume inspect --format '{{ .Mountpoint }}' container_mysql-for-tomcat-log) $(pwd)/logs/mysql/wordpress/Link_to_internal_log
+    sudo ln -s $(docker volume inspect --format '{{ .Mountpoint }}' container_mysql-for-wordpress-log) $(pwd)/logs/mysql/tomcat/Link_to_internal_log
+    # Use sudo to view content inside the linked directory.
+  fi
 
-echo -e "\n\n"
-echo "==========================================================================="
-echo "                        Starting docker containers"
-echo "==========================================================================="
-docker-compose up
-# docker-compose down
+  echo -e "\n\n"
+  echo "==========================================================================="
+  echo "                        Starting docker containers"
+  echo "==========================================================================="
+  docker-compose up
+  # docker-compose down
+}
 
+
+usage="
+usage: $thisScript [option]... [argument]...
+Giving arguments to options is not mandatory.
+
+Option          | Argument  | Description
+------------------------------------------------------------------
+-u, --update    | (No args)  Update database files.
+                |            The files that will be updated include:
+                |            - gk_current.sql.gz    : for mysql/tomcat
+                |            - reactome.graphdb.tg  : for Neo4j
+                |            - solr_data.tgz        : for Solr
+                |            - diagrams_and_fireworks.tgz
+                |
+                | all        Using 'all' argument would update those
+                |            files also which can be built locally.
+                |            Like: 
+                |            - analysis.bin
+                |            - interactors.db
+
+-d, --download  | (No args)  Remove old and download new database files
+                |            It operates sequentially on each file
+                |            Following files will be downloaded:
+                |            - gk_current.sql.gz    : for mysql/tomcat
+                |            - reactome.graphdb.tg  : for Neo4j
+                |            - solr_data.tgz        : for Solr
+                |            - diagrams_and_fireworks.tgz
+                |
+                | all        Using 'all' argument would also download
+                |            those files which can be built locally.
+                |            Like: 
+                |            - analysis.bin
+                |            - interactors.db
+
+-b, --build     | (No args)  Build essential java web applications.
+                |            Following applications will be built:
+                |            - CuratorTool
+                |            - PathwayExchange
+                |            - RESTfulAPI
+                |            - PathwayBrowser
+                |            - DataContent
+                |            - ContentService
+                |            - AnalysisToolsCore
+                |
+                | all        Builds all the java applications and files
+                |            These additinal applications will be built
+                |            - AnalysisBin
+                |            - InteractorsCore
+                |            - AnalysisToolsService
+                |
+                | select     You will be provided with prompts to select
+                |            which applications you want to build.
+
+Example: $thisScript
+       : $thisScript -d -b
+       : $thisScript -d all -b
+       : $thisScript -d all -b all
+       : $thisScript --build --download
+       : $thisScript --build all --download all
+  -b      Build webapps
+  -d      Download Archives
+  -h      display help
+"
+
+# Setting the currect working directory
+cd "${0%/*}"
+thisScript="$0"
+echo "Now executing the script"
+numargs=$#
+for ((i=1 ; i <= numargs ; i++))
+do
+  case "$1" in
+    -d | --download)
+      # This is the download option
+      if [[ "$2" == "all" ]]; then
+        echo "Selected 'all'. All previous archives, if present, will be deleted and new ones will be downloaded."
+        shift
+      else
+        echo "Switching to Default behavior: Only database archives will be removed and downloaded again."
+      fi
+      ;;
+    -b | --build)
+      # This is build option. Used to build webapps for tomcat
+      if [[ "$2" == "all" ]]; then
+        echo "Selected all: All webapps will be built"
+        shift
+      elif [[ "$2" == "select" ]]; then
+        echo "Please select which applications you want to build:"
+        shift
+      else
+        echo "Default behavior: 'Build' will switch to its default behavior and only essential applications will be built"
+        echo "Essential applications: ReactomeRESTfulAPI.war"
+        echo "                        PathwayBrowser.war"
+        echo "                        analysis-service.war"
+        echo "                        ContentService.war"
+        echo "                        content.war"
+      fi
+      ;;
+    -h | --help)
+      # Displaying help
+      echo $usage
+    esac
+    shift
+done
