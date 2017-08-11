@@ -27,6 +27,7 @@ docker run -it --name=java-webapp-builder --rm -v "$(pwd)/webapps:/webapps" \
 	-v "$(pwd)/mounts/junit-4.12.jar:/gitroot/CuratorTool/lib/junit/junit-4.12.jar" \
 	-v "$(pwd)/mounts/ant-javafx.jar:/gitroot/CuratorTool/lib/ant-javafx.jar" \
 	-v "$(pwd)/mounts/RESTfulAPI-pom.xml:/gitroot/RESTfulAPI/pom.xml" \
+	-v "$(pwd)/mounts/search-indexer-logback.xml:/gitroot/search-indexer/src/main/resources/logback.xml" \
 	-v "$(pwd)/m2-cache:/root/.m2" \
 	-v "$(pwd)/mounts/applicationContext.xml:/gitroot/RESTfulAPI/web/WEB-INF/applicationContext.xml" \
 	-v "$(pwd)/mounts/applicationContext.xml:/gitroot/Pathway-Exchange/web/WEB-INF/applicationContext.xml" \

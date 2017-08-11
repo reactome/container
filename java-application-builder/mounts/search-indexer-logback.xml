@@ -1,0 +1,33 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>./logs/ReactomeSolrIndexer.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>./logs/ReactomeSolrIndexer-%i-log.zip</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>5</maxIndex>
+        </rollingPolicy>
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>100MB</maxFileSize>
+        </triggeringPolicy>
+        <encoder>
+            <pattern>%d %-5level [%thread] %logger{0}: %msg%n</pattern>
+        </encoder>
+    </appender>
+    <logger name="importLogger" level="INFO" additivity="false">
+        <appender-ref ref="FILE"/>
+    </logger>
+    <!-- Setting up neo4j and sdn logging to ERROR -->
+    <logger name="org.neo4j.ogm" level="INFO"/>
+	<logger name="org.apache.http" level="WARN"/>
+	<logger name="org.apache.http.wire" level="WARN"/>
+	<logger name="org.apache.http.header" level="WARN"/>
+    <logger name="org.springframework" level="ERROR"/>
+    <root level="DEBUG">
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>

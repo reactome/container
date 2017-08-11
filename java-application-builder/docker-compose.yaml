@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+    solr:
+        image: solr:6.6.0
+        hostname: solr
+        ports:
+            - 8983:8983
+        volumes:
+            - ./generated_solr_core:/opt/solr/server/solr/mycores:rw
+            # - ../solr/solrconfig.xml:/opt/solr/server/solr/mycores/reactome/conf/solrconfig.xml
+            - ./logs/solr/:/opt/solr/server/logs/
+        entrypoint: solr-create -c reactome
+
+    neo4j:
+        image: neo4j
+        hostname: neo4j
+        env_file:
+            - neo4j.env
+        volumes:
+            - ../neo4j/data:/var/lib/neo4j/data/databases
+            - ../neo4j/neo4j-init.sh:/data/neo4j-init.sh
+            - ../neo4j/conf/:/var/lib/neo4j/conf/
+            - ./logs/neo4j/:/var/lib/neo4j/logs/
+        ports:
+            - 7474:7474
+            - 7687:7687
+
+    solr-index-builder:
+        image: reactome-app-builder
+        build:
+            context: .
+            dockerfile: buildApps.dockerfile
+        depends_on:
+            - neo4j
+            - solr
+        volumes:
+            - ./build_solr_index.sh:/build_solr_index.sh
+            - ./webapps/interactors.db:/interactors.db
+            - ./wait-for.sh:/wait-for.sh
+            - ./webapps/Indexer-jar-with-dependencies.jar:/Indexer-jar-with-dependencies.jar
+            - ./logs:/logs
+        entrypoint: bash -c "/wait-for.sh neo4j:7687 -t 360 && /wait-for.sh solr:8983 -t 360 && /build_solr_index.sh"
