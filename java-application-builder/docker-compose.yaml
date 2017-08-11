@@ -11,6 +11,8 @@ services:
             # - ../solr/solrconfig.xml:/opt/solr/server/solr/mycores/reactome/conf/solrconfig.xml
             - ./logs/solr/:/opt/solr/server/logs/
         entrypoint: solr-create -c reactome
+        networks:
+            - solr-index-builder
 
     neo4j:
         image: neo4j
@@ -25,19 +27,25 @@ services:
         ports:
             - 7474:7474
             - 7687:7687
+        networks:
+            - solr-index-builder
 
+networks:
     solr-index-builder:
-        image: reactome-app-builder
-        build:
-            context: .
-            dockerfile: buildApps.dockerfile
-        depends_on:
-            - neo4j
-            - solr
-        volumes:
-            - ./build_solr_index.sh:/build_solr_index.sh
-            - ./webapps/interactors.db:/interactors.db
-            - ./wait-for.sh:/wait-for.sh
-            - ./webapps/Indexer-jar-with-dependencies.jar:/Indexer-jar-with-dependencies.jar
-            - ./logs:/logs
-        entrypoint: bash -c "/wait-for.sh neo4j:7687 -t 360 && /wait-for.sh solr:8983 -t 360 && /build_solr_index.sh"
+        driver: bridge
+
+    # solr-index-builder:
+    #     image: reactome-app-builder
+    #     build:
+    #         context: .
+    #         dockerfile: buildApps.dockerfile
+    #     depends_on:
+    #         - neo4j
+    #         - solr
+    #     volumes:
+    #         - ./build_solr_index.sh:/build_solr_index.sh
+    #         - ./webapps/interactors.db:/interactors.db
+    #         - ./wait-for.sh:/wait-for.sh
+    #         - ./webapps/Indexer-jar-with-dependencies.jar:/Indexer-jar-with-dependencies.jar
+    #         - ./logs:/logs
+    #     entrypoint: bash -c "/wait-for.sh neo4j:7687 -t 360 && /wait-for.sh solr:8983 -t 360 && /build_solr_index.sh"
