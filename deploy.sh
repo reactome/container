@@ -193,11 +193,11 @@ function unpackArchives()
   echo "==========================================================================="
   echo "                           Unpacking required files"
   echo "==========================================================================="
-  if [[ ! -f solr/data/solr_data_extracted.flag ]]; then
+  if [[ ! -f solr/data/solr_data/solr_data_extracted.flag ]]; then
     echo "Unpacking SolrData"
     rm -rf solr/solr_data
     tar -xvzf solr/data/solr_data.tgz -C solr/data
-    touch solr/data/solr_data_extracted.flag
+    touch solr/data/solr_data/solr_data_extracted.flag # 'Extracted' flag should reside inside the extracted folder
     chmod a+w solr/data/solr_data/reactome
     chmod a+w solr/data/solr_data/reactome/data
     chmod a+w solr/data/solr_data/reactome/data/index/write.lock
@@ -213,30 +213,29 @@ function unpackArchives()
   echo "Changing directory to: "
   cd java-application-builder/downloads
   pwd
-  if [[ ! -f diagrams_and_fireworks_extracted.flag ]]; then
+  if [[ ! -f diagrams_and_fireworks/diagrams_and_fireworks_extracted.flag ]]; then
     echo "Extracting diagrams and fireworks"
     rm -rf diagrams_and_fireworks
     set -e
     tar -xvzf diagrams_and_fireworks.tgz
-    touch diagrams_and_fireworks_extracted.flag
+    touch diagrams_and_fireworks/diagrams_and_fireworks_extracted.flag
     set +e
 
   else
     echo "Diagrams and fireworks already unpacked"
   fi
 
-  if [[ ! -f interactorsdb_extracted.flag ]]; then
+  if [[ ! -f interactors.db ]]; then
     echo "Extracting interactors.db"
     rm -rf interactors.db
     set -e
     gzip -dk interactors.db.gz
-    touch interactorsdb_extracted.flag
     set +e
   else
     echo "interactors.db already unpacked"
   fi
 
-  if [[ ! -f analysis.bin_extracted.flag ]]; then
+  if [[ ! -f analysis.bin ]]; then
     rm -rf analysis.bin
     echo "Extracting analysis.bin"
     set -e
@@ -244,7 +243,7 @@ function unpackArchives()
     touch analysis.bin_extracted.flag
     set +e
   else
-    echo "analysis.bin already unpacked"
+    echo "analysis.bin already exists"
   fi
 }
 
