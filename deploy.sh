@@ -9,74 +9,72 @@
 function updateDataArchives()
 {
   # Test for an active inernet connection
-  if [[ $1 == "-u" ]]; then
-    echo -e "GET http://google.com HTTP/1.0\n\n" | nc google.com 80 > /dev/null 2>&1
+  echo -e "GET http://google.com HTTP/1.0\n\n" | nc google.com 80 > /dev/null 2>&1
 
-    if [ $? -eq 0 ]; then
-      echo -e "\n\n"
-      echo "Initiating download"
-      echo "========================================================================="
-      echo "                           Verifying databases"
-      echo "========================================================================="
-      echo "Details of databases to be collected are:"
-      echo "-------------------------------------------------------------------------"
+  if [ $? -eq 0 ]; then
+    echo -e "\n\n"
+    echo "Initiating download"
+    echo "========================================================================="
+    echo "                           Verifying databases"
+    echo "========================================================================="
+    echo "Details of databases to be collected are:"
+    echo "-------------------------------------------------------------------------"
 
-      # wordpress_data is a smaller database and its modified version is available in the repo itself.
-      echo "->mysql/wordpress_data/reactome-wordpress.sql.gz"
-      echo "->mysql/tomcat_data/gk_current.sql.gz"
-      echo "->neo4j/data/reactome.graphdb.tgz"
-      echo "->solr/data/solr_data.tgz"
-      echo "->java-application-builder/downloads/analysis.bin.gz"
-      echo "->java-application-builder/downloads/interactors.db.gz"
-      echo "-------------------------------------------------------------------------"
+    # wordpress_data is a smaller database and its modified version is available in the repo itself.
+    echo "->mysql/wordpress_data/reactome-wordpress.sql.gz"
+    echo "->mysql/tomcat_data/gk_current.sql.gz"
+    echo "->neo4j/data/reactome.graphdb.tgz"
+    echo "->solr/data/solr_data.tgz"
+    echo "->java-application-builder/downloads/analysis.bin.gz"
+    echo "->java-application-builder/downloads/interactors.db.gz"
+    echo "-------------------------------------------------------------------------"
 
-      # The first value in the list is the filepath in host directory and second value is the download link
-      local declare -A file_list
-      file_list+=( ["mysql/tomcat_data/gk_current.sql.gz"]="http://www.reactome.org/download/current/databases/gk_current.sql.gz" ) # tomcat_data
-      file_list+=( ["neo4j/data/reactome.graphdb.tgz"]="http://reactome.org/download/current/reactome.graphdb.tgz" ) # neo4j data
-      file_list+=( ["solr/data/solr_data.tgz"]="https://reactome.org/download/current/solr_data.tgz" ) # solr data
-      file_list+=( ["java-application-builder/downloads/diagrams_and_fireworks.tgz"]="https://reactome.org/download/current/diagrams_and_fireworks.tgz" )
-      # file_list+=( ["mysql/wordpress_data/reactome-wordpress.sql.gz"]="http://www.reactome.org/download/current/databases/gk_wordpress.sql.gz")
+    # The first value in the list is the filepath in host directory and second value is the download link
+    declare -A file_list
+    file_list+=( ["mysql/tomcat_data/gk_current.sql.gz"]="http://www.reactome.org/download/current/databases/gk_current.sql.gz" ) # tomcat_data
+    file_list+=( ["neo4j/data/reactome.graphdb.tgz"]="http://reactome.org/download/current/reactome.graphdb.tgz" ) # neo4j data
+    file_list+=( ["solr/data/solr_data.tgz"]="https://reactome.org/download/current/solr_data.tgz" ) # solr data
+    file_list+=( ["java-application-builder/downloads/diagrams_and_fireworks.tgz"]="https://reactome.org/download/current/diagrams_and_fireworks.tgz" )
+    # file_list+=( ["mysql/wordpress_data/reactome-wordpress.sql.gz"]="http://www.reactome.org/download/current/databases/gk_wordpress.sql.gz")
 
-      for db_file in "${!file_list[@]}";
-      do
-        # Initialization before prepairing download
-        URL=${file_list[${db_file}]}
-        file_path=${db_file}
-        file_name=$(basename $file_path)
-        mkdir -p $(dirname $file_path)
+    for db_file in "${!file_list[@]}";
+    do
+      # Initialization before prepairing download
+      URL=${file_list[${db_file}]}
+      file_path=${db_file}
+      file_name=$(basename $file_path)
+      mkdir -p $(dirname $file_path)
 
-        if [ -f $file_path ] ; then
-            # Get size information
-            typeset -i remote_file_size=$(curl -sI $URL | tr -d '\r' | grep -i content-length | awk '{print $2}')
-            typeset -i local_file_size=$(stat -c %s -- $file_path) > /dev/null 2>&1
-            echo "======================================================================="
-            echo "======================================================================="
-            echo "Filename:    " $file_name
-            echo "Remote Size: " $remote_file_size
-            echo "Local Size:  " $local_file_size
+      if [ -f $file_path ] ; then
+          # Get size information
+          typeset -i remote_file_size=$(curl -sI $URL | tr -d '\r' | grep -i content-length | awk '{print $2}')
+          typeset -i local_file_size=$(stat -c %s -- $file_path) > /dev/null 2>&1
+          echo "======================================================================="
+          echo "======================================================================="
+          echo "Filename:    " $file_name
+          echo "Remote Size: " $remote_file_size
+          echo "Local Size:  " $local_file_size
 
-            if [[ $local_file_size -eq $remote_file_size ]]; then
-              echo "Database up to date. Update not required"
-            elif [[ $remote_file_size -eq 0 ]]; then
-              echo "Remote file not acccessible. Not updating!"
-            else
-              echo "Database needs to be updated!"
-              echo "Removing old file if it exists!"
-              rm $file_path 2> /dev/null # 2> /dev/null is to ignore error if file not found
-              echo "Downloading newer version"
-              # To resume partially completed download, use --continue flag and comment out "rm $file_path 2> /dev/null"
-              wget -O $file_path $URL
-            fi
-        else
-            echo "File $file_path does not exist. Will download now."
+          if [[ $local_file_size -eq $remote_file_size ]]; then
+            echo "Database up to date. Update not required"
+          elif [[ $remote_file_size -eq 0 ]]; then
+            echo "Remote file not acccessible. Not updating!"
+          else
+            echo "Database needs to be updated!"
+            echo "Removing old file if it exists!"
+            rm $file_path 2> /dev/null # 2> /dev/null is to ignore error if file not found
+            echo "Downloading newer version"
+            # To resume partially completed download, use --continue flag and comment out "rm $file_path 2> /dev/null"
             wget -O $file_path $URL
-        fi
-        echo -e "\n\n"
-      done
-    else
-      echo "No internet access! Not verifying databases!"
-    fi
+          fi
+      else
+          echo "File $file_path does not exist. Will download now."
+          wget -O $file_path $URL
+      fi
+      echo -e "\n\n"
+    done
+  else
+    echo "No internet access! Not verifying databases!"
   fi
 }
 
@@ -92,8 +90,7 @@ function updateDataArchives()
 #     - solr_data.tgz
 function updateAllArchives()
 {
-  updateDataArchives
-  local declare -A file_list
+  declare -A file_list
   file_list+=( ["java-application-builder/downloads/analysis.bin.gz"]="https://reactome.org/download/current/analysis_v61.bin.gz" ) # Analysis.bin for analysis service
   file_list+=( ["java-application-builder/downloads/interactors.db.gz"]="https://reactome.org/download/current/interactors.db.gz" ) # interactors.db required to create analysis.bin
   for db_file in "${!file_list[@]}";
@@ -132,6 +129,7 @@ function updateAllArchives()
     fi
     echo -e "\n\n"
   done
+  updateDataArchives
 }
 
 # Remove old archives and download new ones.
@@ -147,7 +145,7 @@ function updateAllArchives()
 function downloadAllNewArchives()
 {
   downloadNewArchives
-  local declare -A file_list
+  declare -A file_list
   file_list+=( ["java-application-builder/downloads/analysis.bin.gz"]="https://reactome.org/download/current/analysis_v61.bin.gz" ) # Analysis.bin for analysis service
   file_list+=( ["java-application-builder/downloads/interactors.db.gz"]="https://reactome.org/download/current/interactors.db.gz" ) # interactors.db required to create analysis.bin
   
@@ -171,7 +169,7 @@ function downloadAllNewArchives()
 #     - solr_data.tgz
 function downloadNewArchives()
 {
-  local declare -A file_list
+  declare -A file_list
   file_list+=( ["mysql/tomcat_data/gk_current.sql.gz"]="http://www.reactome.org/download/current/databases/gk_current.sql.gz" ) # tomcat_data
   file_list+=( ["neo4j/data/reactome.graphdb.tgz"]="http://reactome.org/download/current/reactome.graphdb.tgz" ) # neo4j data
   file_list+=( ["solr/data/solr_data.tgz"]="https://reactome.org/download/current/solr_data.tgz" ) # solr data
@@ -302,6 +300,9 @@ function startUp()
 }
 
 
+# Setting the currect working directory
+cd "${0%/*}"
+thisScript="$0"
 usage="
 usage: $thisScript [option]... [argument]...
 Every option can be accompanied by an argument
@@ -367,9 +368,6 @@ Example: $thisScript
   -h      display help
 "
 
-# Setting the currect working directory
-cd "${0%/*}"
-thisScript="$0"
 echo "Now executing the script"
 numargs=$#
 for ((i=1 ; i <= numargs ; i++))
@@ -398,6 +396,7 @@ do
       else
         echo "Switching to Default behavior: Only database archives will be removed and downloaded again."
         updateDataArchives
+        echo "Archives updated"
       fi
       ;;
 
@@ -446,7 +445,7 @@ do
 
     -h | --help)
       # Displaying help
-      echo $usage
+      echo "$usage"
     esac
     # Using 'shift' to pop out the current option
     shift
