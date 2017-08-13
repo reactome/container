@@ -133,7 +133,7 @@ do
     echo ${app} " ready! Skippinig ahead"
   else
     echo "Developing " ${app} "In phase=" ${app_list[${app}]}
-    # ${app}
+    ${app}
   fi
 done
 set +e

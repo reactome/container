@@ -135,7 +135,15 @@ function updateAllArchives()
 }
 
 # Remove old archives and download new ones.
+# Following files will be downloaded:
+#     - interactors.db.gz
+#     - analysis.bin.gz
 #
+# These files will get downloaded by downloadNewArchives
+#     - tomcat_sql_data
+#     - Diagrams_and_fireworks.tgz
+#     - reactome.graphdb.tgz
+#     - solr_data.tgz
 function downloadAllNewArchives()
 {
   downloadNewArchives
@@ -156,7 +164,11 @@ function downloadAllNewArchives()
   done
 }
 
-
+# Following files will be downloaded:
+#     - tomcat_sql_data named as gk_current_sql, located in mysql/tomcat_data
+#     - Diagrams_and_fireworks.tgz located inside java-application-builder/downloads
+#     - reactome.graphdb.tgz
+#     - solr_data.tgz
 function downloadNewArchives()
 {
   local declare -A file_list
@@ -314,9 +326,9 @@ Option          | Argument  | Description
 -d, --download  | (No args)  Remove old and download new database files
                 |            It operates sequentially on each file
                 |            Following files will be downloaded:
-                |            - gk_current.sql.gz    : for mysql/tomcat
-                |            - reactome.graphdb.tg  : for Neo4j
-                |            - solr_data.tgz        : for Solr
+                |            - gk_current.sql.gz     : for mysql/tomcat
+                |            - reactome.graphdb.tg   : for Neo4j
+                |            - solr_data.tgz         : for Solr
                 |            - diagrams_and_fireworks.tgz
                 |
                 | all        Using 'all' argument would also download
@@ -368,92 +380,74 @@ do
       # Download option has been selected
       if [[ "$2" == "all" ]]; then
         echo "Selected 'all'. All previous archives, if present, will be deleted and new ones will be downloaded."
+        downloadAllNewArchives
+        # using shift to pop out 'all' argument
         shift
       else
         echo "Switching to Default behavior: Only database archives will be removed and downloaded again."
+        downloadNewArchives
+      fi
+      ;;
+
+    -u | --update)
+      # Update option has been selected.
+      if [[ "$2" == "all" ]]; then
+        echo "Selected 'all'. All previous archives will be checked. if inconsistent with remote version, new file will be downloaded."
+        updateAllArchives
+        shift
+      else
+        echo "Switching to Default behavior: Only database archives will be removed and downloaded again."
+        updateDataArchives
       fi
       ;;
 
     -b | --build)
       # This is build option. Used to build webapps for tomcat
+      declare -a app_list=(CuratorTool PathwayExchange RESTfulAPI PathwayBrowser ContentService AnalysisToolsCore AnalysisToolsService AnalysisBin InteractorsCore)
       if [[ "$2" == "all" ]]; then
         echo "Selected all: These are all webapps which will be built:"
-        echo "
-          CuratorTool
-          PathwayExchange
-          RESTfulAPI
-          PathwayBrowser
-          ContentService
-          AnalysisToolsCore
-          AnalysisToolsService
-          AnalysisBin
-          InteractorsCore"
+        for app_name in "${app_list[@]}"; do
+          echo "${app_name}"
+          export "state_${app_name}=develop"
+        done
         shift
       elif [[ "$2" == "select" ]]; then
         echo "Please select which applications you want to build:"
         echo -e "Which webapps should always be rebuilt? Press [y/n]" -n 1 -r
-        read -p "CuratorTool?`echo $'\n> '`" -n 1 -r
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-          export state_PathwayExchange=develop
-        else export state_PathwayExchange=ready
-        fi
-        echo
-        read -p "PathwayExchange?`echo $'\n> '`" -n 1 -r
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-          export state_RESTfulAPI=develop
-        else export state_RESTfulAPI=ready
-        fi
-        echo
-        read -p "RESTfulAPI?`echo $'\n> '`" -n 1 -r
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-          export state_PathwayBrowser=develop
-        else export state_PathwayBrowser=ready
-        fi
-        echo
-        read -p "ContentService?`echo $'\n> '`" -n 1 -r
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-          export state_ContentService=develop
-        else export state_ContentService=ready
-        fi
-        echo
-        read -p "AnalysisToolsCore?`echo $'\n> '`" -n 1 -r
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-          export state_AnalysisToolsCore=develop
-        else export state_AnalysisToolsCore=ready
-        fi
-        echo
-        read -p "AnalysisToolsService?`echo $'\n> '`" -n 1 -r
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-          export state_AnalysisToolsService=develop
-        else export state_AnalysisToolsService=ready
-        fi
-        echo
-        read -p "AnalysisBin?`echo $'\n> '`" -n 1 -r
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-          export state_AnalysisBin=develop
-        else export state_AnalysisBin=ready
-        fi
-        echo
-        read -p "InteractorsCore?`echo $'\n> '`" -n 1 -r
-        if [[ $REPLY =~ ^[Yy]$ ]]; then
-          export state_InteractorsCore=develop
-        else export state_InteractorsCore=ready
-        fi
-        ./java-application-builder/build_webapps.sh
+        for app_name in "${app_list[@]}"; do
+          echo
+          read -p "${app_name}?`echo $'\n> '`" -n 1 -r
+          if [[ $REPLY =~ ^[Yy]$ ]]; then
+            export "state_${app_name}=develop"
+          else export "state_${app_name}=ready"
+          fi
+        done
+        # Using shift to pop out 'select' argument
         shift
       else
-        echo "Default behavior: 'Build' will switch to its default behavior and only essential applications will be built"
+        echo "Default behavior: Only essential applications will be built"
         echo "Essential applications: ReactomeRESTfulAPI.war"
+        export state_RESTfulAPI=develop
         echo "                        PathwayBrowser.war"
+        export state_PathwayBrowser=develop
         echo "                        analysis-service.war"
+        export state_AnalysisToolsService=develop
         echo "                        ContentService.war"
+        export state_ContentService=develop
         echo "                        content.war"
+        export state_DataContent=develop
       fi
+      # Tell user whatever is going to happen next
+      sleep 1
+      # At this point we have determined which apps we want to build
+      ./java-application-builder/build_webapps.sh
+      shift
       ;;
 
     -h | --help)
       # Displaying help
       echo $usage
     esac
+    # Using 'shift' to pop out the current option
     shift
 done
