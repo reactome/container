@@ -292,11 +292,13 @@ function startUp()
 
 usage="
 usage: $thisScript [option]... [argument]...
-Giving arguments to options is not mandatory.
+Every option can be accompanied by an argument
 
 Option          | Argument  | Description
 ------------------------------------------------------------------
--u, --update    | (No args)  Update database files.
+-u, --update    | (No args)  If files are not present or not consistent 
+                |            with their remote version, they will be
+                |            downloaded. Update database files.
                 |            The files that will be updated include:
                 |            - gk_current.sql.gz    : for mysql/tomcat
                 |            - reactome.graphdb.tg  : for Neo4j
@@ -361,8 +363,9 @@ numargs=$#
 for ((i=1 ; i <= numargs ; i++))
 do
   case "$1" in
+
     -d | --download)
-      # This is the download option
+      # Download option has been selected
       if [[ "$2" == "all" ]]; then
         echo "Selected 'all'. All previous archives, if present, will be deleted and new ones will be downloaded."
         shift
@@ -370,13 +373,73 @@ do
         echo "Switching to Default behavior: Only database archives will be removed and downloaded again."
       fi
       ;;
+
     -b | --build)
       # This is build option. Used to build webapps for tomcat
       if [[ "$2" == "all" ]]; then
-        echo "Selected all: All webapps will be built"
+        echo "Selected all: These are all webapps which will be built:"
+        echo "
+          CuratorTool
+          PathwayExchange
+          RESTfulAPI
+          PathwayBrowser
+          ContentService
+          AnalysisToolsCore
+          AnalysisToolsService
+          AnalysisBin
+          InteractorsCore"
         shift
       elif [[ "$2" == "select" ]]; then
         echo "Please select which applications you want to build:"
+        echo -e "Which webapps should always be rebuilt? Press [y/n]" -n 1 -r
+        read -p "CuratorTool?`echo $'\n> '`" -n 1 -r
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+          export state_PathwayExchange=develop
+        else export state_PathwayExchange=ready
+        fi
+        echo
+        read -p "PathwayExchange?`echo $'\n> '`" -n 1 -r
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+          export state_RESTfulAPI=develop
+        else export state_RESTfulAPI=ready
+        fi
+        echo
+        read -p "RESTfulAPI?`echo $'\n> '`" -n 1 -r
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+          export state_PathwayBrowser=develop
+        else export state_PathwayBrowser=ready
+        fi
+        echo
+        read -p "ContentService?`echo $'\n> '`" -n 1 -r
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+          export state_ContentService=develop
+        else export state_ContentService=ready
+        fi
+        echo
+        read -p "AnalysisToolsCore?`echo $'\n> '`" -n 1 -r
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+          export state_AnalysisToolsCore=develop
+        else export state_AnalysisToolsCore=ready
+        fi
+        echo
+        read -p "AnalysisToolsService?`echo $'\n> '`" -n 1 -r
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+          export state_AnalysisToolsService=develop
+        else export state_AnalysisToolsService=ready
+        fi
+        echo
+        read -p "AnalysisBin?`echo $'\n> '`" -n 1 -r
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+          export state_AnalysisBin=develop
+        else export state_AnalysisBin=ready
+        fi
+        echo
+        read -p "InteractorsCore?`echo $'\n> '`" -n 1 -r
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+          export state_InteractorsCore=develop
+        else export state_InteractorsCore=ready
+        fi
+        ./java-application-builder/build_webapps.sh
         shift
       else
         echo "Default behavior: 'Build' will switch to its default behavior and only essential applications will be built"
@@ -387,6 +450,7 @@ do
         echo "                        content.war"
       fi
       ;;
+
     -h | --help)
       # Displaying help
       echo $usage

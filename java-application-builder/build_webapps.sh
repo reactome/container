@@ -1,4 +1,5 @@
 #! /bin/bash
+cd "${0%/*}"
 # Build the container - this also builds the applications.
 docker build -t reactome-app-builder -f buildApps.dockerfile .
 
@@ -14,9 +15,11 @@ docker run -itd --rm \
 	--env-file $(dirname `pwd`)/tomcat.env mysql
 
 # Build the java applications
-docker run -it --name=java-webapp-builder --rm -v "$(pwd)/webapps:/webapps" \
-    --network=isolated_nw \
-    -v "$(pwd)/downloads:/downloads" \
+docker run -it --name=java-webapp-builder --rm \
+  --network=isolated_nw \
+  --env-file=build_webapps.env \
+  -v "$(pwd)/webapps:/webapps" \
+  -v "$(pwd)/downloads:/downloads" \
 	-v "$(pwd)/mounts/Pathway-Exchange-pom.xml:/gitroot/Pathway-Exchange/pom.xml" \
 	-v "$(pwd)/mounts/AnalysisTools-Service-pom.xml:/gitroot/AnalysisTools/Service/pom.xml" \
 	-v "$(pwd)/mounts/AnalysisService_mvc-dispatcher-servlet.xml:/gitroot/AnalysisTools/Service/src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml" \

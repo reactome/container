@@ -101,16 +101,30 @@ InteractorsCore ()
   echo "Successfully created interactors.db"
 }
 
+# declare -A app_list
+# # app_list+=( ["CuratorTool"]=ready )
+# app_list+=( ["PathwayExchange"]=ready )
+# app_list+=( ["RESTfulAPI"]=notready )
+# app_list+=( ["PathwayBrowser"]=notready )
+# app_list+=( ["ContentService"]=notready )
+# # app_list+=( ["AnalysisToolsCore"]=notready )
+# app_list+=( ["AnalysisToolsService"]=developing )
+# # app_list+=( ["AnalysisBin"]=ready )
+# # app_list+=( ["InteractorsCore"]=notready )
+
+
 declare -A app_list
-# app_list+=( ["CuratorTool"]=ready )
-app_list+=( ["PathwayExchange"]=ready )
-app_list+=( ["RESTfulAPI"]=notready )
-app_list+=( ["PathwayBrowser"]=notready )
-app_list+=( ["ContentService"]=notready )
-# app_list+=( ["AnalysisToolsCore"]=notready )
-app_list+=( ["AnalysisToolsService"]=developing )
-# app_list+=( ["AnalysisBin"]=ready )
-# app_list+=( ["InteractorsCore"]=notready )
+app_list+=( ["CuratorTool"]=$state_CuratorTool )
+app_list+=( ["PathwayExchange"]=$state_PathwayExchange )
+app_list+=( ["RESTfulAPI"]=$state_RESTfulAPI )
+app_list+=( ["PathwayBrowser"]=$state_PathwayBrowser )
+app_list+=( ["DataContent"]=$state_DataContent )
+app_list+=( ["ContentService"]=$state_ContentService )
+app_list+=( ["InteractorsCore"]=$state_InteractorsCore )
+app_list+=( ["AnalysisToolsCore"]=$state_AnalysisToolsCore )
+app_list+=( ["AnalysisToolsService"]=$state_AnalysisToolsService )
+app_list+=( ["AnalysisBin"]=$state_AnalysisBin )
+app_list+=( ["SearchIndexer"]=developing )
 
 for app in "${!app_list[@]}";
 do
@@ -119,7 +133,7 @@ do
     echo ${app} " ready! Skippinig ahead"
   else
     echo "Developing " ${app} "In phase=" ${app_list[${app}]}
-    ${app}
+    # ${app}
   fi
 done
 set +e
