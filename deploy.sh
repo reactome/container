@@ -12,23 +12,6 @@ function updateDataArchives()
   echo -e "GET http://google.com HTTP/1.0\n\n" | nc google.com 80 > /dev/null 2>&1
 
   if [ $? -eq 0 ]; then
-    echo -e "\n\n"
-    echo "Initiating download"
-    echo "========================================================================="
-    echo "                           Verifying databases"
-    echo "========================================================================="
-    echo "Details of databases to be collected are:"
-    echo "-------------------------------------------------------------------------"
-
-    # wordpress_data is a smaller database and its modified version is available in the repo itself.
-    echo "->mysql/wordpress_data/reactome-wordpress.sql.gz"
-    echo "->mysql/tomcat_data/gk_current.sql.gz"
-    echo "->neo4j/data/reactome.graphdb.tgz"
-    echo "->solr/data/solr_data.tgz"
-    echo "->java-application-builder/downloads/analysis.bin.gz"
-    echo "->java-application-builder/downloads/interactors.db.gz"
-    echo "-------------------------------------------------------------------------"
-
     # The first value in the list is the filepath in host directory and second value is the download link
     declare -A file_list
     file_list+=( ["mysql/tomcat_data/gk_current.sql.gz"]="http://www.reactome.org/download/current/databases/gk_current.sql.gz" ) # tomcat_data
@@ -43,22 +26,24 @@ function updateDataArchives()
       URL=${file_list[${db_file}]}
       file_path=${db_file}
       file_name=$(basename $file_path)
+      # Creating a directory for the file to be downloaded
       mkdir -p $(dirname $file_path)
 
       if [ -f $file_path ] ; then
           # Get size information
+          echo "Fetching metadata for remote file..."
           typeset -i remote_file_size=$(curl -sI $URL | tr -d '\r' | grep -i content-length | awk '{print $2}')
           typeset -i local_file_size=$(stat -c %s -- $file_path) > /dev/null 2>&1
-          echo "======================================================================="
-          echo "======================================================================="
-          echo "Filename:    " $file_name
+          echo "#######################################################################"
+          echo "# Filename:  " $file_name
+          echo "#######################################################################"
           echo "Remote Size: " $remote_file_size
           echo "Local Size:  " $local_file_size
 
           if [[ $local_file_size -eq $remote_file_size ]]; then
             echo "Database up to date. Update not required"
           elif [[ $remote_file_size -eq 0 ]]; then
-            echo "Remote file not acccessible. Not updating!"
+            echo "Remote file not acccessible. Could not update!"
           else
             echo "Database needs to be updated!"
             echo "Removing old file if it exists!"
@@ -68,8 +53,9 @@ function updateDataArchives()
             wget -O $file_path $URL
           fi
       else
-          echo "File $file_path does not exist. Will download now."
-          wget -O $file_path $URL
+        # For downloading file which does not exist locally
+        echo "File $file_path does not exist. Will download now."
+        wget -O $file_path $URL
       fi
       echo -e "\n\n"
     done
@@ -103,11 +89,12 @@ function updateAllArchives()
 
     if [ -f $file_path ] ; then
         # Get size information
+        echo "Fetching metadata for remote file..."
         typeset -i remote_file_size=$(curl -sI $URL | tr -d '\r' | grep -i content-length | awk '{print $2}')
         typeset -i local_file_size=$(stat -c %s -- $file_path) > /dev/null 2>&1
-        echo "======================================================================="
-        echo "======================================================================="
-        echo "Filename:    " $file_name
+        echo "#######################################################################"
+        echo "# Filename:  " $file_name
+        echo "#######################################################################"
         echo "Remote Size: " $remote_file_size
         echo "Local Size:  " $local_file_size
 
@@ -144,7 +131,6 @@ function updateAllArchives()
 #     - solr_data.tgz
 function downloadAllNewArchives()
 {
-  downloadNewArchives
   declare -A file_list
   file_list+=( ["java-application-builder/downloads/analysis.bin.gz"]="https://reactome.org/download/current/analysis_v61.bin.gz" ) # Analysis.bin for analysis service
   file_list+=( ["java-application-builder/downloads/interactors.db.gz"]="https://reactome.org/download/current/interactors.db.gz" ) # interactors.db required to create analysis.bin
@@ -156,10 +142,15 @@ function downloadAllNewArchives()
     file_path=${db_file}
     file_name=$(basename $file_path)
     mkdir -p $(dirname $file_path)
+    echo "#######################################################################"
+    echo "# Filename:  " $file_name
+    echo "#######################################################################"
 
     rm -rf $file_path
+    echo "Old file deleted, downloading new one..."
     wget -O $file_path $URL
   done
+  downloadNewArchives
 }
 
 # Following files will be downloaded:
@@ -181,8 +172,12 @@ function downloadNewArchives()
     file_path=${db_file}
     file_name=$(basename $file_path)
     mkdir -p $(dirname $file_path)
+    echo "#######################################################################"
+    echo "# Filename:  " $file_name
+    echo "#######################################################################"
 
     rm -rf $file_path
+    echo "Old file deleted, downloading new one..."
     wget -O $file_path $URL
   done
 }
@@ -249,22 +244,8 @@ function unpackArchives()
 
 function startUp()
 {
-  echo "Changing directory to:"
-  cd ../..
-  pwd
-
-  read -p "Build webapps? Press [y/n]" -n 1 -r
-  if [[ $REPLY =~ ^[Yy]$ ]]
-  then
-    echo
-    echo "========================================================================="
-    echo "                Building webapps using reactome-app-builder"
-    echo "========================================================================="
-    cd ./java-application-builder
-    bash ./build_webapps.sh |& tee ../logs/build_webapps.log
-    cd ..
-    echo "Reactome-app-builder exits here."
-  fi
+  cd "${0%/*}"
+  echo "Changing to current directory:$(pwd)"
 
   echo -e "\n\n"
   echo "==========================================================================="
@@ -449,3 +430,4 @@ do
     # Using 'shift' to pop out the current option
     shift
 done
+startUp
