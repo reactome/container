@@ -11,7 +11,7 @@ CuratorTool ()
 
 PathwayExchange ()
 {
-  CuratorTool
+  # CuratorTool
   # Build Pathway Exchange
   cd /gitroot/Pathway-Exchange \
   && mvn install:install-file -Dfile=/gitroot/libsbgn/dist/org.sbgn.jar -DartifactId=sbgn -DgroupId=org.sbgn -Dpackaging=jar -Dversion=milestone2 \
@@ -26,10 +26,11 @@ PathwayExchange ()
 
 RESTfulAPI ()
 {
-  CuratorTool
+  # CuratorTool
   # Build RESTfulAPI
-  cd /gitroot/RESTfulAPI/ -lht \
+  cd /gitroot/RESTfulAPI \
   && mvn install:install-file -Dfile=/gitroot/CuratorTool/reactome.jar -DartifactId=Reactome -DgroupId=org.reactome -Dpackaging=jar -Dversion=UNKNOWN_VERSION \
+  && ls /gitroot/RESTfulAPI/ -lht \
   && pwd && mvn package \
   && cp /gitroot/RESTfulAPI/target/ReactomeRESTfulAPI*.war /webapps/ReactomeRESTfulAPI.war
 }
@@ -59,7 +60,7 @@ AnalysisToolsCore ()
 
 AnalysisBin ()
 {
-  AnalysisToolsCore
+  # AnalysisToolsCore
   cd /gitroot/AnalysisTools/Core/target/
   echo "Building analysis.bin, required for running analysis service:"
   if ! [[ -f /downloads/interactors.db ]]; then
@@ -77,7 +78,7 @@ AnalysisBin ()
 
 AnalysisToolsService ()
 {
-  AnalysisToolsCore
+  # AnalysisToolsCore
   # Build AnalysisTools service using the "AnalysisService-Local" profile.
   cd /gitroot/AnalysisTools/Service && mvn package -P AnalysisService-Local
   cp /gitroot/AnalysisTools/Service/target/analysis-service*.war /webapps/
@@ -118,7 +119,7 @@ app_list+=( ["CuratorTool"]=$state_CuratorTool )                   orders+=("Cur
 app_list+=( ["PathwayExchange"]=$state_PathwayExchange )           orders+=("PathwayExchange")
 app_list+=( ["RESTfulAPI"]=$state_RESTfulAPI )                     orders+=("RESTfulAPI")
 app_list+=( ["PathwayBrowser"]=$state_PathwayBrowser )             orders+=("PathwayBrowser")
-app_list+=( ["DataContent"]=$state_DataContent )                   orders+=("DataContent")
+# app_list+=( ["DataContent"]=$state_DataContent )                   orders+=("DataContent")
 app_list+=( ["ContentService"]=$state_ContentService )             orders+=("ContentService")
 app_list+=( ["InteractorsCore"]=$state_InteractorsCore )           orders+=("InteractorsCore")
 app_list+=( ["AnalysisToolsCore"]=$state_AnalysisToolsCore )       orders+=("AnalysisToolsCore")
@@ -132,7 +133,7 @@ do
   then
     echo "Application ready! Skippinig ${orders[$i]}"
   else
-    echo "Application in state=" ${app_list[${orders[$i]}]}
+    echo "Application in state="${app_list[${orders[$i]}]} "Developing ${orders[$i]}"
     ${orders[$i]}
   fi
 done
