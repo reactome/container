@@ -112,28 +112,28 @@ InteractorsCore ()
 # # app_list+=( ["AnalysisBin"]=ready )
 # # app_list+=( ["InteractorsCore"]=notready )
 
+# Associative arrays are ordered according to hash, so using another simple array to preserve order
+declare -A app_list;                                               declare -a orders
+app_list+=( ["CuratorTool"]=$state_CuratorTool )                   orders+=("CuratorTool")
+app_list+=( ["PathwayExchange"]=$state_PathwayExchange )           orders+=("PathwayExchange")
+app_list+=( ["RESTfulAPI"]=$state_RESTfulAPI )                     orders+=("RESTfulAPI")
+app_list+=( ["PathwayBrowser"]=$state_PathwayBrowser )             orders+=("PathwayBrowser")
+app_list+=( ["DataContent"]=$state_DataContent )                   orders+=("DataContent")
+app_list+=( ["ContentService"]=$state_ContentService )             orders+=("ContentService")
+app_list+=( ["InteractorsCore"]=$state_InteractorsCore )           orders+=("InteractorsCore")
+app_list+=( ["AnalysisToolsCore"]=$state_AnalysisToolsCore )       orders+=("AnalysisToolsCore")
+app_list+=( ["AnalysisToolsService"]=$state_AnalysisToolsService ) orders+=("AnalysisToolsService")
+app_list+=( ["AnalysisBin"]=$state_AnalysisBin )                   orders+=("AnalysisBin")
+app_list+=( ["SearchIndexer"]=developing )                         orders+=("SearchIndexer")
 
-declare -A app_list
-app_list+=( ["CuratorTool"]=$state_CuratorTool )
-app_list+=( ["PathwayExchange"]=$state_PathwayExchange )
-app_list+=( ["RESTfulAPI"]=$state_RESTfulAPI )
-app_list+=( ["PathwayBrowser"]=$state_PathwayBrowser )
-app_list+=( ["DataContent"]=$state_DataContent )
-app_list+=( ["ContentService"]=$state_ContentService )
-app_list+=( ["InteractorsCore"]=$state_InteractorsCore )
-app_list+=( ["AnalysisToolsCore"]=$state_AnalysisToolsCore )
-app_list+=( ["AnalysisToolsService"]=$state_AnalysisToolsService )
-app_list+=( ["AnalysisBin"]=$state_AnalysisBin )
-app_list+=( ["SearchIndexer"]=developing )
-
-for app in "${!app_list[@]}";
+for i in "${!orders[@]}";
 do
-  if [[ ${app_list[${app}]} == "ready" ]]; 
+  if [[ ${app_list[${orders[$i]}]} == "ready" ]];
   then
-    echo ${app} " ready! Skippinig ahead"
+    echo "Application ready! Skippinig ${orders[$i]}"
   else
-    echo "Developing " ${app} "In phase=" ${app_list[${app}]}
-    ${app}
+    echo "Application in state=" ${app_list[${orders[$i]}]}
+    ${orders[$i]}
   fi
 done
 set +e
