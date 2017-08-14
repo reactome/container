@@ -423,9 +423,10 @@ do
       shift
       ;;
 
-    -h | --help)
+    -h | --help | *)
       # Displaying help
       echo "$usage"
+      exit 0
     esac
     # Using 'shift' to pop out the current option
     shift
