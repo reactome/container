@@ -348,7 +348,6 @@ Example: $thisScript
   -h      display help
 "
 
-echo "Now executing the script"
 numargs=$#
 for ((i=1 ; i <= numargs ; i++))
 do
@@ -374,7 +373,7 @@ do
         updateAllArchives
         shift
       else
-        echo "Switching to Default behavior: Only database archives will be removed and downloaded again."
+        echo "Switching to Default behavior: Only database archives will be updated."
         updateDataArchives
         echo "Archives updated"
       fi
@@ -420,13 +419,18 @@ do
       sleep 1
       # At this point we have determined which apps we want to build
       ./java-application-builder/build_webapps.sh
-      shift
       ;;
 
-    -h | --help | *)
+    -h | --help )
       # Displaying help
       echo "$usage"
       exit 0
+      ;;
+    * )
+      # Invalid option selected
+      echo "Invalid option: $1"
+      echo "$usage"
+      exit
     esac
     # Using 'shift' to pop out the current option
     shift
