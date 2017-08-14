@@ -1,5 +1,7 @@
 #! /bin/bash
-cd "${0%/*}"
+# Setting the current directory as the directory of script
+cd "$(dirname "$0")"
+
 # Build the container - this also builds the applications.
 docker build -t reactome-app-builder -f buildApps.dockerfile .
 

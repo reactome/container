@@ -244,7 +244,7 @@ function unpackArchives()
 
 function startUp()
 {
-  cd "${0%/*}"
+  cd "$(dirname "$0")"
   echo "Changing to current directory:$(pwd)"
 
   echo -e "\n\n"
@@ -281,7 +281,7 @@ function startUp()
 
 
 # Setting the currect working directory
-cd "${0%/*}"
+cd "$(dirname "$0")"
 thisScript="$0"
 usage="
 usage: $thisScript [option]... [argument]...
