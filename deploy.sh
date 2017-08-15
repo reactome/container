@@ -349,7 +349,7 @@ Example: $thisScript
 "
 
 numargs=$#
-for ((i=1 ; i <= numargs ; i++))
+for ((i=1 ; i <= numargs ;))
 do
   case "$1" in
 
@@ -359,6 +359,7 @@ do
         echo "Selected 'all'. All previous archives, if present, will be deleted and new ones will be downloaded."
         downloadAllNewArchives
         # using shift to pop out 'all' argument
+        ((i++));
         shift
       else
         echo "Switching to Default behavior: Only database archives will be removed and downloaded again."
@@ -371,6 +372,7 @@ do
       if [[ "$2" == "all" ]]; then
         echo "Selected 'all'. All previous archives will be checked. if inconsistent with remote version, new file will be downloaded."
         updateAllArchives
+        i++;
         shift
       else
         echo "Switching to Default behavior: Only database archives will be updated."
@@ -388,6 +390,7 @@ do
           echo "${app_name}"
           export "state_${app_name}=develop"
         done
+        ((i++));
         shift
       elif [[ "$2" == "select" ]]; then
         echo "Please select which applications you want to build:"
@@ -401,6 +404,7 @@ do
           fi
         done
         # Using shift to pop out 'select' argument
+        ((i++));
         shift
       else
         echo "Default behavior: Only essential applications will be built"
@@ -433,6 +437,7 @@ do
       exit
     esac
     # Using 'shift' to pop out the current option
+    ((i++));
     shift
 done
 startUp
