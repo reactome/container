@@ -6,7 +6,8 @@ CuratorTool ()
   cd /gitroot/libsbgn && ant \
   && cd /gitroot/CuratorTool/ant \
   && ant -buildfile ReactomeJar.xml \
-  && ant -buildfile CuratorToolBuild.xml
+  && ant -buildfile CuratorToolBuild.xml \
+  && mvn install:install-file -Dfile=/gitroot/CuratorTool/reactome.jar -DartifactId=Reactome -DgroupId=org.reactome -Dpackaging=jar -Dversion=UNKNOWN_VERSION
 }
 
 PathwayExchange ()
@@ -129,11 +130,15 @@ app_list+=( ["SearchIndexer"]=developing )                         orders+=("Sea
 
 for i in "${!orders[@]}";
 do
+  echo "############################################################"
+  echo "# Application: ${orders[$i]}"
+  echo "# State:     : ${app_list[${orders[$i]}]}"
+  echo "############################################################"
   if [[ ${app_list[${orders[$i]}]} == "ready" ]];
   then
     echo "Application ready! Skippinig ${orders[$i]}"
   else
-    echo "Application in state="${app_list[${orders[$i]}]} "Developing ${orders[$i]}"
+    echo "Developing ${orders[$i]}"
     ${orders[$i]}
   fi
 done
