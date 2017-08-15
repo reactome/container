@@ -383,7 +383,7 @@ do
 
     -b | --build)
       # This is build option. Used to build webapps for tomcat
-      declare -a app_list=(CuratorTool PathwayExchange RESTfulAPI PathwayBrowser ContentService AnalysisToolsCore AnalysisToolsService AnalysisBin InteractorsCore)
+      declare -a app_list=(CuratorTool PathwayExchange RESTfulAPI PathwayBrowser SearchCore DataContent ContentService AnalysisToolsCore AnalysisToolsService AnalysisBin InteractorsCore)
       if [[ "$2" == "all" ]]; then
         echo "Selected all: These are all webapps which will be built:"
         for app_name in "${app_list[@]}"; do
