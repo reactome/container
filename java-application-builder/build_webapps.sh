@@ -25,6 +25,8 @@ docker run -it --name=java-webapp-builder --rm \
   -v "$(pwd)/webapps:/webapps" \
   -v "$(pwd)/downloads:/downloads" \
 	-v "$(pwd)/mounts/Pathway-Exchange-pom.xml:/gitroot/Pathway-Exchange/pom.xml" \
+	-v "$(pwd)/mounts/data-content-pom.xml:/gitroot/data-content/pom.xml" \
+	-v "$(pwd)/mounts/content-service-pom.xml:/gitroot/content-service/pom.xml" \
 	-v "$(pwd)/mounts/AnalysisTools-Service-pom.xml:/gitroot/AnalysisTools/Service/pom.xml" \
 	-v "$(pwd)/mounts/AnalysisService_mvc-dispatcher-servlet.xml:/gitroot/AnalysisTools/Service/src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml" \
 	-v "$(pwd)/mounts/AnalysisTools-Service-web.xml:/gitroot/AnalysisTools/Service/src/main/webapp/WEB-INF/web.xml" \
