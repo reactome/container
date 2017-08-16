@@ -156,9 +156,12 @@ do
   if [[ ${app_list[${orders[$i]}]} == "ready" ]];
   then
     echo "Application ready! Skippinig ${orders[$i]}"
+  elif [[ ${app_list[${orders[$i]}]} == "develop" ]];
+  then
+    echo "Developing {orders[$i]}:"
+    # ${orders[$i]}
   else
-    echo "Developing ${orders[$i]}"
-    ${orders[$i]}
+    echo "Unknown application state ${orders[$i]}"
   fi
 done
 set +e
