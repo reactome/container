@@ -138,7 +138,7 @@ app_list+=( ["CuratorTool"]=$state_CuratorTool )                   orders+=("Cur
 app_list+=( ["PathwayExchange"]=$state_PathwayExchange )           orders+=("PathwayExchange")
 app_list+=( ["RESTfulAPI"]=$state_RESTfulAPI )                     orders+=("RESTfulAPI")
 app_list+=( ["PathwayBrowser"]=$state_PathwayBrowser )             orders+=("PathwayBrowser")
-app_list+=( ["SearchCore"]=$state_PathwayBrowser )                 orders+=("SearchCore")
+app_list+=( ["SearchCore"]=$state_SearchCore )                     orders+=("SearchCore")
 app_list+=( ["DataContent"]=$state_DataContent )                   orders+=("DataContent")
 app_list+=( ["ContentService"]=$state_ContentService )             orders+=("ContentService")
 app_list+=( ["InteractorsCore"]=$state_InteractorsCore )           orders+=("InteractorsCore")
