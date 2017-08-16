@@ -47,6 +47,7 @@ PathwayBrowser ()
 ContentService ()
 {
   # Build Content-service
+  cd /gitroot/SBMLExporter && mvn package install -DskipTests
   cd /gitroot/content-service
   mvn package -P ContentService-Local
   cp /gitroot/content-service/target/ContentService*.war /webapps/ContentService.war
