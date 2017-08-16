@@ -63,7 +63,7 @@ SearchCore()
 DataContent ()
 {
   # Build data-content application
-  SearchCore
+  # SearchCore
   cd /gitroot/data-content
   mvn package install -P DataContent-Local
   cp /gitroot/data-content/target/content*.war /webapps/content.war
