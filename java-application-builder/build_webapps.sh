@@ -1,10 +1,15 @@
 #! /bin/bash
+set -e # Exit on occurence of any error
+# Setting the current directory as the directory of script
+cd "$(dirname "$0")"
+
 # Build the container - this also builds the applications.
 docker build -t reactome-app-builder -f buildApps.dockerfile .
 
 echo "Running Analysis Service requires a working database"
 # we are using the tomcat database: gk_current
 # using defaults from mysql-for-tomcat container
+set +e # If network and mysql container already exists then it is desirable. Errors ignored here.
 docker network create -d bridge --subnet 172.25.0.0/16 isolated_nw
 docker run -itd --rm \
 	--network=isolated_nw \
@@ -13,10 +18,15 @@ docker run -itd --rm \
 	--volume "$(dirname `pwd`)/mysql/tomcat_data/:/docker-entrypoint-initdb.d" \
 	--env-file $(dirname `pwd`)/tomcat.env mysql
 
+set -e
+# Before we build webapps, we need to remove any empty directories that were created by previous docker-compose 
+find . -empty -type d -delete
 # Build the java applications
-docker run -it --name=java-webapp-builder --rm -v "$(pwd)/webapps:/webapps" \
-    --network=isolated_nw \
-    -v "$(pwd)/downloads:/downloads" \
+docker run -it --name=java-webapp-builder --rm \
+  --network=isolated_nw \
+  --env-file=build_webapps.env \
+  -v "$(pwd)/webapps:/webapps" \
+  -v "$(pwd)/downloads:/downloads" \
 	-v "$(pwd)/mounts/Pathway-Exchange-pom.xml:/gitroot/Pathway-Exchange/pom.xml" \
 	-v "$(pwd)/mounts/data-content-pom.xml:/gitroot/data-content/pom.xml" \
 	-v "$(pwd)/mounts/content-service-pom.xml:/gitroot/content-service/pom.xml" \
@@ -37,3 +47,4 @@ docker run -it --name=java-webapp-builder --rm -v "$(pwd)/webapps:/webapps" \
 	reactome-app-builder
 echo "java-webapp-builder exited, stopping mysql-for-webapps..."
 docker stop mysql-for-webapps
+set +e

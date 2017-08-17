@@ -6,12 +6,13 @@ CuratorTool ()
   cd /gitroot/libsbgn && ant \
   && cd /gitroot/CuratorTool/ant \
   && ant -buildfile ReactomeJar.xml \
-  && ant -buildfile CuratorToolBuild.xml
+  && ant -buildfile CuratorToolBuild.xml \
+  && mvn install:install-file -Dfile=/gitroot/CuratorTool/reactome.jar -DartifactId=Reactome -DgroupId=org.reactome -Dpackaging=jar -Dversion=UNKNOWN_VERSION
 }
 
 PathwayExchange ()
 {
-  CuratorTool
+  # CuratorTool
   # Build Pathway Exchange
   cd /gitroot/Pathway-Exchange \
   && mvn install:install-file -Dfile=/gitroot/libsbgn/dist/org.sbgn.jar -DartifactId=sbgn -DgroupId=org.sbgn -Dpackaging=jar -Dversion=milestone2 \
@@ -26,10 +27,11 @@ PathwayExchange ()
 
 RESTfulAPI ()
 {
-  CuratorTool
+  # CuratorTool
   # Build RESTfulAPI
-  cd /gitroot/RESTfulAPI/ -lht \
+  cd /gitroot/RESTfulAPI \
   && mvn install:install-file -Dfile=/gitroot/CuratorTool/reactome.jar -DartifactId=Reactome -DgroupId=org.reactome -Dpackaging=jar -Dversion=UNKNOWN_VERSION \
+  && ls /gitroot/RESTfulAPI/ -lht \
   && pwd && mvn package \
   && cp /gitroot/RESTfulAPI/target/ReactomeRESTfulAPI*.war /webapps/ReactomeRESTfulAPI.war
 }
@@ -45,6 +47,7 @@ PathwayBrowser ()
 ContentService ()
 {
   # Build Content-service
+  cd /gitroot/SBMLExporter && mvn package install -DskipTests
   cd /gitroot/content-service
   mvn package -P ContentService-Local
   cp /gitroot/content-service/target/ContentService*.war /webapps/ContentService.war
@@ -61,7 +64,7 @@ SearchCore()
 DataContent ()
 {
   # Build data-content application
-  SearchCore
+  # SearchCore
   cd /gitroot/data-content
   mvn package install -P DataContent-Local
   cp /gitroot/data-content/target/content*.war /webapps/content.war
@@ -77,7 +80,7 @@ AnalysisToolsCore ()
 
 AnalysisBin ()
 {
-  AnalysisToolsCore
+  # AnalysisToolsCore
   cd /gitroot/AnalysisTools/Core/target/
   echo "Building analysis.bin, required for running analysis service:"
   if ! [[ -f /downloads/interactors.db ]]; then
@@ -95,6 +98,7 @@ AnalysisBin ()
 
 AnalysisToolsService ()
 {
+  # AnalysisToolsCore
   # Build AnalysisTools service using the "AnalysisService-Local" profile.
   cd /gitroot/AnalysisTools/Service && mvn package -P AnalysisService-Local
   cp /gitroot/AnalysisTools/Service/target/analysis-service*.war /webapps/
@@ -118,26 +122,48 @@ InteractorsCore ()
   echo "Successfully created interactors.db"
 }
 
-declare -A app_list
-app_list+=( ["CuratorTool"]=ready )
-app_list+=( ["PathwayExchange"]=ready )
-app_list+=( ["RESTfulAPI"]=ready )
-app_list+=( ["PathwayBrowser"]=ready )
-app_list+=( ["DataContent"]=develop )
-app_list+=( ["ContentService"]=develop )
-app_list+=( ["InteractorsCore"]=ready )
-app_list+=( ["AnalysisToolsCore"]=ready )
-app_list+=( ["AnalysisToolsService"]=ready )
-app_list+=( ["AnalysisBin"]=ready )
+# declare -A app_list
+# # app_list+=( ["CuratorTool"]=ready )
+# app_list+=( ["PathwayExchange"]=ready )
+# app_list+=( ["RESTfulAPI"]=notready )
+# app_list+=( ["PathwayBrowser"]=notready )
+# app_list+=( ["ContentService"]=notready )
+# # app_list+=( ["AnalysisToolsCore"]=notready )
+# app_list+=( ["AnalysisToolsService"]=developing )
+# # app_list+=( ["AnalysisBin"]=ready )
+# # app_list+=( ["InteractorsCore"]=notready )
 
-for app in "${!app_list[@]}";
+# Associative arrays are ordered according to hash, so using another simple array to preserve order
+declare -A app_list;                                               declare -a orders
+app_list+=( ["CuratorTool"]=$state_CuratorTool )                   orders+=("CuratorTool")
+app_list+=( ["PathwayExchange"]=$state_PathwayExchange )           orders+=("PathwayExchange")
+app_list+=( ["RESTfulAPI"]=$state_RESTfulAPI )                     orders+=("RESTfulAPI")
+app_list+=( ["PathwayBrowser"]=$state_PathwayBrowser )             orders+=("PathwayBrowser")
+app_list+=( ["SearchCore"]=$state_SearchCore )                     orders+=("SearchCore")
+app_list+=( ["DataContent"]=$state_DataContent )                   orders+=("DataContent")
+app_list+=( ["ContentService"]=$state_ContentService )             orders+=("ContentService")
+app_list+=( ["InteractorsCore"]=$state_InteractorsCore )           orders+=("InteractorsCore")
+app_list+=( ["AnalysisToolsCore"]=$state_AnalysisToolsCore )       orders+=("AnalysisToolsCore")
+app_list+=( ["AnalysisToolsService"]=$state_AnalysisToolsService ) orders+=("AnalysisToolsService")
+app_list+=( ["AnalysisBin"]=$state_AnalysisBin )                   orders+=("AnalysisBin")
+app_list+=( ["SearchIndexer"]=developing )                         orders+=("SearchIndexer")
+
+for i in "${!orders[@]}";
 do
-  if [[ ${app_list[${app}]} == "ready" ]];
+  echo -e "\n\n"
+  echo "###############################################################################"
+  echo "# Application: ${orders[$i]}"
+  echo "# State:     : ${app_list[${orders[$i]}]}"
+  echo "###############################################################################"
+  if [[ ${app_list[${orders[$i]}]} == "ready" ]];
   then
-    echo ${app} " ready! Skippinig ahead"
+    echo "Application ready! Skippinig ${orders[$i]}"
+  elif [[ ${app_list[${orders[$i]}]} == "develop" ]];
+  then
+    echo "Developing ${orders[$i]}:"
+    ${orders[$i]}
   else
-    echo "Developing " ${app} "In phase=" ${app_list[${app}]}
-    ${app}
+    echo "Unknown application state ${orders[$i]}"
   fi
 done
 set +e

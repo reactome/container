@@ -15,6 +15,13 @@ RUN git clone https://github.com/reactome-pwp/diagram-exporter.git
 WORKDIR /gitroot/diagram-exporter
 RUN git checkout $DIAGRAM_EXPORTER_VERSION
 
+# Need SBMLExporter for content-service, building locally
+ENV SBMLEXPORTER_VERSION=master
+WORKDIR /gitroot/
+RUN git clone https://github.com/reactome/SBMLExporter.git
+WORKDIR /gitroot/SBMLExporter
+RUN git checkout $SBMLEXPORTER_VERSION
+
 # Build the ContentService application
 ENV CONTENT_SERVICE_VERSION=master
 WORKDIR /gitroot/
