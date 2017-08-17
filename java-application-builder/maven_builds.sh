@@ -151,10 +151,10 @@ app_list+=( ["SearchIndexer"]=developing )                         orders+=("Sea
 for i in "${!orders[@]}";
 do
   echo -e "\n\n"
-  echo "############################################################"
+  echo "###############################################################################"
   echo "# Application: ${orders[$i]}"
   echo "# State:     : ${app_list[${orders[$i]}]}"
-  echo "############################################################"
+  echo "###############################################################################"
   if [[ ${app_list[${orders[$i]}]} == "ready" ]];
   then
     echo "Application ready! Skippinig ${orders[$i]}"

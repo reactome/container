@@ -421,7 +421,7 @@ do
       # Tell user whatever is going to happen next
       sleep 1
       # At this point we have determined which apps we want to build
-      ./java-application-builder/build_webapps.sh
+      bash java-application-builder/build_webapps.sh |& tee logs/build_webapps.log
       ;;
 
     -h | --help )
