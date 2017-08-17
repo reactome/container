@@ -8,14 +8,10 @@ services:
             - 8983:8983
         volumes:
             - ./generated_solr_core:/tmp/reactome-core:rw
-            # - ../solr/solrconfig.xml:/opt/solr/server/solr/mycores/reactome/conf/solrconfig.xml
             - ./logs/solr/:/opt/solr/server/logs/
-        #   - ../solr/solrconfig.xml:/opt/solr/server/solr/reactome/conf/solrconfig.xml
-            # - ../solr/solrconfig.xml:/tmp/solrconfig.xml
             - ../solr/data/solr_data/reactome/conf:/tmp/reactome-solr-conf
             - ../solr/solr_init.sh:/solr_init.sh
         entrypoint: /bin/bash /solr_init.sh /tmp/reactome-solr-conf reactome
-        # entrypoint: /bin/bash -c "solr start && solr create -c reactome -p 8983 && solr stop && solr start -f" #use this for solr 6.2.1
         networks:
             - solr-index-builder
 
