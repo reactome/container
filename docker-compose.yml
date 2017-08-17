@@ -1,4 +1,4 @@
-version: '3'
+version: '3.2'
 services:
 
   tomcat:
@@ -16,7 +16,7 @@ services:
       - mysql-for-tomcat
       - wordpress-sites
       - neo4j-db
-    entrypoint: bash -c "/wait-for.sh neo4j-db:7687 -t 360 && /wait-for.sh solr-for-reactome:8983 -t 360 && /wait-for.sh wordpress-sites:80 -t 360 && /wait-for.sh mysql-for-tomcat:3306 -t 360 && catalina.sh run"
+    entrypoint: bash -c "/wait-for.sh neo4j-db:7687 -t 360 && /wait-for.sh solr-for-reactome:8983 -t 360 && /wait-for.sh mysql-for-tomcat:3306 -t 360 && /wait-for.sh wordpress-sites:80 -t 360 && catalina.sh run"
     volumes:
       - ./java-application-builder/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
       - ./java-application-builder/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war
@@ -41,13 +41,6 @@ services:
       - tomcat.env
     ports:
       - 8082:8080
-
-# #   # apache-server:
-# #   #   image: httpd:2.4
-# #   #   container_name: apache-server
-# #   #   volumes:
-# #   #     - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
-# #   #     - ./release/scripts/:/usr/local/bin/perl/scripts
 
   solr:
     image: solr:6.6.0
@@ -85,14 +78,22 @@ services:
       - tomcat.env
     volumes:
       - ./mysql/tomcat_data/:/docker-entrypoint-initdb.d
+      - ./mysql/init.sh:/init.sh
+      - ./logs/mysql/tomcat:/var/log/mysql
+      - mysql-for-tomcat-log:/backup
+    command: bash -c "/init.sh && exec /entrypoint.sh mysqld"
 
   mysql-database:
     image: mysql
     container_name: mysql-database
+    env_file:
+      - wordpress.env
     volumes:
       - ./mysql/wordpress_data/:/docker-entrypoint-initdb.d
-    env_file:
-      - .env
+      - ./mysql/init.sh:/init.sh
+      - ./logs/mysql/wordpress:/var/log/mysql
+      - mysql-for-wordpress-log:/backup
+    command: bash -c "/init.sh && exec /entrypoint.sh mysqld"
 
 
   wordpress-sites:
@@ -117,4 +118,8 @@ services:
       - ./wordpress/footer.php:/var/www/html/footer.php
       - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
       - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wordpress/wp-content/plugins
-      - ./logs/apache/:/var/log/apache2
+      - ./logs/apache/:/var/log/apache2 
+
+volumes:
+  mysql-for-wordpress-log:
+  mysql-for-tomcat-log:
