@@ -372,7 +372,7 @@ do
       if [[ "$2" == "all" ]]; then
         echo "Selected 'all'. All previous archives will be checked. if inconsistent with remote version, new file will be downloaded."
         updateAllArchives
-        i++;
+        ((i++));
         shift
       else
         echo "Switching to Default behavior: Only database archives will be updated."
