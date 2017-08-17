@@ -393,8 +393,7 @@ do
         ((i++));
         shift
       elif [[ "$2" == "select" ]]; then
-        echo "Please select which applications you want to build:"
-        echo -e "Which webapps should always be rebuilt? Press [y/n]" -n 1 -r
+        echo "Please select which applications you want to build: Press [y/n]"
         for app_name in "${app_list[@]}"; do
           echo
           read -p "${app_name}?`echo $'\n> '`" -n 1 -r
