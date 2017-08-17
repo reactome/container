@@ -9,9 +9,8 @@ docker build -t reactome-app-builder -f buildApps.dockerfile .
 echo "Running Analysis Service requires a working database"
 # we are using the tomcat database: gk_current
 # using defaults from mysql-for-tomcat container
-set +e # If netowrk already exists then it gives error. And own aim to run this was to make a network
+set +e # If network and mysql container already exists then it is desirable. Errors ignored here.
 docker network create -d bridge --subnet 172.25.0.0/16 isolated_nw
-set -e
 docker run -itd --rm \
 	--network=isolated_nw \
 	--ip=172.25.3.3 \
@@ -19,6 +18,7 @@ docker run -itd --rm \
 	--volume "$(dirname `pwd`)/mysql/tomcat_data/:/docker-entrypoint-initdb.d" \
 	--env-file $(dirname `pwd`)/tomcat.env mysql
 
+set -e
 # Before we build webapps, we need to remove any empty directories that were created by previous docker-compose 
 find . -empty -type d -delete
 # Build the java applications

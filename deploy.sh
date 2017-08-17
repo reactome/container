@@ -260,7 +260,7 @@ function startUp()
   if ! [[ $owner == 999 || $owner == 'mysql' ]]; then
     # Permissions remain unchanged, logs will reside in internal docker volumes
     # if it is first run of this script, volumes do not exist, we need to create them before providing its link
-    # this docker run will exit immidiately due to errors on startup, since we have not supplied root password
+    # this docker run is supposed to exit immidiately due to errors on startup, since we have not supplied root password
     docker run --rm -itd \
     -v "container_mysql-for-tomcat-log:/random/location" \
     -v "container_mysql-for-wordpress-log:/another/random" mysql:5.7
@@ -429,14 +429,26 @@ do
       echo "$usage"
       exit 0
       ;;
+    -run )
+      startUp
+      exit
+      ;;
     * )
       # Invalid option selected
-      echo "Invalid option: $1"
       echo "$usage"
+      echo "Invalid option: $1"
       exit
     esac
     # Using 'shift' to pop out the current option
     ((i++));
     shift
 done
-startUp
+if [[ $numargs == 0 ]]; then
+  # Only deploy is called, containers should be started
+  startUp
+  else
+    # All flags have been processed, time to exit
+    echo "Deploy script exiting..."
+    exit 0
+fi
+
