@@ -44,13 +44,6 @@ services:
     ports:
       - 8082:8080
 
-# #   # apache-server:
-# #   #   image: httpd:2.4
-# #   #   container_name: apache-server
-# #   #   volumes:
-# #   #     - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
-# #   #     - ./release/scripts/:/usr/local/bin/perl/scripts
-
   solr:
     image: solr:6.6.0
     container_name: solr-for-reactome
