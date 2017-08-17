@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 # Update and download data archives.
 # Following files will be downloaded:
 #     - tomcat_sql_data named as gk_current_sql, located in mysql/tomcat_data

@@ -1,4 +1,5 @@
 #! /bin/bash
+set -e # Exit on occurence of any error
 # Setting the current directory as the directory of script
 cd "$(dirname "$0")"
 
@@ -8,7 +9,9 @@ docker build -t reactome-app-builder -f buildApps.dockerfile .
 echo "Running Analysis Service requires a working database"
 # we are using the tomcat database: gk_current
 # using defaults from mysql-for-tomcat container
+set +e # If netowrk already exists then it gives error. And own aim to run this was to make a network
 docker network create -d bridge --subnet 172.25.0.0/16 isolated_nw
+set -e
 docker run -itd --rm \
 	--network=isolated_nw \
 	--ip=172.25.3.3 \
@@ -44,3 +47,4 @@ docker run -it --name=java-webapp-builder --rm \
 	reactome-app-builder
 echo "java-webapp-builder exited, stopping mysql-for-webapps..."
 docker stop mysql-for-webapps
+set +e
