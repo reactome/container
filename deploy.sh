@@ -134,7 +134,7 @@ function downloadAllNewArchives()
   declare -A file_list
   file_list+=( ["java-application-builder/downloads/analysis.bin.gz"]="https://reactome.org/download/current/analysis_v61.bin.gz" ) # Analysis.bin for analysis service
   file_list+=( ["java-application-builder/downloads/interactors.db.gz"]="https://reactome.org/download/current/interactors.db.gz" ) # interactors.db required to create analysis.bin
-  
+
   for db_file in "${!file_list[@]}";
   do
     # Initialization before prepairing download
@@ -272,7 +272,7 @@ function startUp()
   fi
 
   # Ensure scripts are executable.
-  chmod a+x ./release/website/cgi-bin/*
+  sudo chmod a+x ./release/website/cgi-bin/*
 
   echo -e "\n\n"
   echo "==========================================================================="
@@ -292,7 +292,7 @@ Every option can be accompanied by an argument
 
 Option          | Argument  | Description
 ------------------------------------------------------------------
--u, --update    | (No args)  If files are not present or not consistent 
+-u, --update    | (No args)  If files are not present or not consistent
                 |            with their remote version, they will be
                 |            downloaded. Update database files.
                 |            The files that will be updated include:
@@ -303,7 +303,7 @@ Option          | Argument  | Description
                 |
                 | all        Using 'all' argument would update those
                 |            files also which can be built locally.
-                |            Like: 
+                |            Like:
                 |            - analysis.bin
                 |            - interactors.db
 
@@ -317,7 +317,7 @@ Option          | Argument  | Description
                 |
                 | all        Using 'all' argument would also download
                 |            those files which can be built locally.
-                |            Like: 
+                |            Like:
                 |            - analysis.bin
                 |            - interactors.db
 
@@ -454,4 +454,3 @@ if [[ $numargs == 0 ]]; then
     echo "Deploy script exiting..."
     exit 0
 fi
-
