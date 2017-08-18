@@ -103,7 +103,7 @@ services:
 
   wordpress-sites:
     hostname: wordpress-sites
-    image: wordpress:4.8.0_for_reactome
+    image: wordpress:4.8.1_for_reactome
     build:
       context: ./wordpress
       dockerfile: wordpress.dockerfile
