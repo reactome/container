@@ -115,7 +115,7 @@ services:
     env_file:
       - .env
     ports:
-      - 8080:80
+      - 80:80
     entrypoint: /wait-for.sh mysql-database:3306 -t 120 -- /usr/local/bin/docker-entrypoint.sh apache2-foreground
     volumes:
       - ./wordpress/wait-for.sh:/wait-for.sh
@@ -128,7 +128,7 @@ services:
       - ./wordpress/proxy.load:/etc/apache2/mods-enabled/proxy.load
       - ./wordpress/proxy_http.load:/etc/apache2/mods-enabled/proxy_http.load
       - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
-      - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wordpress/wp-content/plugins
+      - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wp-content/plugins
       - ./release/website/cgi-bin:/usr/lib/cgi-bin
       - ./release/modules/GKB:/usr/local/gkb/modules/GKB
       - ./release/website/html/instructionlibrary.xml:/usr/local/gkb/website/html/instructionlibrary.xml
