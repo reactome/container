@@ -12,4 +12,5 @@ RUN ln -s /usr/local/gkb/modules/ /usr/modules
 RUN ln -s /usr/bin/perl /usr/local/bin/perl
 RUN mkdir -p /usr/local/gkb/website/html/img-tmp \
     && chmod a+r /usr/local/gkb/website/html/img-tmp \
-    && ln -s /usr/local/gkb/website/html/img-tmp /var/www/html/img-tmp
+    && chown www-data:www-data /usr/local/gkb/website/html/img-tmp \
+    && ln -s /usr/local/gkb/website/html/img-tmp /usr/src/wordpress/img-tmp
