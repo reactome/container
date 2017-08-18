@@ -285,7 +285,8 @@ cd "$(dirname "$0")"
 thisScript="$0"
 usage="
 usage: $thisScript [option]... [argument]...
-Every option can be accompanied by an argument
+Every option can be accompanied by an argument, and flags are executed
+in the order they are called.
 
 Option          | Argument  | Description
 ------------------------------------------------------------------
@@ -336,6 +337,12 @@ Option          | Argument  | Description
                 |
                 | select     You will be provided with prompts to select
                 |            which applications you want to build.
+
+-r, --run       | (No args)  Start the containers that run reactome server
+                |            This should be last flag. Anything after this
+                |            flag is not processed.
+                |            Running deploy alone would also trigger the
+                |            reactome server to start
 
 Example: $thisScript
        : $thisScript -d -b
@@ -429,7 +436,7 @@ do
       echo "$usage"
       exit 0
       ;;
-    -run )
+    -r | --run )
       startUp
       exit
       ;;
