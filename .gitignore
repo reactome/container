@@ -10,3 +10,4 @@ solr/data/*
 neo4j/conf/neo4j.conf
 neo4j*
 toc_files/*
+tmp_files/*
