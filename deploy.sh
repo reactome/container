@@ -266,6 +266,8 @@ function startUp()
     -v "container_mysql-for-wordpress-log:/another/random" mysql:5.7
 
     # Volumes are created, now we can link those volumes to /backup inside container
+    rm -rf $(pwd)/logs/mysql/wordpress/Link_to_internal_log
+    rm -rf $(pwd)/logs/mysql/tomcat/Link_to_internal_logdock
     sudo ln -s $(docker volume inspect --format '{{ .Mountpoint }}' container_mysql-for-tomcat-log) $(pwd)/logs/mysql/wordpress/Link_to_internal_log
     sudo ln -s $(docker volume inspect --format '{{ .Mountpoint }}' container_mysql-for-wordpress-log) $(pwd)/logs/mysql/tomcat/Link_to_internal_log
     # Use sudo to view content inside the linked directory.
