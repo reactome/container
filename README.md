@@ -33,7 +33,7 @@ You can begin with cloning the repository along with its submodule using:
 git clone --recursive https://github.com/reactome/container.git
 ```
 
-Before you can run this project, you need to install [docker](https://docs.docker.com/engine/installation/) and [docker-compose](https://docs.docker.com/compose/install/) on your system. To ease out things, installation instructions are packed in the file [prereqs-ubuntu.sh](https://github.com/reactome/container/blob/master/prereqs-ubuntu.sh) which can be executed by:
+Before you can run this project, you need to [install docker](https://docs.docker.com/engine/installation/) and [install docker-compose](https://docs.docker.com/compose/install/) on your system. To ease out things, installation instructions are packed in the file [prereqs-ubuntu.sh](https://github.com/reactome/container/blob/master/prereqs-ubuntu.sh) which can be executed by:
 
 ```
 cd container
@@ -64,15 +64,17 @@ For the first time, we need to download the database files and build all the app
 
 The above command will download all database files and then build all the applications. While using the first time, users are advised to use `-b all` to build all the applications since some applications are dependend on other. After that users may select individual applications to build using `select` argument with `-b` flag.
 
-The `./deploy.sh` script can be run with many flags, and they are described below:
+#### Flags used with `deploy.sh`
 
- - `-d` or `--download` to Download database files. This flag will remove old database files (if present) and download new files from remote server. This will not include those files which can be built locally (analysis.bin and interactors.db). It will download only these files: database files (neo4j db and tomcat db ), diagrams and fireworks and solr_data.
+The `./deploy.sh` script can be run with single or multiple or no flags. The usage of flags is described below:
 
- - `-d all` or `--download all` to Download all files. This flag will remove previous files and download new ones. The files that will be affected include: database files, diagrams and fireworks, solr_data. And due to `all` argument, it will also include: analysis.bin, interactors.db.
+ - `-d` or `--download` to Download database files. It will remove old database files (if present) and download new files from remote server. This will not include those files which can be built locally (analysis.bin and interactors.db). It will download only these files: database files (neo4j db and tomcat db ), diagrams and fireworks and solr_data.
 
-  -  `-u` or `--update` to Update database files. This will update database files and those files which cannot be built locally. Files which can be built locally will not be affected. This flag plays a two way role. If the files are not present locally, then it downloads the files and if the remote file is newer, then local file is deleted and new one is downloaded. It is like a superset to download flag.
+ - `-d all` or `--download all` to Download all files. It will remove previous files and download new ones. The files that will be affected include: database files, diagrams and fireworks, solr_data. And due to `all` argument, it will also include: analysis.bin, interactors.db.
 
- -  `-u all` or `--update all` to Update all database files. This will include all data archives and also the files which can be built locally, for example, analysis.bin and interactors.db.
+  -  `-u` or `--update` to Update database files. It will update database files and those files which cannot be built locally. Files which can be built locally will not be affected. This flag plays a two way role. If the files are not present locally, then it downloads the files and if the remote file is newer, then local file is deleted and new one is downloaded. It is like a superset to download flag.
+
+ -  `-u all` or `--update all` to Update all database files. It will include all data archives and also the files which can be built locally, for example, analysis.bin and interactors.db.
 
  - `-b` or `--build`  is Build flag. Rebuild essential war files.
  
@@ -92,3 +94,31 @@ After the reactome server has been given the instruction to get started, it will
 -   `localhost:8983` for solr admin
 -   `localhost:7474` for neo4j admin
 -   `localhost:8082/manager/html` for tomcat manager
+
+## Configuring custom passwords
+
+Some services require password for running and they have been provided with the default passowrds in their environment file, the files having `.env` extension. The default passwords can be changed by changing the `env` file for corresponding service.
+
+- **Mysql:** Its configurations are stored in `tomcat.env`. `root` is the default user and if you want to add another user or change the password then you can add following lines to [tomcat.env](https://github.com/reactome/container/blob/master/tomcat.env)
+
+  ```
+  MYSQL_USER=<you_user_name>
+  MYSQL_PASSWORD=<you_password>
+  ```
+
+  Note: If you add your own user and password for mysql, then make sure, to change the username and password at [application-context](https://github.com/reactome/container/blob/master/java-application-builder/mounts/applicationContext.xml#L14) and also modify password of wordpress database user at [wordpress.env](https://github.com/reactome/container/blob/master/wordpress.env#L9).
+
+- **Tomcat Admin:** Its users and their passwords can be modified in [tomcat-users.xml](https://github.com/reactome/container/blob/master/tomcat/tomcat-users.xml#L46).
+
+- **Neo4j Admin:** Its password can be changed in [neo4j.env](https://github.com/reactome/container/blob/master/neo4j.env#L1) by modifying first line to: `NEO4J_AUTH=<new_user>/<new_password>`
+Note: If you modify password of neo4j, then make sure to update changes at [content-service-pom.xml](https://github.com/reactome/container/blob/master/java-application-builder/mounts/content-service-pom.xml#L26) and at [data-content-pom.xml](https://github.com/reactome/container/blob/master/java-application-builder/mounts/data-content-pom.xml#L36)
+
+- **Solr Admin:**  Its default username and password is currently not configurable and both are set as `solr`
+
+- **Wordpress:** The username and password for wordpress-admin can be modified by executing following command when the server is running.
+
+  ```
+  docker exec -i mysql-database mysql --user=<username_from_wordpress.env> --password=<password_from_wordpress.env> wordpress <<< "UPDATE wp_users SET user_login = 'user_name', user_pass = 'password' where id=1;"
+  ```
+
+  The changes will be made by service named `mysql-database` and changes will reside in [container/mysql/wordpress_data/reactome_wordpress.sql.gz](https://github.com/reactome/container/blob/master/mysql/wordpress_data/reactome-wordpress.sql.gz).
