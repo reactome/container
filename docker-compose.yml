@@ -4,6 +4,7 @@ services:
   tomcat:
     image: reactome-tomcat
     container_name: tomcat-server
+    hostname: tomcat-server
     build:
       context: ./tomcat
       dockerfile: tomcat.dockerfile
@@ -23,6 +24,7 @@ services:
       - ./java-application-builder/webapps/analysis-service.war:/usr/local/tomcat/webapps/analysis-service.war
       - ./java-application-builder/webapps/ContentService.war:/usr/local/tomcat/webapps/ContentService.war
       - ./java-application-builder/webapps/content.war:/usr/local/tomcat/webapps/content.war
+      - ./java-application-builder/downloads/interactors.db:/interactors.db
       - ./java-application-builder/downloads/analysis.bin:/analysis.bin
       - ./java-application-builder/downloads/diagrams_and_fireworks/fireworks:/usr/local/tomcat/webapps/download/current/fireworks
       - ./java-application-builder/downloads/diagrams_and_fireworks/diagram:/usr/local/tomcat/webapps/download/current/diagram
@@ -60,6 +62,7 @@ services:
   neo4j-db:
     image: neo4j
     container_name: neo4j-db
+    hostname: neo4j-db
     env_file:
       - neo4j.env
     volumes:
@@ -73,6 +76,7 @@ services:
 
   mysql-for-tomcat:
     image: mysql
+    hostname: mysql-for-tomcat
     container_name: mysql-for-tomcat
     env_file:
       - tomcat.env
@@ -85,6 +89,7 @@ services:
 
   mysql-database:
     image: mysql
+    hostname: mysql-database
     container_name: mysql-database
     env_file:
       - wordpress.env
@@ -97,7 +102,8 @@ services:
 
 
   wordpress-sites:
-    image: wordpress:with-netcat
+    hostname: wordpress-sites
+    image: wordpress:4.8.1_for_reactome
     build:
       context: ./wordpress
       dockerfile: wordpress.dockerfile
@@ -109,16 +115,32 @@ services:
     env_file:
       - .env
     ports:
-      - 8080:80
-    entrypoint: /wait-for.sh mysql-database:3306 -t 120 -- /usr/local/bin/docker-entrypoint.sh apache2-foreground
+      - 80:80
+    entrypoint:  /wait-for.sh mysql-database:3306 -t 120  --  /usr/local/bin/docker-entrypoint.sh apache2-foreground
     volumes:
       - ./wordpress/wait-for.sh:/wait-for.sh
       - ./wordpress/htaccess:/var/www/html/.htaccess
+      - ./wordpress/000-default.conf:/etc/apache2/sites-enabled/000-default.conf
       - ./wordpress/header.php:/var/www/html/header.php
       - ./wordpress/footer.php:/var/www/html/footer.php
+      - ./wordpress/Secrets.pm:/usr/local/gkb/modules/GKB/Secrets.pm
+      - ./wordpress/cgi.load:/etc/apache2/mods-enabled/cgi.load
+      - ./wordpress/proxy.load:/etc/apache2/mods-enabled/proxy.load
+      - ./wordpress/proxy_http.load:/etc/apache2/mods-enabled/proxy_http.load
       - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
-      - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wordpress/wp-content/plugins
-      - ./logs/apache/:/var/log/apache2 
+      - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wp-content/plugins
+      - ./release/website/cgi-bin:/usr/lib/cgi-bin
+      - ./release/modules/GKB:/usr/local/gkb/modules/GKB
+      - ./release/website/html/instructionlibrary.xml:/usr/local/gkb/website/html/instructionlibrary.xml
+      - ./release/website/html/stylesheet.css:/var/www/html/stylesheet.css
+      - ./release/website/html/stylesheets:/var/www/html/stylesheets
+      - ./release/website/html/javascript:/var/www/html/javascript
+      - ./release/website/html/icons:/var/www/html/icons
+      - ./release/website/html/images:/var/www/html/images
+      - ./release/website/html/xml:/var/www/html/xml
+      - ./toc_files:/usr/local/gkb/website/html/img-fp/gk_current/:rw
+      - ./tmp_files:/usr/local/gkb/website/html/img-tmp/:rw
+      - ./logs/apache/:/var/log/apache2
 
 volumes:
   mysql-for-wordpress-log:
