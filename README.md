@@ -23,7 +23,7 @@ This project includes a submodule from [release](https://github.com/reactome/Rel
 9. [Analysis Tools](https://github.com/reactome/AnalysisTools)
 10. [Interactors Core](https://github.com/reactome-pwp/interactors-core)
 
-[Release](https://github.com/reactome/Release/) is a submodule of this project.  [release](https://github.com/reactome/Release/) repository.
+
 
 ## Set Up
 
@@ -44,9 +44,9 @@ cd container
 
 The workflow of project works is described in following steps:
 
-1. Download data and archives: First of all we need to get database files ready. These are downloaded by [deploy.sh -d all](https://github.com/reactome/container/blob/master/deploy.sh) or [deploy.sh -u all](https://github.com/reactome/container/blob/master/deploy.sh)
-2. When database is ready, we need to build java-applications by [deploy.sh -b all](https://github.com/reactome/container/blob/master/deploy.sh).
-3. Now everything is ready, and we can now start the server using [deploy.sh -r](https://github.com/reactome/container/blob/master/deploy.sh).
+1. Download data and archives: First of all we need to get database files ready. These are downloaded by `deploy.sh -d all` or `deploy.sh -u all`.
+2. When database is ready, we need to build java-applications by `deploy.sh -b all`.
+3. Now everything is ready, and we can now start the server using `deploy.sh -r`.
 
 These three steps can be combined in one command: 
 
@@ -62,7 +62,7 @@ For the first time, we need to download the database files and build all the app
 ./deploy.sh -d all -b all -r
 ```
 
-The above command will download all database files and then build all the applications. While using the first time, users are advised to build all the applications since some applications are dependend on other. After that users may select individual applications to build using `select` argument with `-b` flag.
+The above command will download all database files and then build all the applications. While using the first time, users are advised to use `-b all` to build all the applications since some applications are dependend on other. After that users may select individual applications to build using `select` argument with `-b` flag.
 
 The `./deploy.sh` script can be run with many flags, and they are described below:
 
