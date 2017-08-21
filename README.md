@@ -121,4 +121,4 @@ Note: If you modify password of neo4j, then make sure to update changes at [cont
   docker exec -i mysql-database mysql --user=<username_from_wordpress.env> --password=<password_from_wordpress.env> wordpress <<< "UPDATE wp_users SET user_login = 'user_name', user_pass = 'password' where id=1;"
   ```
 
-  The changes will be made by service named `mysql-database` and changes will reside in [container/mysql/wordpress_data/reactome_wordpress.sql.gz](https://github.com/reactome/container/blob/master/mysql/wordpress_data/reactome-wordpress.sql.gz).
+  The changes will be made by service named `mysql-database` and changes will reside in database file internal to `mysql-database` container. On removing container, the customized username and password will also be removed.
