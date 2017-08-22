@@ -1,5 +1,14 @@
 # Reactome Container
 
+## Table of Contents
+
+- [Overview](#overview)
+- [Setup](#set-up)
+- [Understanding Workflow](#understanding-workflow)
+- [How to run](#how-to-run)
+- [How to use](#how-to-use)
+- [Configuring custom passwords](#configuring-custom-passwords)
+
 ## Overview
 
 [Reactome](http://reactome.org/) is a free, open-source, curated and peer reviewed pathway database. It is an online bioinformatics database of human biology described in molecular terms. It is an on-line encyclopedia of core human pathways. [Reactome Wiki](http://wiki.reactome.org/index.php/Main_Page) provides more details about reactome. 
