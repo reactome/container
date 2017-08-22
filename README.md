@@ -10,7 +10,9 @@ This project enables users to setup a standalone reactome server on their own sy
 
 This project builds up a reactome server with all the required java applications inside docker containers and deploys them. The broad view of structure of the project is shown in the image below. Image describes how different components of the project are connected to each other and what endpoints are available to the user for interaction. 
 
-This project includes a submodule from [release](https://github.com/reactome/Release/) repository. The website part and perl scripts for the server are derived from there. The java applications required by reactome server are built from following repositories of reactome:
+![reactome-no-volume](https://user-images.githubusercontent.com/13914634/29534781-e3810f10-86d4-11e7-92f0-f800b7598a65.png)
+
+This project includes [Reactome/Release](https://github.com/reactome/Release/) repository as a submodule. The website part and perl scripts for the server are derived from there. The java applications required by reactome server are built from following repositories of reactome:
 
 1. [Curator Tool](https://github.com/reactome/CuratorTool)
 2. [Pathway Exchange](https://github.com/reactome/Pathway-Exchange)
@@ -99,19 +101,25 @@ After the reactome server has been given the instruction to get started, it will
 
 Some services require password for running and they have been provided with the default passowrds in their environment file, the files having `.env` extension. The default passwords can be changed by changing the `env` file for corresponding service.
 
-- **Mysql:** Its configurations are stored in `tomcat.env`. `root` is the default user and if you want to add another user or change the password then you can add following lines to [tomcat.env](https://github.com/reactome/container/blob/master/tomcat.env)
+- **Mysql Database:** There are two mysql databases. One used by `tomcat` and java applications, whose configurations are stored in `tomcat.env`, and another one used by `wordpress`, whose configurations are stored in `wordpress.env`. In both of them `root` is the default user and if you want to add another user or change the password then you can add following lines to their respective `.env` files:
 
   ```
   MYSQL_USER=<you_user_name>
   MYSQL_PASSWORD=<you_password>
   ```
 
-  Note: If you add your own user and password for mysql, then make sure, to change the username and password at [application-context](https://github.com/reactome/container/blob/master/java-application-builder/mounts/applicationContext.xml#L14) and also modify password of wordpress database user at [wordpress.env](https://github.com/reactome/container/blob/master/wordpress.env#L9).
+  **Mysql for tomcat** If you change configurations for database used by `tomcat`, modify `tomcat.env`, and make sure that following files are also updated:
+  - Update constructor arguments for `bean id="dba"` at  [application-context](https://github.com/reactome/container/blob/master/java-application-builder/mounts/applicationContext.xml#L14)
+ 
+  **Mysql for wordpress** If you are changing password for wordpress database, you can do it by changing `wordpress.env`
+   - Update username and password at [wordpress/secrets.pm#L14](https://github.com/reactome/container/blob/develop/wordpress/Secrets.pm#L14)
 
-- **Tomcat Admin:** Its users and their passwords can be modified in [tomcat-users.xml](https://github.com/reactome/container/blob/master/tomcat/tomcat-users.xml#L46).
+- **Tomcat Admin:** Its users and their passwords can be modified in [tomcat-users.xml#L46](https://github.com/reactome/container/blob/master/tomcat/tomcat-users.xml#L46).
 
 - **Neo4j Admin:** Its password can be changed in [neo4j.env](https://github.com/reactome/container/blob/master/neo4j.env#L1) by modifying first line to: `NEO4J_AUTH=<new_user>/<new_password>`
-Note: If you modify password of neo4j, then make sure to update changes at [content-service-pom.xml](https://github.com/reactome/container/blob/master/java-application-builder/mounts/content-service-pom.xml#L26) and at [data-content-pom.xml](https://github.com/reactome/container/blob/master/java-application-builder/mounts/data-content-pom.xml#L36)
+Note: If you modify password of neo4j, then make sure to update changes at 
+   - [content-service-pom.xml#L26](https://github.com/reactome/container/blob/master/java-application-builder/mounts/content-service-pom.xml#L26)
+   - [data-content-pom.xml#L36](https://github.com/reactome/container/blob/master/java-application-builder/mounts/data-content-pom.xml#L36)
 
 - **Solr Admin:**  Its default username and password is currently not configurable and both are set as `solr`
 
@@ -121,4 +129,4 @@ Note: If you modify password of neo4j, then make sure to update changes at [cont
   docker exec -i mysql-database mysql --user=<username_from_wordpress.env> --password=<password_from_wordpress.env> wordpress <<< "UPDATE wp_users SET user_login = 'user_name', user_pass = 'password' where id=1;"
   ```
 
-  The changes will be made by service named `mysql-database` and changes will reside in database file internal to `mysql-database` container. On removing container, the customized username and password will also be removed.
+  The changes will be made by service named `mysql-database` and changes will reside in database file internal to `mysql-database` container. On removing container, the customized username and password will also get removed.
