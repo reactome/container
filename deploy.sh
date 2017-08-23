@@ -134,7 +134,7 @@ function downloadAllNewArchives()
   declare -A file_list
   file_list+=( ["java-application-builder/downloads/analysis.bin.gz"]="https://reactome.org/download/current/analysis_v61.bin.gz" ) # Analysis.bin for analysis service
   file_list+=( ["java-application-builder/downloads/interactors.db.gz"]="https://reactome.org/download/current/interactors.db.gz" ) # interactors.db required to create analysis.bin
-  
+
   for db_file in "${!file_list[@]}";
   do
     # Initialization before prepairing download
@@ -266,10 +266,15 @@ function startUp()
     -v "container_mysql-for-wordpress-log:/another/random" mysql:5.7
 
     # Volumes are created, now we can link those volumes to /backup inside container
+    rm -rf $(pwd)/logs/mysql/wordpress/Link_to_internal_log
+    rm -rf $(pwd)/logs/mysql/tomcat/Link_to_internal_logdock
     sudo ln -s $(docker volume inspect --format '{{ .Mountpoint }}' container_mysql-for-tomcat-log) $(pwd)/logs/mysql/wordpress/Link_to_internal_log
     sudo ln -s $(docker volume inspect --format '{{ .Mountpoint }}' container_mysql-for-wordpress-log) $(pwd)/logs/mysql/tomcat/Link_to_internal_log
     # Use sudo to view content inside the linked directory.
   fi
+
+  # Ensure scripts are executable.
+  sudo chmod a+x ./release/website/cgi-bin/*
 
   echo -e "\n\n"
   echo "==========================================================================="
@@ -285,11 +290,12 @@ cd "$(dirname "$0")"
 thisScript="$0"
 usage="
 usage: $thisScript [option]... [argument]...
-Every option can be accompanied by an argument
+Every option can be accompanied by an argument, and flags are executed
+in the order they are called.
 
 Option          | Argument  | Description
 ------------------------------------------------------------------
--u, --update    | (No args)  If files are not present or not consistent 
+-u, --update    | (No args)  If files are not present or not consistent
                 |            with their remote version, they will be
                 |            downloaded. Update database files.
                 |            The files that will be updated include:
@@ -300,7 +306,7 @@ Option          | Argument  | Description
                 |
                 | all        Using 'all' argument would update those
                 |            files also which can be built locally.
-                |            Like: 
+                |            Like:
                 |            - analysis.bin
                 |            - interactors.db
 
@@ -314,7 +320,7 @@ Option          | Argument  | Description
                 |
                 | all        Using 'all' argument would also download
                 |            those files which can be built locally.
-                |            Like: 
+                |            Like:
                 |            - analysis.bin
                 |            - interactors.db
 
@@ -336,6 +342,12 @@ Option          | Argument  | Description
                 |
                 | select     You will be provided with prompts to select
                 |            which applications you want to build.
+
+-r, --run       | (No args)  Start the containers that run reactome server
+                |            This should be last flag. Anything after this
+                |            flag is not processed.
+                |            Running deploy alone would also trigger the
+                |            reactome server to start
 
 Example: $thisScript
        : $thisScript -d -b
@@ -429,7 +441,7 @@ do
       echo "$usage"
       exit 0
       ;;
-    -run )
+    -r | --run )
       startUp
       exit
       ;;
@@ -451,4 +463,3 @@ if [[ $numargs == 0 ]]; then
     echo "Deploy script exiting..."
     exit 0
 fi
-
