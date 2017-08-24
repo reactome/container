@@ -38,6 +38,10 @@ sudo apt-get update
 echo "# Installing CURL"
 sudo apt-get -y install curl
 
+# Install Git
+echo "# Installing Git"
+sudo apt-get -y install git
+
 # Ensure that CA certificates are installed
 sudo apt-get -y install apt-transport-https ca-certificates
 
