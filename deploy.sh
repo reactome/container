@@ -395,23 +395,25 @@ do
 
     -b | --build)
       # This is build option. Used to build webapps for tomcat
-      declare -a app_list=(CuratorTool PathwayExchange RESTfulAPI PathwayBrowser SearchCore DataContent ContentService AnalysisToolsCore AnalysisToolsService AnalysisBin InteractorsCore)
+      app_list_location="./java-application-builder/build_webapps.env"
       if [[ "$2" == "all" ]]; then
         echo "Selected all: These are all webapps which will be built:"
-        for app_name in "${app_list[@]}"; do
-          echo "${app_name}"
-          export "state_${app_name}=develop"
+        for app_name_state in `cat "$app_list_location"`; do
+          app_name_from_location="$(echo ${app_name_state} | cut -d'_' -f 2)"
+          echo "$app_name_from_location"
+          export "${app_name_state}=develop"
         done
         ((i++));
         shift
       elif [[ "$2" == "select" ]]; then
         echo "Please select which applications you want to build: Press [y/n]"
-        for app_name in "${app_list[@]}"; do
+        for app_name_state in `cat "$app_list_location"`; do
+          app_name_from_location="$(echo ${app_name_state} | cut -d'_' -f 2)"
           echo
-          read -p "${app_name}?`echo $'\n> '`" -n 1 -r
+          read -p "$app_name_from_location?`echo $'\n> '`" -n 1 -r
           if [[ $REPLY =~ ^[Yy]$ ]]; then
-            export "state_${app_name}=develop"
-          else export "state_${app_name}=ready"
+            export "${app_name_state}=develop"
+          else export "${app_name_state}=ready"
           fi
         done
         # Using shift to pop out 'select' argument
@@ -432,6 +434,7 @@ do
       fi
       # Tell user whatever is going to happen next
       sleep 1
+      echo "Build process is begining..."
       # At this point we have determined which apps we want to build
       bash java-application-builder/build_webapps.sh |& tee logs/build_webapps.log
       ;;
