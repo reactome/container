@@ -119,6 +119,7 @@ Some services require password for running and they have been provided with the 
 
   **Mysql for tomcat** If you change configurations for database used by `tomcat`, modify `tomcat.env`, and make sure that following files are also updated:
   - Update constructor arguments for `bean id="dba"` at  [application-context](https://github.com/reactome/container/blob/master/java-application-builder/mounts/applicationContext.xml#L14)
+  - Update values of `-u` and `-p` in AnalysisBin() in [maven_builds.sh](https://github.com/reactome/container/blob/master/java-application-builder/maven_builds.sh#L89)
  
   **Mysql for wordpress** If you are changing password for wordpress database, you can do it by changing `wordpress.env`
    - Update username and password at [wordpress/secrets.pm#L14](https://github.com/reactome/container/blob/develop/wordpress/Secrets.pm#L14)
