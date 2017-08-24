@@ -44,7 +44,7 @@ You can begin with cloning the repository along with its submodule using:
 git clone --recursive https://github.com/reactome/container.git
 ```
 
-Before you can run this project, you need to [install docker](https://docs.docker.com/engine/installation/) and [install docker-compose](https://docs.docker.com/compose/install/) on your system. To ease out things, installation instructions are packed in the file [prereqs-ubuntu.sh](https://github.com/reactome/container/blob/master/prereqs-ubuntu.sh) which can be executed by:
+Before you can run this project, you need to [install docker](https://docs.docker.com/engine/installation/) and [install docker-compose](https://docs.docker.com/compose/install/) on your system. To ease out things, installation instructions are packed in the file [prereqs-ubuntu.sh](https://github.com/reactome/container/blob/master/prereqs-ubuntu.sh) which is a modified version of the one provided by [hyperledger/composer/prereqs-ubuntu.sh](https://hyperledger.github.io/composer/prereqs-ubuntu.sh) and can be executed by:
 
 ```
 cd container
@@ -101,10 +101,10 @@ The `./deploy.sh` script can be run with single or multiple or no flags. The usa
 
 After the reactome server has been given the instruction to get started, it will take some time get ready. When it is ready, then you will be able to visit following endpoints at your browser:
 
--   `localhost:80` for reactome.org
--   `localhost:8983` for solr admin
--   `localhost:7474` for neo4j admin
--   `localhost:8082/manager/html` for tomcat manager
+-   `localhost:80` for The Reactome front page
+-   `localhost:8983` for Solr Admin
+-   `localhost:7474` for Neo4j Admin
+-   `localhost:8082/manager/html` for Tomcat Manager
 
 ## Configuring custom passwords
 
