@@ -44,6 +44,14 @@ You can begin with cloning the repository along with its submodule using:
 git clone --recursive https://github.com/reactome/container.git
 ```
 
+If above command fails, or if you obtained copy of repository by zipped folder, then you may initialize submodule manually
+
+```
+git clone https://github.com/reactome/container.git
+cd container
+git submodule update --init --recursive
+```
+
 Before you can run this project, you need to [install docker](https://docs.docker.com/engine/installation/) and [install docker-compose](https://docs.docker.com/compose/install/), [install git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) on your system. To ease out things, installation instructions are packed in the file [prereqs-ubuntu.sh](https://github.com/reactome/container/blob/master/prereqs-ubuntu.sh) which is a modified version of the one provided by [hyperledger/composer/prereqs-ubuntu.sh](https://hyperledger.github.io/composer/prereqs-ubuntu.sh) and can be executed by:
 
 ```
