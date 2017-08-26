@@ -9,6 +9,7 @@
 - [How to run](#how-to-run)
 - [How to use](#how-to-use)
 - [Configuring custom passwords](#configuring-custom-passwords)
+- [Troubleshooting](#troubleshooting)
 
 ## Overview
 
@@ -122,7 +123,7 @@ The `./deploy.sh` script can be run with single or multiple or no flags. The usa
 
  - `-b` or `--build`  is Build flag. Rebuild essential war files.
  
- - `-b all` or `--build all` is Build all flag. It will build all webapps. Data files like analysis.bin and interactors.db will also be built due to the presence of all argument.
+ - `-b all` or `--build all` is Build all flag. It will build all webapps. Data files like analysis.bin and interactors.db will also be built due to the presence of `all` argument.
 
  - `-b select` or `--build select` It will allow user to select which webapps to build. By using this flag, the user will be presented with name of the services and from there user will be required to press y/n for yes/no if the service should be built or not.
  
@@ -132,7 +133,15 @@ The `./deploy.sh` script can be run with single or multiple or no flags. The usa
 
 ## How to use
 
-After the reactome server has been given the instruction to get started, it will take some time get ready. When it is ready, then you will be able to visit following endpoints at your browser:
+After the reactome server has been given the instruction to get started, it will take some time get ready. When it is ready, the last output will come from tomcat server which will be similar to the one given below:
+
+```
+tomcat-server       | 26-Aug-2017 02:26:18.986 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["http-nio-8080"]
+tomcat-server       | 26-Aug-2017 02:26:19.004 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler ["ajp-nio-8009"]
+tomcat-server       | 26-Aug-2017 02:26:19.013 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in 94422 ms
+```
+
+Now the server is ready and we can visit following endpoints in browser:
 
 -   `localhost:80` for The Reactome front page
 -   `localhost:8983` for Solr Admin
@@ -173,3 +182,9 @@ Note: If you modify password of neo4j, then make sure to update changes at
   ```
 
   The changes will be made by service named `mysql-database` and changes will reside in database file internal to `mysql-database` container. On removing container, the customized username and password will also get removed.
+
+## Troubleshooting
+
+There are two main applications for use in the repository, one is to build the java applications and other is to run the reactome server. The logs related to build process of java application are stored in 'logs/build_webapps.log' and other logs are stored in their specific folder withing `logs` directory. Logs should help you for most of the troubleshooting.
+
+Other memory related issues can be managed by modifying `JAVA_OPTS` in `tomcat.env` file.
