@@ -381,6 +381,8 @@ do
 
     -u | --update)
       # Update option has been selected.
+      # Remove empty directories which might be created by docker-compose up
+      find . -empty -type d -delete
       if [[ "$2" == "all" ]]; then
         echo "Selected 'all'. All previous archives will be checked. if inconsistent with remote version, new file will be downloaded."
         updateAllArchives
