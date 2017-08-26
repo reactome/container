@@ -445,6 +445,7 @@ do
       exit 0
       ;;
     -r | --run )
+      unpackArchives
       startUp
       exit
       ;;
@@ -460,6 +461,7 @@ do
 done
 if [[ $numargs == 0 ]]; then
   # Only deploy is called, containers should be started
+  unpackArchives
   startUp
   else
     # All flags have been processed, time to exit
