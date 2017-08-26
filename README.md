@@ -185,6 +185,6 @@ Note: If you modify password of neo4j, then make sure to update changes at
 
 ## Troubleshooting
 
-There are two main applications for use in the repository, one is to build the java applications and other is to run the reactome server. The logs related to build process of java application are stored in 'logs/build_webapps.log' and other logs are stored in their specific folder withing `logs` directory. Logs should help you for most of the troubleshooting.
+There are two main applications for use in the repository, one is to build the java applications and other is to run the reactome server. The logs related to build process of java application are stored in `logs/build_webapps.log` and other logs are stored in their specific folder withing `logs` directory. Logs should help you for most of the troubleshooting.
 
 Other memory related issues can be managed by modifying `JAVA_OPTS` in `tomcat.env` file.
