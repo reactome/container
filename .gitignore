@@ -1,5 +1,6 @@
 webapps/*
 mysql/tomcat_data/*.gz
+mysql/wordpress_data/*.gz
 logs/*
 fireworks/*
 diagram/*
@@ -7,4 +8,7 @@ tomcat/analysis-service
 java-application-builder/downloads/*
 neo4j/data/*
 solr/data/*
-neo4j/conf/neo4j.conf
+neo4j/data/*
+neo4j/*.tgz
+toc_files/*
+tmp_files/*
