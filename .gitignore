@@ -1,5 +1,6 @@
 webapps/*
 mysql/tomcat_data/*.gz
+mysql/wordpress_data/*.gz
 logs/*
 fireworks/*
 diagram/*

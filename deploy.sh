@@ -18,7 +18,7 @@ function updateDataArchives()
     file_list+=( ["neo4j/data/reactome.graphdb.tgz"]="http://reactome.org/download/current/reactome.graphdb.tgz" ) # neo4j data
     file_list+=( ["solr/data/solr_data.tgz"]="https://reactome.org/download/current/solr_data.tgz" ) # solr data
     file_list+=( ["java-application-builder/downloads/diagrams_and_fireworks.tgz"]="https://reactome.org/download/current/diagrams_and_fireworks.tgz" )
-    # file_list+=( ["mysql/wordpress_data/reactome-wordpress.sql.gz"]="http://www.reactome.org/download/current/databases/gk_wordpress.sql.gz")
+    file_list+=( ["mysql/wordpress_data/reactome-wordpress.sql.gz"]="http://www.reactome.org/download/current/databases/gk_wordpress.sql.gz")
 
     for db_file in "${!file_list[@]}";
     do
@@ -384,6 +384,9 @@ do
 
     -u | --update)
       # Update option has been selected.
+      # some subdirectories of neo4j will not be owned by $USER and this will cause find
+      # to fail.
+      sudo chown -R $USER:$USER ./neo4j
       # Remove empty directories which might be created by docker-compose up
       find . -empty -type d -delete
       if [[ "$2" == "all" ]]; then
