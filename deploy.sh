@@ -184,6 +184,7 @@ function downloadNewArchives()
 
 function unpackArchives()
 {
+  current_dir=`pwd`
   echo -e "\n\n"
   echo "==========================================================================="
   echo "                           Unpacking required files"
@@ -240,6 +241,8 @@ function unpackArchives()
   else
     echo "analysis.bin already exists"
   fi
+  echo "Coming back to original directory: $current_dir"
+  cd $current_dir
 }
 
 function startUp()
