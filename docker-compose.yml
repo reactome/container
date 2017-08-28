@@ -51,6 +51,7 @@ services:
     ports:
       - "8983:8983"
     volumes:
+      - ./solr/etc/:/opt/solr/server/etc
       - ./solr/data/solr_data:/opt/solr/server/solr/mycores
       - ./solr/solrconfig.xml:/opt/solr/server/solr/mycores/reactome/conf/solrconfig.xml
       - ./logs/solr/:/opt/solr/server/logs/
