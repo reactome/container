@@ -184,6 +184,7 @@ function downloadNewArchives()
 
 function unpackArchives()
 {
+  current_dir=`pwd`
   echo -e "\n\n"
   echo "==========================================================================="
   echo "                           Unpacking required files"
@@ -240,6 +241,8 @@ function unpackArchives()
   else
     echo "analysis.bin already exists"
   fi
+  echo "Coming back to original directory: $current_dir"
+  cd $current_dir
 }
 
 function startUp()
@@ -381,6 +384,8 @@ do
 
     -u | --update)
       # Update option has been selected.
+      # Remove empty directories which might be created by docker-compose up
+      find . -empty -type d -delete
       if [[ "$2" == "all" ]]; then
         echo "Selected 'all'. All previous archives will be checked. if inconsistent with remote version, new file will be downloaded."
         updateAllArchives
@@ -395,23 +400,25 @@ do
 
     -b | --build)
       # This is build option. Used to build webapps for tomcat
-      declare -a app_list=(CuratorTool PathwayExchange RESTfulAPI PathwayBrowser SearchCore DataContent ContentService AnalysisToolsCore AnalysisToolsService AnalysisBin InteractorsCore)
+      app_list_location="./java-application-builder/build_webapps.env"
       if [[ "$2" == "all" ]]; then
         echo "Selected all: These are all webapps which will be built:"
-        for app_name in "${app_list[@]}"; do
-          echo "${app_name}"
-          export "state_${app_name}=develop"
+        for app_name_state in `cat "$app_list_location"`; do
+          app_name_from_location="$(echo ${app_name_state} | cut -d'_' -f 2)"
+          echo "$app_name_from_location"
+          export "${app_name_state}=develop"
         done
         ((i++));
         shift
       elif [[ "$2" == "select" ]]; then
         echo "Please select which applications you want to build: Press [y/n]"
-        for app_name in "${app_list[@]}"; do
+        for app_name_state in `cat "$app_list_location"`; do
+          app_name_from_location="$(echo ${app_name_state} | cut -d'_' -f 2)"
           echo
-          read -p "${app_name}?`echo $'\n> '`" -n 1 -r
+          read -p "$app_name_from_location?`echo $'\n> '`" -n 1 -r
           if [[ $REPLY =~ ^[Yy]$ ]]; then
-            export "state_${app_name}=develop"
-          else export "state_${app_name}=ready"
+            export "${app_name_state}=develop"
+          else export "${app_name_state}=ready"
           fi
         done
         # Using shift to pop out 'select' argument
@@ -432,6 +439,7 @@ do
       fi
       # Tell user whatever is going to happen next
       sleep 1
+      echo "Build process is begining..."
       # At this point we have determined which apps we want to build
       bash java-application-builder/build_webapps.sh |& tee logs/build_webapps.log
       ;;
@@ -442,6 +450,7 @@ do
       exit 0
       ;;
     -r | --run )
+      unpackArchives
       startUp
       exit
       ;;
@@ -457,6 +466,7 @@ do
 done
 if [[ $numargs == 0 ]]; then
   # Only deploy is called, containers should be started
+  unpackArchives
   startUp
   else
     # All flags have been processed, time to exit

@@ -55,6 +55,7 @@ services:
       - ./solr/data/solr_data:/opt/solr/server/solr/mycores
       - ./solr/solrconfig.xml:/opt/solr/server/solr/mycores/reactome/conf/solrconfig.xml
       - ./logs/solr/:/opt/solr/server/logs/
+      - ./solr/solr-security.json:/opt/solr/server/solr/security.json:rw
     entrypoint:
       - docker-entrypoint.sh
       - solr-precreate
@@ -114,7 +115,7 @@ services:
     depends_on:
       - mysql-database
     env_file:
-      - .env
+      - wordpress.env
     ports:
       - 80:80
     entrypoint:  /wait-for.sh mysql-database:3306 -t 120  --  /usr/local/bin/docker-entrypoint.sh apache2-foreground
