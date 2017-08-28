@@ -114,7 +114,7 @@ services:
     depends_on:
       - mysql-database
     env_file:
-      - .env
+      - wordpress.env
     ports:
       - 80:80
     entrypoint:  /wait-for.sh mysql-database:3306 -t 120  --  /usr/local/bin/docker-entrypoint.sh apache2-foreground
