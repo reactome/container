@@ -184,6 +184,7 @@ function downloadNewArchives()
 
 function unpackArchives()
 {
+  current_dir=`pwd`
   echo -e "\n\n"
   echo "==========================================================================="
   echo "                           Unpacking required files"
@@ -240,6 +241,8 @@ function unpackArchives()
   else
     echo "analysis.bin already exists"
   fi
+  echo "Coming back to original directory: $current_dir"
+  cd $current_dir
 }
 
 function startUp()
@@ -381,6 +384,8 @@ do
 
     -u | --update)
       # Update option has been selected.
+      # Remove empty directories which might be created by docker-compose up
+      find . -empty -type d -delete
       if [[ "$2" == "all" ]]; then
         echo "Selected 'all'. All previous archives will be checked. if inconsistent with remote version, new file will be downloaded."
         updateAllArchives
@@ -445,6 +450,7 @@ do
       exit 0
       ;;
     -r | --run )
+      unpackArchives
       startUp
       exit
       ;;
@@ -460,6 +466,7 @@ do
 done
 if [[ $numargs == 0 ]]; then
   # Only deploy is called, containers should be started
+  unpackArchives
   startUp
   else
     # All flags have been processed, time to exit
