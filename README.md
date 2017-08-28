@@ -173,7 +173,10 @@ Note: If you modify password of neo4j, then make sure to update changes at
    - [content-service-pom.xml#L26](https://github.com/reactome/container/blob/master/java-application-builder/mounts/content-service-pom.xml#L26)
    - [data-content-pom.xml#L36](https://github.com/reactome/container/blob/master/java-application-builder/mounts/data-content-pom.xml#L36)
 
-- **Solr Admin:**  Its default username and password is currently not configurable and both are set as `solr`
+- **Solr Admin:**  Its default username and password are "solr"/"solr". This is set in the file solr/solr-security.json. To change this, follow the instructions here:
+ https://lucene.apache.org/solr/guide/6_6/basic-authentication-plugin.html#BasicAuthenticationPlugin-AddaUserorEditaPassword
+
+  You will also need to update [content-service-pom.xml](https://github.com/reactome/container/blob/develop/java-application-builder/mounts/content-service-pom.xml#L28) and [data-content-pom](https://github.com/reactome/container/blob/develop/java-application-builder/mounts/data-content-pom.xml#L41)
 
 - **Wordpress:** The username and password for wordpress-admin can be modified by executing following command when the server is running.
 
