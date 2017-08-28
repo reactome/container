@@ -182,7 +182,7 @@ Note: If you modify password of neo4j, then make sure to update changes at
 - **Wordpress:** The username and password for wordpress-admin can be modified by executing following command when the server is running.
 
   ```
-  docker exec -i mysql-database mysql --user=<username_from_wordpress.env> --password=<password_from_wordpress.env> wordpress <<< "UPDATE wp_users SET user_login = 'user_name', user_pass = 'password' where id=1;"
+  docker exec -i mysql-database mysql --user=<username_from_wordpress.env> --password=<password_from_wordpress.env> wordpress <<< "UPDATE wp_users SET user_login = 'user_name', user_pass = MD5('password') where id=1;"
   ```
 
   The changes will be made by service named `mysql-database` and changes will reside in database file internal to `mysql-database` container. If this container is removed, the customized username and password will also get removed.
