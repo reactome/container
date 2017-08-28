@@ -17,7 +17,7 @@
 
 This project enables users to setup a standalone reactome server on their own system. With this server users will be able to run an instance of [Reactome](http://reactome.org/) on their local system. The components of the Reactome server are packaged in  docker containers, so any system capable of running docker can run an instance of this server. The image given below gives a high-level view of the project describing how different components of the project are connected to each other and what endpoints are available to the user for interaction.
 
-![reactome-no-volume](../../feature/documentation/documentation-images/all-services-abstract-view.png)
+![reactome-no-volume](./documentation-images/all-services-abstract-view.png)
 
 The graphs on this page were generated using [docker-compose-viz](https://github.com/pmsipilot/docker-compose-viz). For a better understanding of these graphs, visit [docker-compose-viz/How to read the graph](https://github.com/pmsipilot/docker-compose-viz#how-to-read-the-graph).
 
@@ -26,23 +26,23 @@ The graphs on this page were generated using [docker-compose-viz](https://github
 This project builds up a reactome server with all the required java applications inside docker containers and deploys them. A detailed view of structure of the project is shown in the image below. This image describes how files on the host are mapped inside the container.
 
 <div align="center">
-  <img src="../../feature/documentation/documentation-images/all-services.png" width="100%"/>
+  <img src="./documentation-images/all-services.png" width="100%"/>
 </div></br>
 
 The graphical representation of each internal service is shown below
 
 <div align="center">
-  <img src="../../feature/documentation/documentation-images/tomcat.png" width="15%"/>
+  <img src="./documentation-images/tomcat.png" width="15%"/>
 
-  <img src="../../feature/documentation/documentation-images/wordpress-sites.png" width="15%"/>
+  <img src="./documentation-images/wordpress-sites.png" width="15%"/>
 
-  <img src="../../feature/documentation/documentation-images/mysql-for-wordpress.png" width="15%"/>
+  <img src="./documentation-images/mysql-for-wordpress.png" width="15%"/>
 
-  <img src="../../feature/documentation/documentation-images/mysql-for-tomcat.png" width="15%"/>
+  <img src="./documentation-images/mysql-for-tomcat.png" width="15%"/>
 
-  <img src="../../feature/documentation/documentation-images/solr.png" width="15%"/>
+  <img src="./documentation-images/solr.png" width="15%"/>
 
-  <img src="../../feature/documentation/documentation-images/neo4j-db.png" width="15%"/>
+  <img src="./documentation-images/neo4j-db.png" width="15%"/>
 
 
 </div>
