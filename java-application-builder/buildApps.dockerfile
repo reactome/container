@@ -1,5 +1,5 @@
 FROM maven:3.5-jdk-8
-ENV PATHWAY_BROWSER_VERSION=v3.2.0
+ENV PATHWAY_BROWSER_VERSION=curator
 RUN mkdir -p /gitroot
 WORKDIR /gitroot
 
@@ -22,12 +22,12 @@ RUN git clone https://github.com/reactome/SBMLExporter.git
 WORKDIR /gitroot/SBMLExporter
 RUN git checkout $SBMLEXPORTER_VERSION
 
-# Build the ContentService application
-ENV CONTENT_SERVICE_VERSION=master
-WORKDIR /gitroot/
-RUN git clone https://github.com/reactome/content-service.git
-WORKDIR /gitroot/content-service
-RUN git checkout $CONTENT_SERVICE_VERSION
+# # Build the ContentService application
+# ENV CONTENT_SERVICE_VERSION=master
+# WORKDIR /gitroot/
+# RUN git clone https://github.com/reactome/content-service.git
+# WORKDIR /gitroot/content-service
+# RUN git checkout $CONTENT_SERVICE_VERSION
 
 ENV DATA_CONTENT_VERSION=master
 WORKDIR /gitroot/
@@ -40,12 +40,18 @@ RUN git checkout $DATA_CONTENT_VERSION
 # The repo:
 # http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-repo/org/reactome/server/search/search-core/
 # only has version 1.0.0.
-ENV SEARCH_CORE_VERSION=master
-WORKDIR /gitroot/
-RUN git clone https://github.com/reactome/search-core.git
-WORKDIR /gitroot/search-core
-RUN git checkout $SEARCH_CORE_VERSION
+# ENV SEARCH_CORE_VERSION=master
+# WORKDIR /gitroot/
+# RUN git clone https://github.com/reactome/search-core.git
+# WORKDIR /gitroot/search-core
+# RUN git checkout $SEARCH_CORE_VERSION
 
+# ENV SEARCH_VERSION = 1.0.1
+ENV SEARCH_VERSION = master
+WORKDIR /gitroot/
+RUN git clone https://github.com/reactome/Search.git
+WORKDIR /gitroot/Search
+RUN git checkout $SEARCH_VERSION
 
 # Build the AnalysisService application
 ENV ANALYSIS_SERVICE_VERSION=master

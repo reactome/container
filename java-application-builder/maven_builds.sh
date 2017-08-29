@@ -44,20 +44,20 @@ PathwayBrowser ()
   && cp /gitroot/browser/target/PathwayBrowser*.war /webapps/PathwayBrowser.war
 }
 
-ContentService ()
-{
-  # Build Content-service
-  cd /gitroot/SBMLExporter && mvn package install -DskipTests
-  cd /gitroot/content-service
-  mvn package -P ContentService-Local
-  cp /gitroot/content-service/target/ContentService*.war /webapps/ContentService.war
-}
+# ContentService ()
+# {
+#   # Build Content-service
+#   cd /gitroot/SBMLExporter && mvn package install -DskipTests
+#   cd /gitroot/content-service
+#   mvn package -P ContentService-Local
+#   cp /gitroot/content-service/target/ContentService*.war /webapps/ContentService.war
+# }
 
 SearchCore()
 {
-  echo "building/installing search-core..."
+  echo "building/installing Search..."
   # build and install search-core
-  cd /gitroot/search-core
+  cd /gitroot/Search
   mvn package install -DskipTests=true
 }
 
@@ -141,12 +141,12 @@ app_list+=( ["RESTfulAPI"]=$state_RESTfulAPI )                     orders+=("RES
 app_list+=( ["PathwayBrowser"]=$state_PathwayBrowser )             orders+=("PathwayBrowser")
 app_list+=( ["SearchCore"]=$state_SearchCore )                     orders+=("SearchCore")
 app_list+=( ["DataContent"]=$state_DataContent )                   orders+=("DataContent")
-app_list+=( ["ContentService"]=$state_ContentService )             orders+=("ContentService")
+# app_list+=( ["ContentService"]=$state_ContentService )             orders+=("ContentService")
 app_list+=( ["InteractorsCore"]=$state_InteractorsCore )           orders+=("InteractorsCore")
 app_list+=( ["AnalysisToolsCore"]=$state_AnalysisToolsCore )       orders+=("AnalysisToolsCore")
 app_list+=( ["AnalysisToolsService"]=$state_AnalysisToolsService ) orders+=("AnalysisToolsService")
 app_list+=( ["AnalysisBin"]=$state_AnalysisBin )                   orders+=("AnalysisBin")
-app_list+=( ["SearchIndexer"]=developing )                         orders+=("SearchIndexer")
+# app_list+=( ["SearchIndexer"]=developing )                         orders+=("SearchIndexer")
 
 for i in "${!orders[@]}";
 do
