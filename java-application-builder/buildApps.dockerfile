@@ -4,9 +4,8 @@ RUN mkdir -p /gitroot
 WORKDIR /gitroot
 
 # Build the PathwayBrowser application
-RUN git clone https://github.com/reactome-pwp/browser.git
-WORKDIR /gitroot/browser
-RUN git checkout $PATHWAY_BROWSER_VERSION
+#RUN mkdir PathwayBrowser
+COPY ./PathwayBrowser /gitroot/PathwayBrowser
 
 # Need diagram-exporter for content-service and it's not in a repo so we will build it locally.
 ENV DIAGRAM_EXPORTER_VERSION=master
@@ -22,36 +21,11 @@ RUN git clone https://github.com/reactome/SBMLExporter.git
 WORKDIR /gitroot/SBMLExporter
 RUN git checkout $SBMLEXPORTER_VERSION
 
-# # Build the ContentService application
-# ENV CONTENT_SERVICE_VERSION=master
-# WORKDIR /gitroot/
-# RUN git clone https://github.com/reactome/content-service.git
-# WORKDIR /gitroot/content-service
-# RUN git checkout $CONTENT_SERVICE_VERSION
-
 ENV DATA_CONTENT_VERSION=master
 WORKDIR /gitroot/
 RUN git clone https://github.com/reactome/data-content.git
 WORKDIR /gitroot/data-content
 RUN git checkout $DATA_CONTENT_VERSION
-
-# search-core library is needed by data-content, but the *correct version*
-# doesn't seem to be in any online repos.
-# The repo:
-# http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-repo/org/reactome/server/search/search-core/
-# only has version 1.0.0.
-# ENV SEARCH_CORE_VERSION=master
-# WORKDIR /gitroot/
-# RUN git clone https://github.com/reactome/search-core.git
-# WORKDIR /gitroot/search-core
-# RUN git checkout $SEARCH_CORE_VERSION
-
-# ENV SEARCH_VERSION = 1.0.1
-ENV SEARCH_VERSION = master
-WORKDIR /gitroot/
-RUN git clone https://github.com/reactome/Search.git
-WORKDIR /gitroot/Search
-RUN git checkout $SEARCH_VERSION
 
 # Build the AnalysisService application
 ENV ANALYSIS_SERVICE_VERSION=master

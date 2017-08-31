@@ -39,36 +39,28 @@ RESTfulAPI ()
 PathwayBrowser ()
 {
   # Build Pathway Browser
-  cd /gitroot/browser && mvn package \
-  && cd /gitroot/diagram-exporter && mvn install \
-  && cp /gitroot/browser/target/PathwayBrowser*.war /webapps/PathwayBrowser.war
+  cd /gitroot/PathwayBrowser
+  mvn package
+  # cd /gitroot/diagram-exporter && mvn install
+  cp /gitroot/PathwayBrowser/target/PathwayBrowser*.war /webapps/PathwayBrowser.war
 }
 
-# ContentService ()
+# SearchCore()
 # {
-#   # Build Content-service
-#   cd /gitroot/SBMLExporter && mvn package install -DskipTests
-#   cd /gitroot/content-service
-#   mvn package -P ContentService-Local
-#   cp /gitroot/content-service/target/ContentService*.war /webapps/ContentService.war
+#   echo "building/installing Search..."
+#   # build and install search-core
+#   cd /gitroot/Search
+#   mvn package install -DskipTests=true
 # }
 
-SearchCore()
-{
-  echo "building/installing Search..."
-  # build and install search-core
-  cd /gitroot/Search
-  mvn package install -DskipTests=true
-}
-
-DataContent ()
-{
-  # Build data-content application
-  # SearchCore
-  cd /gitroot/data-content
-  mvn package install -P DataContent-Local
-  cp /gitroot/data-content/target/content*.war /webapps/content.war
-}
+# DataContent ()
+# {
+#   # Build data-content application
+#   # SearchCore
+#   cd /gitroot/data-content
+#   mvn package install -P DataContent-Local
+#   cp /gitroot/data-content/target/content*.war /webapps/content.war
+# }
 
 AnalysisToolsCore ()
 {
@@ -139,8 +131,8 @@ app_list+=( ["CuratorTool"]=$state_CuratorTool )                   orders+=("Cur
 app_list+=( ["PathwayExchange"]=$state_PathwayExchange )           orders+=("PathwayExchange")
 app_list+=( ["RESTfulAPI"]=$state_RESTfulAPI )                     orders+=("RESTfulAPI")
 app_list+=( ["PathwayBrowser"]=$state_PathwayBrowser )             orders+=("PathwayBrowser")
-app_list+=( ["SearchCore"]=$state_SearchCore )                     orders+=("SearchCore")
-app_list+=( ["DataContent"]=$state_DataContent )                   orders+=("DataContent")
+# app_list+=( ["SearchCore"]=$state_SearchCore )                     orders+=("SearchCore")
+# app_list+=( ["DataContent"]=$state_DataContent )                   orders+=("DataContent")
 # app_list+=( ["ContentService"]=$state_ContentService )             orders+=("ContentService")
 app_list+=( ["InteractorsCore"]=$state_InteractorsCore )           orders+=("InteractorsCore")
 app_list+=( ["AnalysisToolsCore"]=$state_AnalysisToolsCore )       orders+=("AnalysisToolsCore")
