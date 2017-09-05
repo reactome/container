@@ -1,4 +1,5 @@
 #! /bin/bash
+MYSQL_ROOT_PASSWORD=root
 set -e
 CuratorTool ()
 {
@@ -90,7 +91,7 @@ AnalysisBin ()
         -h 172.25.3.3 \
         -d gk_current \
         -u root \
-        -p root \
+        -p $MYSQL_ROOT_PASSWORD \
         -o ./analysis.bin \
         -g /downloads/interactors.db
   cp ./analysis.bin /downloads/
