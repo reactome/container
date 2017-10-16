@@ -1,6 +1,6 @@
--- # This little script will set the WordPress home and siteurl to http://localhost/
+-- This relies on @HOST to be set from some other script, which will use a value that has been given by the user.
 select wp_options.option_name, wp_options.option_value from wp_options where wp_options.option_name in ('siteurl','home');
-update wp_options set option_value = 'http://localhost/' where option_name in ('siteurl','home');
+update wp_options set option_value = concat('http://',@HOST,'/') where option_name in ('siteurl','home');
 select wp_options.option_name, wp_options.option_value from wp_options where wp_options.option_name in ('siteurl','home');
 /* original: doesn't work.
 update wp_postmeta set meta_value='/cgi-bin/classbrowser'

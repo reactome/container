@@ -1,4 +1,7 @@
 #!/bin/bash
+
+HOST=localhost
+
 set -e
 # Update and download data archives.
 # Following files will be downloaded:
@@ -352,6 +355,10 @@ Option          | Argument  | Description
                 |            Running deploy alone would also trigger the
                 |            reactome server to start
 
+-H, --host      | host       Sets the host for WordPress. Defaults to localhost.
+                |            You can specify the hostname of the machine where the
+                |            WordPress container is running, or its IP address.
+
 Example: $thisScript
        : $thisScript -d -b
        : $thisScript -d all -b
@@ -400,7 +407,23 @@ do
         echo "Archives updated"
       fi
       ;;
-
+    -H | --host)
+    # This will take in an IP address or hostname for from the user. It will be used for the 'siteurl' and 'home' wordpress variables.
+    # This should be the public-facing IP/hostname of the machine where these containers are running.
+      HOST=$2
+      # Remove any pre-existing host-setting file
+      if [ -e mysql/wordpress_data/_set_host.sh ] ; then
+          rm mysql/wordpress_data/_set_host.sh
+      fi
+      cat >mysql/wordpress_data/_set_host.sh<<EOF
+#! /bin/bash
+set -x
+mysql -uroot -hlocalhost -p$MYSQL_ROOT_PASSWORD -e 'set @HOST=$HOST'
+set +x
+EOF
+      chmod a+x mysql/wordpress_data/_set_host.sh
+      shift
+      ;;
     -b | --build)
       # This is build option. Used to build webapps for tomcat
       app_list_location="./java-application-builder/build_webapps.env"
