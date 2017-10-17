@@ -6,6 +6,7 @@ fireworks/*
 diagram/*
 tomcat/analysis-service
 java-application-builder/downloads/*
+java-application-builder/logs
 neo4j/data/*
 solr/data/*
 neo4j/data/*
