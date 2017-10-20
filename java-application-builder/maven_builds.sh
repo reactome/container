@@ -66,6 +66,15 @@ DataContent ()
   # Build data-content application
   # SearchCore
   cd /gitroot/data-content
+  # Rename customTag.tld to implicit.tld
+  # For more information see: https://stackoverflow.com/questions/38593625/java-error-message-invalid-tld-file-see-jsp-2-2-specification-section-7-3-1-fo/39264879#39264879
+  mv src/main/webapp/WEB-INF/tags/customTag.tld src/main/webapp/WEB-INF/tags/implicit.tld
+  for f in $(grep -RIH customTag.tld . | cut -d ':' -f 1) ; do
+      echo "fixing customTag.tld name in  $f"
+      sed -i -e 's/customTag\.tld/implicit.tld/g' $f
+  done;
+  echo "Files still referencing customTag.tld"
+  grep -RH customTag.tld . | cut -d ':' -f 1
   mvn package install -P DataContent-Local
   cp /gitroot/data-content/target/content*.war /webapps/content.war
 }
