@@ -14,8 +14,6 @@ ENV EXTENSION_SCRIPT /data/neo4j-init.sh
 EXPOSE 7474
 EXPOSE 7687
 COPY ./neo4j-init.sh /data/neo4j-init.sh
-# TODO: Download the graphdb file from reactome.org instead of local copy.
-#COPY ./data/reactome.graphdb.tgz /var/lib/neo4j/data/databases/reactome.graphdb.tgz
 ADD https://reactome.org/download/current/reactome.graphdb.tgz /var/lib/neo4j/data/databases/reactome.graphdb.tgz
 COPY ./conf/neo4j.conf /var/lib/neo4j/conf/neo4j.conf
 # RUN sed -i -e s/dbms.active_database=.*/dbms.active_database=reactome.graphdb.${ReleaseVersion}/g /var/lib/neo4j/conf/neo4j.conf
