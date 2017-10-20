@@ -13,7 +13,7 @@ if [ ! -f /tmp/neo4j-import-done.flag ]; then
     # extra "v") and neo4j needs an EXACT directory name, so we will ensure
     # that the data will *always* be in "reactome.graphdb" - then we never
     # need to update dbms.active_database in neo4j.conf
-    mkdir reactome.graphdb
+    mkdir -p reactome.graphdb
     tar -C reactome.graphdb --strip-components=1  -xvzf reactome.graphdb.tgz
     cd $currentDir
     touch /tmp/neo4j-import-done.flag

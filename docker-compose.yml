@@ -61,15 +61,14 @@ services:
       - reactome
 
   neo4j-db:
-    image: neo4j
+    image: reactome-neo4j
+    build:
+      context: ./neo4j
+      dockerfile: neo4j_stand-alone.dockerfile
     container_name: neo4j-db
     hostname: neo4j-db
-    env_file:
-      - neo4j.env
     volumes:
       - ./neo4j/data:/var/lib/neo4j/data/databases
-      - ./neo4j/neo4j-init.sh:/data/neo4j-init.sh
-      - ./neo4j/conf/:/var/lib/neo4j/conf/
       - ./logs/neo4j/:/var/lib/neo4j/logs/
     ports:
       - 7474:7474
