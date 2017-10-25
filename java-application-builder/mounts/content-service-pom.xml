@@ -92,10 +92,10 @@
     <properties>
         <deploymentPath>/</deploymentPath>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <graph.core>1.0.8</graph.core>
+        <graph.core>1.1.2</graph.core>
         <search.core>1.0.0</search.core>
         <interactors.core>1.0.8</interactors.core>
-        <diagram.exporter>1.0.0</diagram.exporter>
+        <diagram.exporter>1.1.0</diagram.exporter>
         <sbml-exporter>1.0.0</sbml-exporter>
         <spring.version>4.3.10.RELEASE</spring.version>
         <servlet.version>4.0.0-b01</servlet.version>
@@ -220,6 +220,13 @@
             <artifactId>activation</artifactId>
             <version>${activation.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>catalina</artifactId>
+            <version>6.0.53</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!--Logging: will transitively add logback core and slf4j-api-->
         <dependency>
             <groupId>ch.qos.logback</groupId>
