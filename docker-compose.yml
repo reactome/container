@@ -10,14 +10,14 @@ services:
       dockerfile: tomcat.dockerfile
     depends_on:
       - mysql-for-tomcat
-      - wordpress-sites
+      - joomla-sites
       - neo4j-db
       - solr
     links:
       - mysql-for-tomcat
-      - wordpress-sites
+      - joomla-sites
       - neo4j-db
-    entrypoint: bash -c "/wait-for.sh neo4j-db:7687 -t 360 && /wait-for.sh solr-for-reactome:8983 -t 360 && /wait-for.sh mysql-for-tomcat:3306 -t 360 && /wait-for.sh wordpress-sites:80 -t 360 && catalina.sh run"
+    entrypoint: bash -c "/wait-for.sh neo4j-db:7687 -t 360 && /wait-for.sh solr-for-reactome:8983 -t 360 && /wait-for.sh mysql-for-tomcat:3306 -t 360 && /wait-for.sh joomla-sites:80 -t 360 && catalina.sh run"
     volumes:
       - ./java-application-builder/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
       - ./java-application-builder/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war
@@ -87,48 +87,48 @@ services:
       - mysql-for-tomcat-log:/backup
     command: bash -c "/init.sh && exec /entrypoint.sh mysqld"
 
-  mysql-database:
+  mysql-for-joomla:
     image: mysql
-    hostname: mysql-database
-    container_name: mysql-database
+    hostname: mysql-for-joomla
+    container_name: mysql-for-joomla
     env_file:
-      - wordpress.env
+      - joomla.env
     volumes:
-      - ./mysql/wordpress_data/:/docker-entrypoint-initdb.d
+      - ./mysql/joomla_data/:/docker-entrypoint-initdb.d
       - ./mysql/init.sh:/init.sh
-      - ./logs/mysql/wordpress:/var/log/mysql
-      - mysql-for-wordpress-log:/backup
+      - ./logs/mysql/joomla:/var/log/mysql
+      - mysql-for-joomla-log:/backup
     command: bash -c "/init.sh && exec /entrypoint.sh mysqld"
 
 
-  wordpress-sites:
-    hostname: wordpress-sites
-    image: wordpress:4.8.1_for_reactome
+  joomla-sites:
+    hostname: joomla-sites
+    image: joomla:4.8.1_for_reactome
     build:
-      context: ./wordpress
-      dockerfile: wordpress.dockerfile
-    container_name: wordpress-sites
+      context: ./joomla
+      dockerfile: joomla.dockerfile
+    container_name: joomla-sites
     links:
-      - mysql-database
+      - mysql-for-joomla
     depends_on:
-      - mysql-database
+      - mysql-for-joomla
     env_file:
-      - wordpress.env
+      - joomla.env
     ports:
       - 80:80
-    entrypoint:  /wait-for.sh mysql-database:3306 -t 120  --  /usr/local/bin/docker-entrypoint.sh apache2-foreground
+    entrypoint:  /wait-for.sh mysql-for-joomla:3306 -t 120  --  /usr/local/bin/docker-entrypoint.sh apache2-foreground
     volumes:
-      - ./wordpress/wait-for.sh:/wait-for.sh
-      - ./wordpress/htaccess:/var/www/html/.htaccess
-      - ./wordpress/000-default.conf:/etc/apache2/sites-enabled/000-default.conf
-      - ./wordpress/header.php:/var/www/html/header.php
-      - ./wordpress/footer.php:/var/www/html/footer.php
-      - ./wordpress/Secrets.pm:/usr/local/gkb/modules/GKB/Secrets.pm
-      - ./wordpress/cgi.load:/etc/apache2/mods-enabled/cgi.load
-      - ./wordpress/proxy.load:/etc/apache2/mods-enabled/proxy.load
-      - ./wordpress/proxy_http.load:/etc/apache2/mods-enabled/proxy_http.load
-      - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
-      - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wp-content/plugins
+      - ./joomla/wait-for.sh:/wait-for.sh
+      - ./joomla/htaccess:/var/www/html/.htaccess
+      - ./joomla/000-default.conf:/etc/apache2/sites-enabled/000-default.conf
+      - ./joomla/header.php:/var/www/html/header.php
+      - ./joomla/footer.php:/var/www/html/footer.php
+      - ./joomla/Secrets.pm:/usr/local/gkb/modules/GKB/Secrets.pm
+      - ./joomla/cgi.load:/etc/apache2/mods-enabled/cgi.load
+      - ./joomla/proxy.load:/etc/apache2/mods-enabled/proxy.load
+      - ./joomla/proxy_http.load:/etc/apache2/mods-enabled/proxy_http.load
+      - ./release/website/html/joomla/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
+      - ./release/website/html/joomla/wp-content/plugins:/var/www/html/wp-content/plugins
       - ./release/website/cgi-bin:/usr/lib/cgi-bin
       - ./release/modules/GKB:/usr/local/gkb/modules/GKB
       - ./release/website/html/instructionlibrary.xml:/usr/local/gkb/website/html/instructionlibrary.xml
@@ -143,5 +143,5 @@ services:
       - ./logs/apache/:/var/log/apache2
 
 volumes:
-  mysql-for-wordpress-log:
+  mysql-for-joomla-log:
   mysql-for-tomcat-log:

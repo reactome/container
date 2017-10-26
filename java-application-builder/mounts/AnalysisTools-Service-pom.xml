@@ -19,7 +19,7 @@
                 <!-- Logging -->
                 <log4j.root>/usr/local/AnalysisService/log</log4j.root>
                 <!-- Reactome Server to query header and footer -->
-                <template.server>http://wordpress-sites/</template.server>
+                <template.server>http://joomla-sites/</template.server>
             </properties>
         </profile>
     </profiles>
