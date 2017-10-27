@@ -109,7 +109,7 @@ AnalysisToolsService ()
 {
   # AnalysisToolsCore
   # Build AnalysisTools service using the "AnalysisService-Local" profile.
-  cd /gitroot/AnalysisTools/Service && mvn package -P AnalysisService-Local
+  cd /gitroot/AnalysisTools/Service && mvn package -q -P AnalysisService-Local
   cp /gitroot/AnalysisTools/Service/target/analysis-service*.war /webapps/
 }
 
