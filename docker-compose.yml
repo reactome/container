@@ -140,7 +140,11 @@ services:
       - ./release/website/html/xml:/var/www/html/xml
       - ./toc_files:/usr/local/gkb/website/html/img-fp/gk_current/:rw
       - ./tmp_files:/usr/local/gkb/website/html/img-tmp/:rw
-      - ./logs/apache/:/var/log/apache2
+      - ./logs/joomla-apache/:/var/log/apache2
+      - ./joomla/cgi-bin:/var/www/html/cgi-bin
+      - ./joomla/cgi-modules:/var/www/html/cgi-modules
+      - ./joomla/download:/var/www/html/download
+      - ./joomla/figures:/var/www/html/figures
 
 volumes:
   mysql-for-joomla-log:
