@@ -1,3 +1,6 @@
 [submodule "release"]
 	path = release
 	url = https://github.com/reactome/release.git
+[submodule "joomla/Website"]
+	path = joomla/Website
+	url = git@github.com:reactome/Website.git
