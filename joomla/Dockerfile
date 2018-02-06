@@ -20,3 +20,4 @@ RUN openssl req -new -key server.key -out server.csr -subj "/C=XX/ST=SomePlace/L
 RUN openssl x509 -req -sha256 -days 365 -in server.csr -signkey server.key -out server.crt
 # RUN pwd && ls -lht
 RUN rm server.csr && rm server.pass.key
+RUN docker-php-ext-install mysqli
