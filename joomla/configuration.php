@@ -12,10 +12,10 @@ class JConfig {
   public $debug = '1';
   public $debug_lang = '0';
   public $dbtype = 'mysqli';
-  public $host = '172.17.0.2'; # The Joomla container doesn't work if I put the host name, only works if the IP address is used. This needs to be fixed.
+  public $host = 'mysql-for-joomla';
   public $user = '<USER>'; # Set this before running the container
   public $password = '<PASSWORD>'; # Set this before running the container
-  public $db = 'website';
+  public $db = 'joomla';
   public $dbprefix = 'rlp_';
   public $live_site = '';
   public $secret = 'joomla_secret';
