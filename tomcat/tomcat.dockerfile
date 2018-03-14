@@ -22,12 +22,12 @@ RUN cd /gitroot/ && git clone https://github.com/reactome/SBMLExporter.git \
   && git checkout $SBMLEXPORTER_VERSION
 
 # Build the ContentService application
-ENV CONTENT_SERVICE_VERSION=v1.0.0
+ENV CONTENT_SERVICE_VERSION=master
 RUN cd /gitroot/ && git clone https://github.com/reactome/content-service.git \
   && cd /gitroot/content-service \
   && git checkout $CONTENT_SERVICE_VERSION
 
-ENV DATA_CONTENT_VERSION=v1.0.0
+ENV DATA_CONTENT_VERSION=master
 RUN cd /gitroot/ && git clone https://github.com/reactome/data-content.git \
   && cd /gitroot/data-content \
   && git checkout $DATA_CONTENT_VERSION
@@ -70,26 +70,28 @@ RUN cd /gitroot/ && git clone https://github.com/reactome-pwp/interactors-core.g
 RUN apt-get update && apt-get install ant -y && rm -rf /var/lib/apt/lists/*
 
 # COPY ./maven_builds.sh /maven_builds.sh
-COPY ./java-build-mounts/settings-docker.xml /mvn-settings.xml
 COPY ./java-build-mounts/CuratorToolBuild.xml /gitroot/CuratorTool/ant/CuratorToolBuild.xml
 COPY ./java-build-mounts/ReactomeJar.xml /gitroot/CuratorTool/ant/ReactomeJar.xml
 COPY ./java-build-mounts/JavaBuildPackaging.xml /gitroot/CuratorTool/ant/JavaBuildPackaging.xml
 COPY ./java-build-mounts/junit-4.12.jar /gitroot/CuratorTool/lib/junit/junit-4.12.jar
 COPY ./java-build-mounts/ant-javafx.jar /gitroot/CuratorTool/lib/ant-javafx.jar
 COPY ./java-build-mounts/Pathway-Exchange-pom.xml /gitroot/Pathway-Exchange/pom.xml
-COPY ./java-build-mounts/AnalysisService_mvc-dispatcher-servlet.xml /gitroot/AnalysisTools/Service/src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xm
-COPY ./java-build-mounts/AnalysisTools-Service-web.xml /gitroot/AnalysisTools/Service/src/main/webapp/WEB-INF/web.xml
 COPY ./java-build-mounts/RESTfulAPI-pom.xml /gitroot/RESTfulAPI/pom.xml
 COPY ./java-build-mounts/applicationContext.xml /gitroot/RESTfulAPI/web/WEB-INF/applicationContext.xml
 COPY ./java-build-mounts/applicationContext.xml /gitroot/Pathway-Exchange/web/WEB-INF/applicationContext.xml
 RUN mkdir /webapps
-ENV MVN_CMD "mvn --global-settings  /mvn-settings.xml -Dmaven.repo.local=/mvn/.m2nrepo/repository"
-#RUN bash /maven_builds.sh
+
+# Build projects from the CuratorTool
 RUN cd /gitroot/libsbgn && ant \
 	&& cd /gitroot/CuratorTool/ant \
 	&& ant -buildfile ReactomeJar.xml \
-	&& ant -buildfile CuratorToolBuild.xml \
-	&& $MVN_CMD install:install-file -Dfile=/gitroot/CuratorTool/reactome.jar -DartifactId=Reactome -DgroupId=org.reactome -Dpackaging=jar -Dversion=UNKNOWN_VERSION
+	&& ant -buildfile CuratorToolBuild.xml
+COPY ./java-build-mounts/settings-docker.xml /mvn-settings.xml
+RUN mkdir -p /mvn/alt-m2/
+ENV MVN_CMD "mvn --global-settings  /mvn-settings.xml -Dmaven.repo.local=/mvn/alt-m2/"
+RUN cd /gitroot/CuratorTool/ant && $MVN_CMD install:install-file -Dfile=/gitroot/CuratorTool/reactome.jar -DartifactId=Reactome -DgroupId=org.reactome -Dpackaging=jar -Dversion=UNKNOWN_VERSION
+
+# Install libs for PathwayExchange, then build PathwayExchange
 RUN cd /gitroot/Pathway-Exchange \
   && $MVN_CMD install:install-file -Dfile=/gitroot/libsbgn/dist/org.sbgn.jar -DartifactId=sbgn -DgroupId=org.sbgn -Dpackaging=jar -Dversion=milestone2 \
   && $MVN_CMD install:install-file -Dfile=./lib/celldesigner/celldesigner.jar -DgroupId=celldesigner -DartifactId=celldesigner -Dversion=UNKNOWN_VERSION -Dpackaging=jar \
@@ -99,24 +101,29 @@ RUN cd /gitroot/Pathway-Exchange \
   && $MVN_CMD install:install-file -Dfile=lib/sbml/jsbml-0.8-rc1-with-dependencies.jar -DgroupId=org.sbml -DartifactId=jsbml -Dversion=0.8-rc1 -Dpackaging=jar \
   && $MVN_CMD install:install-file -Dfile=./lib/sbml/libsbmlj.jar -DgroupId=org.sbml -DartifactId=libsbml -Dpackaging=jar -Dversion=0.8-rc1 \
   && pwd && $MVN_CMD compile package install
+
+# Build RESTfulAPI
 RUN cd /gitroot/RESTfulAPI \
   && $MVN_CMD install:install-file -Dfile=/gitroot/CuratorTool/reactome.jar -DartifactId=Reactome -DgroupId=org.reactome -Dpackaging=jar -Dversion=UNKNOWN_VERSION \
   && ls /gitroot/RESTfulAPI/ -lht \
   && pwd && $MVN_CMD package \
   && cp /gitroot/RESTfulAPI/target/ReactomeRESTfulAPI*.war /webapps/ReactomeRESTfulAPI.war
 
-# RUN cd /gitroot/diagram-exporter && $MVN_CMD install -DskipTests
-
+# Build PathwayBrowser
 RUN cd /gitroot/browser && $MVN_CMD package \
   && cp /gitroot/browser/target/PathwayBrowser*.war /webapps/PathwayBrowser.war
 
+# Build & install the SBML Exporter
 RUN cd /gitroot/SBMLExporter && $MVN_CMD package install -DskipTests
 
+# Build the content service
 RUN cd /gitroot/content-service \
-  && $MVN_CMD package -P ContentService-Local \
+  && cd src/main/resources \
+  && echo "log4j.logger.httpclient.wire.header=WARN" >> log4j.properties && echo "log4j.logger.httpclient.wire.content=WARN" >> log4j.properties && echo  "log4j.logger.org.apache.commons.httpclient=WARN" >> log4j.properties \
+  && cd /gitroot/content-service && $MVN_CMD package -P ContentService-Local \
   && cp /gitroot/content-service/target/ContentService*.war /webapps/ContentService.war
 
-# COPY ./java-build-mounts/data-content-pom.xml /gitroot/data-content/pom.xml
+# Build the data-content application
 # Rename customTag.tld to implicit.tld
 # For more information see: https://stackoverflow.com/questions/38593625/java-error-message-invalid-tld-file-see-jsp-2-2-specification-section-7-3-1-fo/39264879#39264879
 RUN cd /gitroot/data-content \
@@ -124,13 +131,16 @@ RUN cd /gitroot/data-content \
   && { for f in $(grep -RIH customTag.tld . | cut -d ':' -f 1) ; do echo "fixing customTag.tld name in  $f" ; sed -i -e 's/customTag\.tld/implicit.tld/g' $f ; done ; } \
   && echo "Files still referencing customTag.tld" \
   && grep -RH customTag.tld . | cut -d ':' -f 1 \
-  && $MVN_CMD package install -P DataContent-Local \
+  && cd src/main/resources && sed -i -e 's/<\/configuration>/<logger name="org.apache" level="WARN"\/><logger name="httpclient" level="WARN"\/><\/configuration>/g' logback.xml \
+  && cd /gitroot/data-content && $MVN_CMD package install -P DataContent-Local \
   && cp /gitroot/data-content/target/content*.war /webapps/content.war
 
+# Build  AnalysisService.
+COPY ./java-build-mounts/AnalysisService_mvc-dispatcher-servlet.xml /gitroot/AnalysisTools/Service/src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xm
+COPY ./java-build-mounts/AnalysisTools-Service-web.xml /gitroot/AnalysisTools/Service/src/main/webapp/WEB-INF/web.xml
 RUN cd /gitroot/AnalysisTools/Core && $MVN_CMD package install \
   && echo "Following files were generated in Core/target" \
   && ls -a /gitroot/AnalysisTools/Core/target/
-# COPY ./java-build-mounts/AnalysisTools-Service-pom.xml /gitroot/AnalysisService/Service/pom.xml
 RUN   cd /gitroot/AnalysisTools/Service && $MVN_CMD  package -DskipTests -P AnalysisService-Local \
   && cp /gitroot/AnalysisTools/Service/target/analysis-service*.war /webapps/
 
@@ -145,3 +155,8 @@ RUN apt-get update && apt-get install -y netcat \
     && rm -rf /var/lib/apt/lists/*
 
 RUN mkdir -p /usr/local/interactors/tuple
+
+RUN mkdir -p /var/www/html/download/current/
+ADD https://reactome.org/download/current/ehlds.tgz /var/www/html/download/current/ehld.tgz
+RUN cd /var/www/html/download/current/ && tar -zxvf ehld.tgz
+ADD https://reactome.org/download/current/ehld/svgsummary.txt /var/www/html/download/current/ehld/svgsummary.txt
