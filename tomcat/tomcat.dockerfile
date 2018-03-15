@@ -120,6 +120,7 @@ RUN cd /gitroot/SBMLExporter && $MVN_CMD package install -DskipTests
 RUN cd /gitroot/content-service \
   && cd src/main/resources \
   && echo "log4j.logger.httpclient.wire.header=WARN" >> log4j.properties && echo "log4j.logger.httpclient.wire.content=WARN" >> log4j.properties && echo  "log4j.logger.org.apache.commons.httpclient=WARN" >> log4j.properties \
+  && sed -i -e 's/<\/configuration>/<logger name="org.apache" level="WARN"\/><logger name="httpclient" level="WARN"\/><\/configuration>/g' logback.xml \
   && cd /gitroot/content-service && $MVN_CMD package -P ContentService-Local \
   && cp /gitroot/content-service/target/ContentService*.war /webapps/ContentService.war
 
