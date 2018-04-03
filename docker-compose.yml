@@ -103,7 +103,7 @@ services:
     image: joomla:4.8.1_for_reactome
     build:
       context: ./joomla
-      dockerfile: Dockerfile
+      dockerfile: joomla.dockerfile
     container_name: joomla-sites
     links:
       - mysql-for-joomla
