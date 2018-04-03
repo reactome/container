@@ -9,6 +9,8 @@
 		  <properties>
 			  <!-- Analysis -->
 			  <analysis.structure.file>/analysis.bin</analysis.structure.file>
+              <analysis.data.file>/analysis.bin</analysis.data.file>
+              <analysis.data.tmp>/tmp/analysis-tmp</analysis.data.tmp>
 			  <analysis.result.root>/usr/local/AnalysisService/analysis-results</analysis.result.root>
 			  <analysis.report.log>/usr/local/AnalysisService/analysis-reports</analysis.report.log>
 			  <!-- Logging -->
