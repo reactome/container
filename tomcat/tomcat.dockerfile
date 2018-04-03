@@ -1,6 +1,6 @@
 # "Builder" layer
 FROM maven:3.5-jdk-8 AS builder
-ENV PATHWAY_BROWSER_VERSION=v3.5.0
+ENV PATHWAY_BROWSER_VERSION=master
 RUN mkdir -p /gitroot
 WORKDIR /gitroot
 
@@ -161,3 +161,11 @@ RUN mkdir -p /var/www/html/download/current/
 ADD https://reactome.org/download/current/ehlds.tgz /var/www/html/download/current/ehld.tgz
 RUN cd /var/www/html/download/current/ && tar -zxvf ehld.tgz
 ADD https://reactome.org/download/current/ehld/svgsummary.txt /var/www/html/download/current/ehld/svgsummary.txt
+RUN chmod a+r /var/www/html/download/current/ehld/svgsummary.txt
+RUN mkdir -p /var/www/html/ehld-icons
+ADD https://reactome.org/ehld-icons/icon-lib-svg.tgz /var/www/html/ehld-icons/icon-lib-svg.tgz
+RUN cd /var/www/html/ehld-icons/ && tar -zxvf icon-lib-svg.tgz
+ADD https://reactome.org/ehld-icons/icon-lib-emf.tgz /var/www/html/ehld-icons/icon-lib-emf.tgz
+RUN cd /var/www/html/ehld-icons/ && tar -zxvf icon-lib-emf.tgz
+ADD https://reactome.org/ehld-icons/icon-lib-png.tgz /var/www/html/ehld-icons/icon-lib-png.tgz
+RUN cd /var/www/html/ehld-icons/ && tar -zxvf icon-lib-png.tgz
