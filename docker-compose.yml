@@ -122,7 +122,9 @@ services:
       - ./joomla/configuration.php:/var/www/html/configuration.php
       - ./certificates:/certs
       - ./joomla/php.ini:/usr/local/etc/php/php.ini
-
+      - ./joomla/Secrets.pm:/var/www/html/cgi-modules/GKB/Secrets.pm
+      - ./joomla/Config.pm:/var/www/html/cgi-modules/GKB/Config.pm
+      - ./tmp_files:/var/www/html/cgi-tmp
 volumes:
   mysql-for-joomla-log:
   mysql-for-tomcat-log:
