@@ -66,6 +66,11 @@ RUN cd /gitroot/ && git clone https://github.com/reactome-pwp/interactors-core.g
   && cd /gitroot/interactors-core \
   && git checkout master
 
+# need fresh graph-core for data-content
+RUN cd /gitroot/ && git clone https://github.com/reactome/graph-core.git \
+  && cd /gitroot/graph-core \
+  && git checkout master
+
 # Install ant (needed for CuratorTool and libsbgn)
 RUN apt-get update && apt-get install ant -y && rm -rf /var/lib/apt/lists/*
 
@@ -126,6 +131,9 @@ RUN cd /gitroot/content-service \
   && sed -i -e 's/<\/configuration>/<logger name="org.apache" level="WARN"\/><logger name="httpclient" level="WARN"\/><\/configuration>/g' logback.xml \
   && cd /gitroot/content-service && $MVN_CMD package -P ContentService-Local \
   && cp /gitroot/content-service/target/ContentService*.war /webapps/ContentService.war && du -hscx /mvn/alt-m2/
+
+RUN cd /gitroot/graph-core \
+  && $MVN_CMD package install -DskipTests && du -hscx /mvn/alt-m2/
 
 # Build the data-content application
 # Rename customTag.tld to implicit.tld
