@@ -1,0 +1,23 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                      https://maven.apache.org/xsd/settings-1.0.0.xsd">
+	<localRepository>/mvn/alt-m2/</localRepository>
+	<profiles>
+	  <profile>
+		  <id>AnalysisService-Local</id>
+		  <properties>
+			  <!-- Analysis -->
+			  <analysis.structure.file>/analysis.bin</analysis.structure.file>
+              <analysis.data.file>/analysis.bin</analysis.data.file>
+              <analysis.data.tmp>/tmp/analysis-tmp</analysis.data.tmp>
+			  <analysis.result.root>/usr/local/AnalysisService/analysis-results</analysis.result.root>
+			  <analysis.report.log>/usr/local/AnalysisService/analysis-reports</analysis.report.log>
+			  <!-- Logging -->
+			  <log4j.root>/usr/local/AnalysisService/log</log4j.root>
+			  <!-- Reactome Server to query header and footer -->
+			  <template.server>http://localhost/</template.server>
+		  </properties>
+	  </profile>
+	</profiles>
+</settings>
