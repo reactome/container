@@ -10,20 +10,15 @@ services:
       dockerfile: tomcat.dockerfile
     depends_on:
       - mysql-for-tomcat
-      - wordpress-sites
+      - joomla-sites
       - neo4j-db
       - solr
     links:
       - mysql-for-tomcat
-      - wordpress-sites
+      - joomla-sites
       - neo4j-db
-    entrypoint: bash -c "/wait-for.sh neo4j-db:7687 -t 360 && /wait-for.sh solr-for-reactome:8983 -t 360 && /wait-for.sh mysql-for-tomcat:3306 -t 360 && /wait-for.sh wordpress-sites:80 -t 360 && catalina.sh run"
+    entrypoint: bash -c "ls -lht /certs && /wait-for.sh neo4j-db:7687 -t 500 && /wait-for.sh solr-for-reactome:8983 -t 500 && /wait-for.sh mysql-for-tomcat:3306 -t 500 && /wait-for.sh joomla-sites:80 -t 500 && { echo yes | keytool -v -import -file /certs/server.crt -alias joomla-sites -keystore cacerts.jks -keypass changeit -storepass changeit || ( keytool -v -delete -alias joomla-sites -keystore  cacerts.jks -storepass changeit && echo yes | keytool -v -import -file /certs/server.crt -alias joomla-sites -keystore cacerts.jks -keypass changeit -storepass changeit ) ; } && catalina.sh run"
     volumes:
-      - ./java-application-builder/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
-      - ./java-application-builder/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war
-      - ./java-application-builder/webapps/analysis-service.war:/usr/local/tomcat/webapps/analysis-service.war
-      - ./java-application-builder/webapps/ContentService.war:/usr/local/tomcat/webapps/ContentService.war
-      - ./java-application-builder/webapps/content.war:/usr/local/tomcat/webapps/content.war
       - ./java-application-builder/downloads/interactors.db:/interactors.db
       - ./java-application-builder/downloads/analysis.bin:/analysis.bin
       - ./java-application-builder/downloads/diagrams_and_fireworks/fireworks:/usr/local/tomcat/webapps/download/current/fireworks
@@ -35,10 +30,12 @@ services:
       - ./tomcat/tomcat-manager.xml:/usr/local/tomcat/conf/Catalina/localhost/manager.xml
       - ./tomcat/analysis-service/results:/usr/local/AnalysisService/analysis-results
       - ./tomcat/analysis-service/reports:/usr/local/AnalysisService/analysis-reports
+      - ./tomcat/logging.properties:/usr/local/tomcat/conf/logging.properties
       - ./logs/applications/AnalysisService:/usr/local/AnalysisService/log
       - ./logs/applications/ContentService:/usr/local/search/log/content-service
       - ./logs/applications/DataContent:/usr/local/search/log/data-content
       - ./logs/tomcat/:/usr/local/tomcat/logs/ #to save logs inside host directory of tomcat/logs/
+      - ./certificates:/certs
     env_file:
       - tomcat.env
     ports:
@@ -87,61 +84,47 @@ services:
       - mysql-for-tomcat-log:/backup
     command: bash -c "/init.sh && exec /entrypoint.sh mysqld"
 
-  mysql-database:
+  mysql-for-joomla:
     image: mysql
-    hostname: mysql-database
-    container_name: mysql-database
+    hostname: mysql-for-joomla
+    container_name: mysql-for-joomla
     env_file:
-      - wordpress.env
+      - joomla.env
     volumes:
-      - ./mysql/wordpress_data/:/docker-entrypoint-initdb.d
+      - ./joomla/Website/database/:/docker-entrypoint-initdb.d
       - ./mysql/init.sh:/init.sh
-      - ./logs/mysql/wordpress:/var/log/mysql
-      - mysql-for-wordpress-log:/backup
+      - ./logs/mysql/joomla:/var/log/mysql
+      - mysql-for-joomla-log:/backup
     command: bash -c "/init.sh && exec /entrypoint.sh mysqld"
 
 
-  wordpress-sites:
-    hostname: wordpress-sites
-    image: wordpress:4.8.1_for_reactome
+  joomla-sites:
+    hostname: joomla-sites
+    image: joomla:4.8.1_for_reactome
     build:
-      context: ./wordpress
-      dockerfile: wordpress.dockerfile
-    container_name: wordpress-sites
+      context: ./joomla
+      dockerfile: joomla.dockerfile
+    container_name: joomla-sites
     links:
-      - mysql-database
+      - mysql-for-joomla
     depends_on:
-      - mysql-database
+      - mysql-for-joomla
     env_file:
-      - wordpress.env
+      - joomla.env
     ports:
       - 80:80
-    entrypoint:  /wait-for.sh mysql-database:3306 -t 120  --  /usr/local/bin/docker-entrypoint.sh apache2-foreground
+      - 443:443
+    entrypoint: bash -c "/wait-for.sh mysql-for-joomla:3306 -t 360  -- cp /etc/apache2/ssl/* /certs/ && /usr/local/bin/docker-php-entrypoint apache2-foreground"
     volumes:
-      - ./wordpress/wait-for.sh:/wait-for.sh
-      - ./wordpress/htaccess:/var/www/html/.htaccess
-      - ./wordpress/000-default.conf:/etc/apache2/sites-enabled/000-default.conf
-      - ./wordpress/header.php:/var/www/html/header.php
-      - ./wordpress/footer.php:/var/www/html/footer.php
-      - ./wordpress/Secrets.pm:/usr/local/gkb/modules/GKB/Secrets.pm
-      - ./wordpress/cgi.load:/etc/apache2/mods-enabled/cgi.load
-      - ./wordpress/proxy.load:/etc/apache2/mods-enabled/proxy.load
-      - ./wordpress/proxy_http.load:/etc/apache2/mods-enabled/proxy_http.load
-      - ./release/website/html/wordpress/wp-content/themes/HS_OICR_2013:/var/www/html/wp-content/themes/HS_OICR_2013
-      - ./release/website/html/wordpress/wp-content/plugins:/var/www/html/wp-content/plugins
-      - ./release/website/cgi-bin:/usr/lib/cgi-bin
-      - ./release/modules/GKB:/usr/local/gkb/modules/GKB
-      - ./release/website/html/instructionlibrary.xml:/usr/local/gkb/website/html/instructionlibrary.xml
-      - ./release/website/html/stylesheet.css:/var/www/html/stylesheet.css
-      - ./release/website/html/stylesheets:/var/www/html/stylesheets
-      - ./release/website/html/javascript:/var/www/html/javascript
-      - ./release/website/html/icons:/var/www/html/icons
-      - ./release/website/html/images:/var/www/html/images
-      - ./release/website/html/xml:/var/www/html/xml
-      - ./toc_files:/usr/local/gkb/website/html/img-fp/gk_current/:rw
-      - ./tmp_files:/usr/local/gkb/website/html/img-tmp/:rw
-      - ./logs/apache/:/var/log/apache2
-
+      - ./wait-for.sh:/wait-for.sh
+      - ./joomla/000-default.conf:/etc/apache2/sites-enabled/000-default.conf
+      - ./joomla/000-default-ssl.conf:/etc/apache2/sites-enabled/default-ssl.conf
+      - ./joomla/configuration.php:/var/www/html/configuration.php
+      - ./certificates:/certs
+      - ./joomla/php.ini:/usr/local/etc/php/php.ini
+      - ./joomla/Secrets.pm:/var/www/html/cgi-modules/GKB/Secrets.pm
+      - ./joomla/Config.pm:/var/www/html/cgi-modules/GKB/Config.pm
+      - ./tmp_files:/var/www/html/cgi-tmp
 volumes:
-  mysql-for-wordpress-log:
+  mysql-for-joomla-log:
   mysql-for-tomcat-log:

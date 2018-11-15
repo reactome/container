@@ -45,7 +45,7 @@
 		        <mail.support.dest>helpdesk@mycompany.co.uk</mail.support.dest>
 
 		        <!-- Reactome Server to query header and footer -->
-		        <template.server>http://wordpress-sites/</template.server>
+		        <template.server>http://joomla-sites/</template.server>
 
 		        <!-- Interactor custom folder -->
 		        <tuples.uploaded.files.folder>/usr/local/interactors/tuple</tuples.uploaded.files.folder>

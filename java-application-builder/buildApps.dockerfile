@@ -1,5 +1,5 @@
 FROM maven:3.5-jdk-8
-ENV PATHWAY_BROWSER_VERSION=v3.2.0
+ENV PATHWAY_BROWSER_VERSION=v3.5.0
 RUN mkdir -p /gitroot
 WORKDIR /gitroot
 
@@ -23,13 +23,13 @@ WORKDIR /gitroot/SBMLExporter
 RUN git checkout $SBMLEXPORTER_VERSION
 
 # Build the ContentService application
-ENV CONTENT_SERVICE_VERSION=master
+ENV CONTENT_SERVICE_VERSION=v1.0.0
 WORKDIR /gitroot/
 RUN git clone https://github.com/reactome/content-service.git
 WORKDIR /gitroot/content-service
 RUN git checkout $CONTENT_SERVICE_VERSION
 
-ENV DATA_CONTENT_VERSION=master
+ENV DATA_CONTENT_VERSION=v1.0.0
 WORKDIR /gitroot/
 RUN git clone https://github.com/reactome/data-content.git
 WORKDIR /gitroot/data-content

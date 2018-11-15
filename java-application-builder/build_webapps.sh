@@ -19,18 +19,16 @@ docker run -itd --rm \
 	--env-file $(dirname `pwd`)/tomcat.env mysql
 
 set -e
-# Before we build webapps, we need to remove any empty directories that were created by previous docker-compose 
+# Before we build webapps, we need to remove any empty directories that were created by previous docker-compose
 find . -empty -type d -delete
 # Build the java applications
 docker run -it --name=java-webapp-builder --rm \
   --network=isolated_nw \
   --env-file=build_webapps.env \
+  -v "$(pwd)/mounts/settings-docker.xml:/root/.m2/settings.xml" \
   -v "$(pwd)/webapps:/webapps" \
   -v "$(pwd)/downloads:/downloads" \
 	-v "$(pwd)/mounts/Pathway-Exchange-pom.xml:/gitroot/Pathway-Exchange/pom.xml" \
-	-v "$(pwd)/mounts/data-content-pom.xml:/gitroot/data-content/pom.xml" \
-	-v "$(pwd)/mounts/content-service-pom.xml:/gitroot/content-service/pom.xml" \
-	-v "$(pwd)/mounts/AnalysisTools-Service-pom.xml:/gitroot/AnalysisTools/Service/pom.xml" \
 	-v "$(pwd)/mounts/AnalysisService_mvc-dispatcher-servlet.xml:/gitroot/AnalysisTools/Service/src/main/webapp/WEB-INF/mvc-dispatcher-servlet.xml" \
 	-v "$(pwd)/mounts/AnalysisTools-Service-web.xml:/gitroot/AnalysisTools/Service/src/main/webapp/WEB-INF/web.xml" \
 	-v "$(pwd)/mounts/ReactomeJar.xml:/gitroot/CuratorTool/ant/ReactomeJar.xml" \

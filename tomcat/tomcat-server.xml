@@ -93,6 +93,16 @@
         </SSLHostConfig>
     </Connector>
     -->
+    <!--
+    <Connector port="8443" maxHttpHeaderSize="8192"
+        maxThreads="150" minSpareThreads="25" maxSpareThreads="75"
+        enableLookups="false" disableUploadTimeout="true"
+        acceptCount="100" scheme="https" secure="true"
+        keystoreFile="/usr/local/tomcat/cacerts.jks"
+        truststoreFile="/usr/local/tomcat/cacerts.jks"
+        keystorePass="changeit" truststorePass="changeit"
+        clientAuth="false" sslProtocol="TLS" />
+    -->
     <!-- Define a SSL/TLS HTTP/1.1 Connector on port 8443 with HTTP/2
          This connector uses the APR/native implementation which always uses
          OpenSSL for TLS.
