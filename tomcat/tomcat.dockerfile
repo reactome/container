@@ -1,8 +1,10 @@
 # "Builder" layer
-FROM maven:3.5-jdk-8 AS builder
+FROM maven:3.6.0-jdk-8 AS builder
 ENV PATHWAY_BROWSER_VERSION=master
 RUN mkdir -p /gitroot
 WORKDIR /gitroot
+
+LABEL maintainer="solomon.shorser@oicr.on.ca"
 
 # Build the PathwayBrowser application
 RUN git clone https://github.com/reactome-pwp/browser.git \
@@ -21,12 +23,18 @@ RUN cd /gitroot/ && git clone https://github.com/reactome/SBMLExporter.git \
   && cd /gitroot/SBMLExporter \
   && git checkout $SBMLEXPORTER_VERSION
 
+ENV SEARCH_CORE_VERSION=master
+RUN cd /gitroot/ && git clone https://github.com/reactome/search-core.git \
+&& cd /gitroot/search-core \
+&& git checkout $SEARCH_CORE_VERSION
+
 # Build the ContentService application
 ENV CONTENT_SERVICE_VERSION=master
 RUN cd /gitroot/ && git clone https://github.com/reactome/content-service.git \
   && cd /gitroot/content-service \
   && git checkout $CONTENT_SERVICE_VERSION
 
+#ENV DATA_CONTENT_VERSION=icon
 ENV DATA_CONTENT_VERSION=master
 RUN cd /gitroot/ && git clone https://github.com/reactome/data-content.git \
   && cd /gitroot/data-content \
@@ -37,10 +45,7 @@ RUN cd /gitroot/ && git clone https://github.com/reactome/data-content.git \
 # The repo:
 # http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-repo/org/reactome/server/search/search-core/
 # only has version 1.0.0.
-ENV SEARCH_CORE_VERSION=master
-RUN cd /gitroot/ && git clone https://github.com/reactome/search-core.git \
-  && cd /gitroot/search-core \
-  && git checkout $SEARCH_CORE_VERSION
+# ENV SEARCH_CORE_VERSION=icon
 
 # Build the AnalysisService application
 ENV ANALYSIS_SERVICE_VERSION=master
@@ -123,6 +128,14 @@ RUN cd /gitroot/SBMLExporter && $MVN_CMD package install -DskipTests && du -hscx
 
 RUN cd /gitroot/search-core \
   && $MVN_CMD package install -DskipTests && du -hscx /mvn/alt-m2/
+
+# ENV SEARCH_CORE_VERSION=dev
+# RUN rm -rf /gitroot/search-core && cd /gitroot/ && git clone https://github.com/reactome/search-core.git \
+#   && cd /gitroot/search-core \
+#   && git checkout $SEARCH_CORE_VERSION \
+#   && cd /gitroot/search-core \
+#     && $MVN_CMD package install -DskipTests && du -hscx /mvn/alt-m2/
+
 
 # Build the content service
 RUN cd /gitroot/content-service \
