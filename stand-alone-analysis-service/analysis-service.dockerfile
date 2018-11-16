@@ -56,4 +56,4 @@ COPY ./entrypoint.sh /analysis-service-entrypoint.sh
 RUN chmod a+x /analysis-service-entrypoint.sh
 CMD ["/analysis-service-entrypoint.sh"]
 
-# Run this as: docker run --name analysis-service --rm -v $(pwd)/reactome.graphdb.v66:/neo4j/neo4j-community-3.4.10/data/databases/regraph.db -p 8888:8080 reactome_analysis_service
+# Run this as: docker run --name analysis-service --rm -v $(pwd)/reactome.graphdb.v66:/neo4j/neo4j-community-3.4.10/data/databases/graph.db -p 8888:8080 reactome_analysis_service
