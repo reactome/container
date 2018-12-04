@@ -1,8 +1,10 @@
 #!/bin/bash
-set -euo pipefail
-IFS=$'\n\t'
 
-echo "Initialization script started"
+# These cause problems with the latest docker-entrypoint.sh for neo4j.
+# set -euo pipefail
+# IFS=$'\n\t'
+
+echo "Extension script started"
 # do not run init script at each container start but only at the first start
 if [ ! -f /tmp/neo4j-import-done.flag ]; then
     currentDir="$(pwd)"
@@ -14,9 +16,15 @@ if [ ! -f /tmp/neo4j-import-done.flag ]; then
     # that the data will *always* be in "reactome.graphdb" - then we never
     # need to update dbms.active_database in neo4j.conf
     mkdir -p reactome.graphdb
-    tar -C reactome.graphdb --strip-components=1  -xvzf reactome.graphdb.tgz
+    echo "Extracting reactome graphdb..."
+    tar -C reactome.graphdb --strip-components=1  -xzf reactome.graphdb.tgz
     cd $currentDir
     touch /tmp/neo4j-import-done.flag
+    chown -R neo4j:neo4j /var/lib/neo4j/data/databases/
+    echo "Data-extraction is complete!"
+    # clean up - the tgz is no longer needed.
+    rm /var/lib/neo4j/data/databases/reactome.graphdb.tgz
 else
     echo "The import has already been made."
 fi
+echo "The extension script is complete!"
