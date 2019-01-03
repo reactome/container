@@ -31,13 +31,16 @@ RUN rm server.csr && rm server.pass.key
 
 RUN mkdir -p /var/www/html/download/current/
 ADD https://reactome.org/download/current/ehlds.tgz /var/www/html/download/current/ehld.tgz
-RUN cd /var/www/html/download/current/ && tar -zxvf ehld.tgz
+RUN cd /var/www/html/download/current/ && tar -zxf ehld.tgz && echo "$(ls ./ehld | wc -l) items, $(du -hsxc ehld/* | tail -n 1) space used."
 ADD https://reactome.org/download/current/ehld/svgsummary.txt /var/www/html/download/current/ehld/svgsummary.txt
 RUN chmod a+r /var/www/html/download/current/ehld/svgsummary.txt
 RUN mkdir -p /var/www/html/ehld-icons
 ADD https://reactome.org/ehld-icons/icon-lib-svg.tgz /var/www/html/ehld-icons/icon-lib-svg.tgz
-RUN cd /var/www/html/ehld-icons/ && tar -zxvf icon-lib-svg.tgz
+RUN cd /var/www/html/ehld-icons/ && tar -zxf icon-lib-svg.tgz && echo "$(du -hsxc lib/* | tail -n 1) space used."
 ADD https://reactome.org/ehld-icons/icon-lib-emf.tgz /var/www/html/ehld-icons/icon-lib-emf.tgz
-RUN cd /var/www/html/ehld-icons/ && tar -zxvf icon-lib-emf.tgz
+RUN cd /var/www/html/ehld-icons/ && tar -zxf icon-lib-emf.tgz && echo "$(du -hsxc lib/* | tail -n 1) space used."
 ADD https://reactome.org/ehld-icons/icon-lib-png.tgz /var/www/html/ehld-icons/icon-lib-png.tgz
-RUN cd /var/www/html/ehld-icons/ && tar -zxvf icon-lib-png.tgz
+RUN cd /var/www/html/ehld-icons/ && tar -zxf icon-lib-png.tgz && echo "$(du -hsxc lib/* | tail -n 1) space used."
+RUN a2enmod cgi
+RUN mkdir -p /var/www/html/cgi-tmp/img-fp/gk_current/ && chmod a+rw /var/www/html/cgi-tmp/img-fp/gk_current/
+RUN apt-get install -y libjson-perl

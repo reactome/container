@@ -13,8 +13,8 @@ class JConfig {
   public $debug_lang = '0';
   public $dbtype = 'mysqli';
   public $host = 'mysql-for-joomla';
-  public $user = '<USER>'; # Set this before running the container
-  public $password = '<PASSWORD>'; # Set this before running the container
+  public $user = 'root'; # Set this before running the container
+  public $password = 'root'; # Set this before running the container
   public $db = 'joomla';
   public $dbprefix = 'rlp_';
   public $live_site = '';
