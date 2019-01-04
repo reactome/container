@@ -1,23 +1,23 @@
 # Use PHP + Apache as the base layer.
-FROM php:7.2.1-apache
+FROM php:7.2.13-apache
 RUN apt-get update
 # Netcat is needed for waiting for database
 RUN apt-get install -y netcat cpanminus wget \
 	liblog-log4perl-perl libdbi-perl  libwww-search-perl \
 	libtemplate-plugin-gd-perl libxml-simple-perl libcgi-pm-perl \
 	libemail-valid-perl libpdf-api2-perl librtf-writer-perl \
-	liburi-encode-perl libdbd-mysql-perl curl
+	liburi-encode-perl libdbd-mysql-perl libjson-perl openssl curl
 RUN cpanm Bio::Perl --notest
 RUN ln -s /usr/bin/perl /usr/local/bin/perl
 RUN docker-php-ext-install mysqli
 COPY ./Website /var/www/html/
 RUN chmod a+x /var/www/html/cgi-bin/*
 RUN a2enmod rewrite
-RUN apt-get install openssl -y
 RUN a2enmod ssl
 RUN a2enmod proxy
 RUN a2enmod proxy_http
 RUN a2enmod proxy_html
+RUN a2enmod cgi
 RUN mkdir /etc/apache2/ssl
 
 # Create a self-signed certificate so SSL will work. Users should overwrite this with their own certs and keys.
@@ -30,6 +30,7 @@ RUN openssl x509 -req -sha256 -days 365 -in server.csr -signkey server.key -out 
 RUN rm server.csr && rm server.pass.key
 
 RUN mkdir -p /var/www/html/download/current/
+RUN mkdir -p /var/www/html/cgi-tmp/img-fp/gk_current/ && chmod a+rw /var/www/html/cgi-tmp/img-fp/gk_current/
 ADD https://reactome.org/download/current/ehlds.tgz /var/www/html/download/current/ehld.tgz
 RUN cd /var/www/html/download/current/ && tar -zxf ehld.tgz && echo "$(ls ./ehld | wc -l) items, $(du -hsxc ehld/* | tail -n 1) space used."
 ADD https://reactome.org/download/current/ehld/svgsummary.txt /var/www/html/download/current/ehld/svgsummary.txt
@@ -41,6 +42,3 @@ ADD https://reactome.org/ehld-icons/icon-lib-emf.tgz /var/www/html/ehld-icons/ic
 RUN cd /var/www/html/ehld-icons/ && tar -zxf icon-lib-emf.tgz && echo "$(du -hsxc lib/* | tail -n 1) space used."
 ADD https://reactome.org/ehld-icons/icon-lib-png.tgz /var/www/html/ehld-icons/icon-lib-png.tgz
 RUN cd /var/www/html/ehld-icons/ && tar -zxf icon-lib-png.tgz && echo "$(du -hsxc lib/* | tail -n 1) space used."
-RUN a2enmod cgi
-RUN mkdir -p /var/www/html/cgi-tmp/img-fp/gk_current/ && chmod a+rw /var/www/html/cgi-tmp/img-fp/gk_current/
-RUN apt-get install -y libjson-perl
