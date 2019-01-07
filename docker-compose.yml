@@ -36,6 +36,7 @@ services:
       - ./logs/applications/DataContent:/usr/local/search/log/data-content
       - ./logs/tomcat/:/usr/local/tomcat/logs/ #to save logs inside host directory of tomcat/logs/
       - ./certificates:/certs
+      # - download-directory:/usr/local/tomcat/webapps/download/
     env_file:
       - tomcat.env
     ports:
@@ -126,6 +127,15 @@ services:
       - ./joomla/Config.pm:/var/www/html/cgi-modules/GKB/Config.pm
       - ./tmp_files:/var/www/html/cgi-tmp
       - ./joomla/cgi-modules/GKB/FrontPage3.pm:/var/www/html/cgi-modules/GKB/FrontPage3.pm
+      - ./joomla/cgi-modules/GKB/Utils/InstructionLibrary.pm:/var/www/html/cgi-modules/GKB/Utils/InstructionLibrary.pm
+      - ./joomla/cgi-modules/GKB/WebUtils.pm:/var/www/html/cgi-modules/GKB/WebUtils.pm
+      - ./joomla/cgi-modules/GKB/Config.pm:/var/www/html/cgi-modules/GKB/Config.pm
+      - ./joomla/cgi-modules/GKB/URLMaker.pm:/var/www/html/cgi-modules/GKB/URLMaker.pm
+      - ./java-application-builder/downloads/diagrams_and_fireworks/fireworks:/var/www/html/download/current/fireworks
+      - ./java-application-builder/downloads/diagrams_and_fireworks/diagram:/var/www/html/download/current/diagram
+      # - download-directory:/var/www/html/download
+
 volumes:
   mysql-for-joomla-log:
   mysql-for-tomcat-log:
+  download-directory:
