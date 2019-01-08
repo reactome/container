@@ -18,6 +18,8 @@ RUN a2enmod proxy
 RUN a2enmod proxy_http
 RUN a2enmod proxy_html
 RUN a2enmod cgi
+RUN a2enmod headers
+RUN a2enmod include
 RUN mkdir /etc/apache2/ssl
 
 # Create a self-signed certificate so SSL will work. Users should overwrite this with their own certs and keys.
