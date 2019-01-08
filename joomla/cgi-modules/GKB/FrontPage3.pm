@@ -130,7 +130,8 @@ sub get_index_html_content {
     # when running in a docker container, $host must always be localhost.
     # Otherwise, "joomla-sites" gets propagated to the "base" element of the template
     # and then none of the resources load properly.
-    my $host = 'localhost';
+    # my $host = 'localhost';
+	my $host = $GKB::Config::HOST_NAME;
     chomp $host;
     my $content = `wget --no-check-certificate -qO- $host/template-cgi`;
 
