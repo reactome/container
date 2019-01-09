@@ -2,7 +2,7 @@ version: '3.2'
 services:
 
   tomcat:
-    image: reactome_tomcat_alt
+    image: reactome_tomcat_alt2
     container_name: tomcat-server
     hostname: tomcat-server
     build:
@@ -20,7 +20,7 @@ services:
     entrypoint: bash -c "ls -lht /certs && /wait-for.sh neo4j-db:7687 -t 500 && /wait-for.sh neo4j-db:7474 -t 500 && /wait-for.sh solr-for-reactome:8983 -t 500 && /wait-for.sh mysql-for-tomcat:3306 -t 500 && /wait-for.sh joomla-sites:80 -t 500 && { echo yes | keytool -v -import -file /certs/server.crt -alias joomla-sites -keystore cacerts.jks -keypass changeit -storepass changeit || ( keytool -v -delete -alias joomla-sites -keystore  cacerts.jks -storepass changeit && echo yes | keytool -v -import -file /certs/server.crt -alias joomla-sites -keystore cacerts.jks -keypass changeit -storepass changeit ) ; } && catalina.sh run"
     volumes:
       - ./java-application-builder/downloads/interactors.db:/interactors.db
-      - ./java-application-builder/downloads/analysis.bin:/analysis.bin
+      - ./analysis-core/output/analysis.bin:/analysis.bin
       - ./java-application-builder/downloads/diagrams_and_fireworks/fireworks:/usr/local/tomcat/webapps/download/current/fireworks
       - ./java-application-builder/downloads/diagrams_and_fireworks/diagram:/usr/local/tomcat/webapps/download/current/diagram
       - ./wait-for.sh:/wait-for.sh
@@ -59,7 +59,7 @@ services:
       - reactome
 
   neo4j-db:
-    image: reactome/reactome-neo4j:R-999
+    image: reactome/reactome-neo4j:R-67
     build:
       context: ./neo4j
       dockerfile: neo4j_stand-alone.dockerfile
@@ -74,6 +74,7 @@ services:
 
   mysql-for-tomcat:
     image: mysql
+    # image: reactome_gk_central:20181211_with_data
     hostname: mysql-for-tomcat
     container_name: mysql-for-tomcat
     env_file:
@@ -118,8 +119,8 @@ services:
     entrypoint: bash -c "/wait-for.sh mysql-for-joomla:3306 -t 360  -- cp /etc/apache2/ssl/* /certs/ && /usr/local/bin/docker-php-entrypoint apache2-foreground"
     volumes:
       - ./wait-for.sh:/wait-for.sh
+      - ./joomla/000-default-common.conf:/etc/apache2/sites-common/000-default-common.conf
       - ./joomla/000-default.conf:/etc/apache2/sites-enabled/000-default.conf
-      - ./joomla/000-default-ssl.conf:/etc/apache2/sites-enabled/default-ssl.conf
       - ./joomla/configuration.php:/var/www/html/configuration.php
       - ./certificates:/certs
       - ./joomla/php.ini:/usr/local/etc/php/php.ini
