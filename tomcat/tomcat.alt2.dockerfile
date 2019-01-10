@@ -24,8 +24,22 @@ COPY --from=datacontent /webapps-final/ /webapps-final/
 RUN cp /webapps/* /webapps-final/
 RUN ls /webapps-final
 
+FROM reactome/diagramjs as diagramjs
+RUN mkdir /webapps-final
+COPY --from=pathwaybrowser /webapps-final/ /webapps-final/
+RUN cp /webapps/* /webapps-final/
+RUN ls /webapps-final
+
+FROM reactome/fireworksjs as fireworksjs
+RUN mkdir /webapps-final
+COPY --from=diagramjs /webapps-final/ /webapps-final/
+RUN cp /webapps/* /webapps-final/
+RUN ls /webapps-final
+
 FROM tomcat:8.5.35-jre8
-COPY --from=pathwaybrowser /webapps-final/ /usr/local/tomcat/webapps/
+COPY --from=fireworksjs /webapps-final/ /usr/local/tomcat/webapps/
+RUN ln -s /usr/local/tomcat/webapps/diagram*.war /usr/local/tomcat/webapps/DiagramJs.war
+RUN ln -s /usr/local/tomcat/webapps/fireworks*.war /usr/local/tomcat/webapps/FireworksJs.war
 RUN ls -lht  /usr/local/tomcat/webapps/
 
 RUN apt-get update && apt-get install -y netcat zip && rm -rf /var/lib/apt/lists/*
