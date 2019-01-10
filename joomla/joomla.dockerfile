@@ -44,3 +44,7 @@ ADD https://reactome.org/ehld-icons/icon-lib-emf.tgz /var/www/html/ehld-icons/ic
 RUN cd /var/www/html/ehld-icons/ && tar -zxf icon-lib-emf.tgz && echo "$(du -hsxc lib/* | tail -n 1) space used."
 ADD https://reactome.org/ehld-icons/icon-lib-png.tgz /var/www/html/ehld-icons/icon-lib-png.tgz
 RUN cd /var/www/html/ehld-icons/ && tar -zxf icon-lib-png.tgz && echo "$(du -hsxc lib/* | tail -n 1) space used."
+WORKDIR /var/www/html
+# Set up some directories for PDF/RTF export.
+RUN mkdir -p cgi-tmp/rtf && chown www-data:www-data cgi-tmp/rtf \
+  && mkdir -p cgi-tmp/pdf && chown www-data:www-data cgi-tmp/pdf
