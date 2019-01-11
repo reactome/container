@@ -1,3 +1,9 @@
+
+
+:warning: _**ATTENTION**_ :warning:
+
+This project is currently a :construction: "work-in-progress" :construction:. The most current code is currently on the [feature/Joomla](https://github.com/reactome/container/tree/feature/Joomla) branch, though please be aware that since there is active development on that branch, the code may change unexpectedly.
+
 # Reactome Container
 
 ## Table of Contents
