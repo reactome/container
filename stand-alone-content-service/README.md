@@ -2,8 +2,12 @@
 
 This document explains how to build and run Reactome's ContentService as a stand-alone Docker image.
 
-
-1. Checkout this repository and `cd` to `stand-alone-content-service`
+1. Clone this repository, checkout the feature/Joomla branch and `cd` to `stand-alone-content-service`.
+```bash
+git clone https://github.com/reactome/container.git
+git checkout feature/Joomla
+cd stand-alone-content-service
+```
 
 2. Build the docker image. This can be done with the command:
 ```bash
