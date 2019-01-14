@@ -1,4 +1,4 @@
-# Stand-alone Reactome Content service
+# :construction: Stand-alone Reactome Content service :construction:
 
 This document explains how to build and run Reactome's ContentService as a stand-alone Docker image.
 
@@ -20,6 +20,7 @@ tar -xzf reactome.graphdb.tgz
 ```bash
 docker run --name content-service --rm -v $(pwd)/reactome.graphdb.v66:/neo4j/neo4j-community-3.4.10/data/databases/graph.db -p 8888:8080 reactome_content_service
 ```
+:warning: **NOTE:** You may need to change the mount for the graph database, depending on the version of the file you download (the "_v66_" in the mount: `reactome.graphdb.v66:/neo4j/neo4j-community-3.4.10/data/databases/graph.db`).
 
 5. You should now be able to access the ContentService at [http://localhost:8888/ContentService](http://localhost:8888/ContentService). On this page you will see a listing of endpoints for the ContentService which you can test interactively
 
@@ -29,4 +30,4 @@ If you prefer to access the ContentService from the command line, you can use th
 wget http://localhost:8888/ContentService/exporter/event/R-HSA-5205682.sbgn > R-HSA-5205682.sbgn
 ```
 
-:warning: **Attention** This docker image of the ContentService is a work-in-progress. Some endpoints might not be 100% functional yet. So far, only `/exporter/event/{identifier}.sbgn` and `/exporter/event/{identifier}.sbml` have been tested. Others _may_ work, but no guarantees are given at this time.
+:warning: **Attention!** :warning: This docker image of the ContentService is a work-in-progress. Some endpoints might not be 100% functional yet. So far, only `/exporter/event/{identifier}.sbgn` and `/exporter/event/{identifier}.sbml` have been tested. Others _may_ work, but no guarantees are given at this time.
