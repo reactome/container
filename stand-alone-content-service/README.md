@@ -10,12 +10,18 @@ This document explains how to build and run Reactome's ContentService as a stand
 docker build -t reactome_content_service -f content-service.dockerfile .
 ```
 
-3. Run the docker container which you just built. This can be done with the command:
+3. Download the Reactome graph database and extract it to the stand-alone-content-service directory:
+```bash
+wget https://reactome.org/download/current/reactome.graphdb.tgz
+tar -xzf reactome.graphdb.tgz
+```
+
+4. Run the docker container which you just built. This can be done with the command:
 ```bash
 docker run --name content-service --rm -v $(pwd)/reactome.graphdb.v66:/neo4j/neo4j-community-3.4.10/data/databases/graph.db -p 8888:8080 reactome_content_service
 ```
 
-4. You should now be able to access the ContentService at [http://localhost:8888/ContentService](http://localhost:8888/ContentService). On this page you will see a listing of endpoints for the ContentService which you can test interactively
+5. You should now be able to access the ContentService at [http://localhost:8888/ContentService](http://localhost:8888/ContentService). On this page you will see a listing of endpoints for the ContentService which you can test interactively
 
 If you prefer to access the ContentService from the command line, you can use the content service like this:
 
