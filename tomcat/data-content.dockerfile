@@ -13,11 +13,7 @@ RUN cd /gitroot/ && git clone https://github.com/reactome/data-content.git \
   && cd /gitroot/data-content \
   && git checkout $DATA_CONTENT_VERSION
 
-# COPY ./properties/data-content.ogm.properties /gitroot/data-content/src/main/resources/ogm.properties
-# COPY ./properties/data-content.service.properties /gitroot/data-content/src/main/resources/core.properties
-
 WORKDIR /gitroot/data-content
-# RUN mv src/main/webapp/WEB-INF/tags/customTag.tld src/main/webapp/WEB-INF/tags/implicit.tld
 RUN cp -a src/main/webapp/WEB-INF/tags src/main/webapp/WEB-INF/custom-tags
 RUN { for f in $(grep -RIH \/tags\/customTag.tld . | cut -d ':' -f 1) ; do echo "fixing customTag.tld path in  $f" ; sed -i -e 's/tags/custom-tags/g' $f ; done ; }
 RUN { for f in $(grep -RIH \/tags\/sortTag.tld . | cut -d ':' -f 1) ; do echo "fixing sortTag.tld path in  $f" ; sed -i -e 's/tags/custom-tags/g' $f ; done ; }
