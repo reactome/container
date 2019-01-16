@@ -17,10 +17,13 @@ RUN cd /gitroot/ && git clone https://github.com/reactome/data-content.git \
 # COPY ./properties/data-content.service.properties /gitroot/data-content/src/main/resources/core.properties
 
 WORKDIR /gitroot/data-content
-RUN mv src/main/webapp/WEB-INF/tags/customTag.tld src/main/webapp/WEB-INF/tags/implicit.tld
-RUN { for f in $(grep -RIH customTag.tld . | cut -d ':' -f 1) ; do echo "fixing customTag.tld name in  $f" ; sed -i -e 's/customTag\.tld/implicit.tld/g' $f ; done ; }
+# RUN mv src/main/webapp/WEB-INF/tags/customTag.tld src/main/webapp/WEB-INF/tags/implicit.tld
+RUN cp -a src/main/webapp/WEB-INF/tags src/main/webapp/WEB-INF/custom-tags
+RUN { for f in $(grep -RIH \/tags\/customTag.tld . | cut -d ':' -f 1) ; do echo "fixing customTag.tld path in  $f" ; sed -i -e 's/tags/custom-tags/g' $f ; done ; }
+RUN { for f in $(grep -RIH \/tags\/sortTag.tld . | cut -d ':' -f 1) ; do echo "fixing sortTag.tld path in  $f" ; sed -i -e 's/tags/custom-tags/g' $f ; done ; }
 
-RUN echo "Files still referencing customTag.tld" && grep -RH customTag.tld . | cut -d ':' -f 1
+RUN echo "Files still referencing tags/customTag.tld" && grep -RIH \/tags\/customTag.tld . | cut -d ':' -f 1
+RUN echo "Files still referencing tags/sortTag.tld" && grep -RIH \/tags\/sortTag.tld . | cut -d ':' -f 1
 
 RUN cd src/main/resources && sed -i -e 's/<\/configuration>/<logger name="org.apache" level="WARN"\/><logger name="httpclient" level="WARN"\/><\/configuration>/g' logback.xml
 RUN cd /gitroot/data-content && sed -i -e 's/<reactome\.search\.core>1\.2\.0-SNAPSHOT<\/reactome\.search\.core>/<reactome.search.core>1.3.0-SNAPSHOT<\/reactome.search.core>/g' pom.xml
