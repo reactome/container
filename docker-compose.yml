@@ -43,20 +43,19 @@ services:
       - 8082:8080
 
   solr:
-    image: solr:6.6.0
+    image: reactome/solr
     container_name: solr-for-reactome
     hostname: solr-for-reactome
     ports:
       - "8983:8983"
     volumes:
-      - ./solr/data/solr_data:/opt/solr/server/solr/mycores
-      - ./solr/solrconfig.xml:/opt/solr/server/solr/mycores/reactome/conf/solrconfig.xml
+      # - ./solr/data/solr_data:/opt/solr/server/solr/mycores
+      # - ./solr/solrconfig.xml:/opt/solr/server/solr/mycores/reactome/conf/solrconfig.xml
       - ./logs/solr/:/opt/solr/server/logs/
       - ./solr/solr-security.json:/opt/solr/server/solr/security.json:rw
-    entrypoint:
-      - docker-entrypoint.sh
-      - solr-precreate
-      - reactome
+    entrypoint: solr start -f
+      # - solr-precreate
+      # - reactome
 
   neo4j-db:
     image: reactome/reactome-neo4j:R-67
