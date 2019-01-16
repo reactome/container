@@ -6,14 +6,14 @@
 # With build args: `docker build -t reactome/reactome-neo4j:R-999 --build-arg NEO4J_USER=neo4j --build-arg NEO4J_PASSWORD=xxxx --build-arg ReleaseVersion=999 -f ./neo4j_stand-alone.dockerfile .`
 FROM neo4j:3.5.0
 LABEL maintainer=solomon.shorser@oicr.on.ca
-LABEL ReleaseVersion=$ReleaseVersion
 ARG NEO4J_USER=neo4j
 ARG NEO4J_PASSWORD=neo4j-password
-ARG ReleaseVersion=66
+ARG ReleaseVersion=67
+LABEL ReleaseVersion=$ReleaseVersion
 ENV NEO4J_AUTH $NEO4J_USER/$NEO4J_PASSWORD
 ENV EXTENSION_SCRIPT /data/neo4j-init.sh
 EXPOSE 7474 7473 7687
 #ADD https://reactome.org/download/current/reactome.graphdb.tgz /var/lib/neo4j/data/databases/reactome.graphdb.tgz
-COPY ./reactome-R66.graphdb.tgz /var/lib/neo4j/data/databases/reactome.graphdb.tgz
+COPY ./reactome-R$ReleaseVersion.graphdb.tgz /var/lib/neo4j/data/databases/reactome.graphdb.tgz
 COPY ./conf/neo4j.conf /var/lib/neo4j/conf/neo4j.conf
 COPY ./neo4j-init.sh /data/neo4j-init.sh
