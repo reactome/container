@@ -24,5 +24,5 @@ RUN echo -e "dbms.active_database=reactome.graphdb\ndbms.allow_format_migration=
 COPY ./entrypoint.sh /start_and_ping_neo4j.sh
 RUN chmod a+x /start_and_ping_neo4j.sh
 RUN mkdir -p /output/ && chmod a+rw /output
-
+# TODO: Have the final step build the analysis core so that it can be copied directly by other containers.
 # run as: docker run --name run-analysis-core --rm -p 7474:7474 -p 7687:7687 -v $(pwd)/output:/output -v $(pwd)/reactome.graphdb.v66:/var/lib/neo4j/data/databases/reactome.graphdb reactome_analysis_core /bin/bash -c "/start_and_ping_neo4j.sh"
