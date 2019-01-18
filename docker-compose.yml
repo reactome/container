@@ -19,10 +19,6 @@ services:
       - neo4j-db
     entrypoint: bash -c "ls -lht /certs && /wait-for.sh neo4j-db:7687 -t 500 && /wait-for.sh neo4j-db:7474 -t 500 && /wait-for.sh solr-for-reactome:8983 -t 500 && /wait-for.sh mysql-for-tomcat:3306 -t 500 && /wait-for.sh joomla-sites:80 -t 500 && { echo yes | keytool -v -import -file /certs/server.crt -alias joomla-sites -keystore cacerts.jks -keypass changeit -storepass changeit || ( keytool -v -delete -alias joomla-sites -keystore  cacerts.jks -storepass changeit && echo yes | keytool -v -import -file /certs/server.crt -alias joomla-sites -keystore cacerts.jks -keypass changeit -storepass changeit ) ; } && catalina.sh run"
     volumes:
-      # - ./java-application-builder/downloads/interactors.db:/interactors.db
-      # - ./analysis-core/output/analysis.bin:/analysis.bin
-      # - ./java-application-builder/downloads/diagrams_and_fireworks/fireworks:/usr/local/tomcat/webapps/download/current/fireworks
-      # - ./java-application-builder/downloads/diagrams_and_fireworks/diagram:/usr/local/tomcat/webapps/download/current/diagram
       - fireworks-dir:/usr/local/tomcat/webapps/download/current/fireworks
       - diagrams-dir:/usr/local/tomcat/webapps/download/current/diagram
       - ./wait-for.sh:/wait-for.sh
@@ -38,7 +34,6 @@ services:
       - ./logs/applications/DataContent:/usr/local/search/log/data-content
       - ./logs/tomcat/:/usr/local/tomcat/logs/ #to save logs inside host directory of tomcat/logs/
       - ./certificates:/certs
-      # - download-directory:/usr/local/tomcat/webapps/download/
     env_file:
       - tomcat.env
     ports:
@@ -51,13 +46,9 @@ services:
     ports:
       - 8983:8983
     volumes:
-      # - ./solr/data/solr_data:/opt/solr/server/solr/mycores
-      # - ./solr/solrconfig.xml:/opt/solr/server/solr/mycores/reactome/conf/solrconfig.xml
       - ./logs/solr/:/opt/solr/server/logs/
       - ./solr/solr-security.json:/opt/solr/server/solr/security.json:rw
     entrypoint: solr start -f
-      # - solr-precreate
-      # - reactome
 
   neo4j-db:
     image: reactome/reactome-neo4j:R-67
@@ -73,15 +64,12 @@ services:
       - 7687:7687
 
   mysql-for-tomcat:
-    # image: mysql
-    # image: reactome_gk_central:20181211_with_data
     image: reactome/reactome-mysql:R67
     hostname: mysql-for-tomcat
     container_name: mysql-for-tomcat
     env_file:
       - tomcat.env
     volumes:
-      # - ./mysql/tomcat_data/:/docker-entrypoint-initdb.d
       - ./mysql/init.sh:/init.sh
       - ./logs/mysql/tomcat:/var/log/mysql
       - mysql-for-tomcat-log:/backup
@@ -127,7 +115,6 @@ services:
       - ./joomla/php.ini:/usr/local/etc/php/php.ini
       - ./joomla/Secrets.pm:/var/www/html/cgi-modules/GKB/Secrets.pm
       - ./joomla/Config.pm:/var/www/html/cgi-modules/GKB/Config.pm
-      # - ./tmp_files:/var/www/html/cgi-tmp
       - ./joomla/cgi-modules/GKB/FrontPage3.pm:/var/www/html/cgi-modules/GKB/FrontPage3.pm
       - ./joomla/cgi-modules/GKB/Utils/InstructionLibrary.pm:/var/www/html/cgi-modules/GKB/Utils/InstructionLibrary.pm
       - ./joomla/cgi-modules/GKB/WebUtils.pm:/var/www/html/cgi-modules/GKB/WebUtils.pm
@@ -135,13 +122,9 @@ services:
       - ./joomla/cgi-modules/GKB/URLMaker.pm:/var/www/html/cgi-modules/GKB/URLMaker.pm
       - fireworks-dir:/var/www/html/download/current/fireworks
       - diagrams-dir:/var/www/html/download/current/diagram
-      # - ./java-application-builder/downloads/diagrams_and_fireworks/fireworks:/var/www/html/download/current/fireworks
-      # - ./java-application-builder/downloads/diagrams_and_fireworks/diagram:/var/www/html/download/current/diagram
-      # - download-directory:/var/www/html/download
 
 volumes:
   mysql-for-joomla-log:
   mysql-for-tomcat-log:
   fireworks-dir:
   diagrams-dir:
-  # download-directory:

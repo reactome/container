@@ -9,6 +9,7 @@ FROM reactome/fireworksjs as fireworksjs
 FROM reactome/analysis-core as analysiscore
 FROM reactome/fireworks-generator as fireworks
 FROM reactome/diagram-generator as diagramfiles
+
 # Final layer is Tomcat.
 FROM tomcat:8.5.35-jre8
 # Copy in all the components that we need.
@@ -50,16 +51,13 @@ COPY ./properties/content-service.ogm.properties /usr/local/tomcat/webapps/WEB-I
 RUN { touch WEB-INF/classes/ogm.properties; zip -u ContentService.war WEB-INF/classes/ogm.properties; rc=$?; echo $rc; if [ $rc -eq 12 ]; then exit 0; fi; exit $rc; }
 COPY ./properties/content-service.service.properties /usr/local/tomcat/webapps/WEB-INF/classes/service.properties
 RUN { touch WEB-INF/classes/service.properties; zip -u ContentService.war WEB-INF/classes/service.properties; rc=$?; echo $rc; if [ $rc -eq 12 ]; then exit 0; fi; exit $rc; }
-# RUN zip -u ContentService.war WEB-INF/classes/service.properties && zip -u ContentService.war WEB-INF/classes/ogm.properties
 
 COPY ./properties/data-content.ogm.properties /usr/local/tomcat/webapps/WEB-INF/classes/ogm.properties
 RUN { touch WEB-INF/classes/ogm.properties; zip -u content.war WEB-INF/classes/ogm.properties; rc=$?; echo $rc; if [ $rc -eq 12 ]; then exit 0; fi; exit $rc; }
 COPY ./properties/data-content.service.properties /usr/local/tomcat/webapps/WEB-INF/classes/core.properties
-# RUN zip -u content.war WEB-INF/classes/core.properties && zip -u content.war WEB-INF/classes/ogm.properties
 RUN { touch WEB-INF/classes/core.properties; zip -u content.war WEB-INF/classes/core.properties; rc=$?; echo $rc; if [ $rc -eq 12 ]; then exit 0; fi; exit $rc; }
 
 COPY ./properties/analysis-service.service.properties /usr/local/tomcat/webapps/WEB-INF/classes/analysis.properties
-# RUN zip -u AnalysisService.war WEB-INF/classes/analysis.properties
 RUN { touch WEB-INF/classes/analysis.properties; zip -u AnalysisService.war WEB-INF/classes/analysis.properties; rc=$?; echo $rc; if [ $rc -eq 12 ]; then exit 0; fi; exit $rc; }
 
 COPY ./properties/RESTfulAPI_application-context.xml /usr/local/tomcat/webapps/WEB-INF/applicationContext.xml
