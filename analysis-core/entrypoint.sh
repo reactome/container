@@ -1,13 +1,11 @@
 #! /bin/bash
-echo "starting neo4j..."
-neo4j start &
-end="$((SECONDS+60))"
-echo "waiting for neo4j to start up..."
-while true; do
-	echo "waiting..."
-    [[ "200" = "$(curl --silent --write-out %{http_code} --output /dev/null http://localhost:7474)" ]] && break
-    [[ "${SECONDS}" -ge "${end}" ]] && exit 1
-    sleep 1
-done
+PATH=$PATH:/var/lib/neo4j/bin/
 
-time java -jar /applications/analysis-core-jar-with-dependencies.jar -h localhost -p 7474 -u neo4j -k neo4j -o /output/analysis.bin -t -v
+# Start Neo4j
+cd /var/lib/neo4j
+bash /docker-entrypoint.sh neo4j &
+
+echo "Waiting for Neo4j..."
+bash /wait-for.sh localhost:7687 -t 90 && bash /wait-for.sh localhost:7474 -t 90
+
+time java -jar /applications/analysis-core-jar-with-dependencies.jar -h localhost -p 7474 -u $NEO4J_USER -k $NEO4J_PASSWORD -o /output/analysis.bin -t -v
