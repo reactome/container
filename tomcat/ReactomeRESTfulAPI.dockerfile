@@ -53,3 +53,6 @@ RUN cd /gitroot/RESTfulAPI \
   && ls /gitroot/RESTfulAPI/ -lht \
   && pwd && $MVN_CMD package \
   && cp /gitroot/RESTfulAPI/target/ReactomeRESTfulAPI*.war /webapps/ReactomeRESTfulAPI.war && du -hscx /mvn/alt-m2/
+
+  FROM alpine:3.8
+  COPY --from=builder /webapps/ReactomeRESTfulAPI.war /webapps/ReactomeRESTfulAPI.war

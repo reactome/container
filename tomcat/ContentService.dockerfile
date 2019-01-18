@@ -20,3 +20,6 @@ RUN echo "log4j.logger.httpclient.wire.header=WARN" >> log4j.properties && echo 
 RUN sed -i -e 's/<\/configuration>/<logger name="org.apache" level="WARN"\/><logger name="httpclient" level="WARN"\/><\/configuration>/g' logback.xml
 RUN cd /gitroot/content-service && $MVN_CMD package -P ContentService-Local
 RUN cp /gitroot/content-service/target/ContentService*.war /webapps/ContentService.war && du -hscx /mvn/alt-m2/
+
+FROM alpine:3.8
+COPY --from=builder /webapps/ContentService.war /webapps/ContentService.war

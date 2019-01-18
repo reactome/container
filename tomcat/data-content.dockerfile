@@ -25,3 +25,6 @@ RUN cd src/main/resources && sed -i -e 's/<\/configuration>/<logger name="org.ap
 RUN cd /gitroot/data-content && sed -i -e 's/<reactome\.search\.core>1\.2\.0-SNAPSHOT<\/reactome\.search\.core>/<reactome.search.core>1.3.0-SNAPSHOT<\/reactome.search.core>/g' pom.xml
 RUN $MVN_CMD clean compile package install -P DataContent-Local \
     && cp /gitroot/data-content/target/content*.war /webapps/content.war && du -hscx /mvn/alt-m2/
+
+FROM alpine:3.8
+COPY --from=builder /webapps/content.war /webapps/content.war

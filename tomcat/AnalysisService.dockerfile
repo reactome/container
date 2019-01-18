@@ -28,3 +28,6 @@ RUN cd /gitroot/analysis-service \
   && mvn --global-settings  /mvn-settings.xml -Dmaven.repo.local=/mvn/alt-m2/ package -DskipTests -P AnalysisService-Local
 
 RUN ls -lht /gitroot/analysis-service/target && cp /gitroot/analysis-service/target/AnalysisService.war /webapps/ && du -hscx /mvn/alt-m2/ && ls -lht /webapps/
+
+FROM alpine:3.8
+COPY --from=builder /webapps/AnalysisService.war /webapps/AnalysisService.war

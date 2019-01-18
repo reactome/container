@@ -16,3 +16,6 @@ RUN cd /gitroot/diagram-js \
   && $MVN_CMD package -DskipTests \
   && ls -lht /gitroot/diagram-js/target
 RUN cp /gitroot/diagram-js/target/diagram*war /webapps/
+
+FROM alpine:3.8
+COPY --from=builder /webapps /webapps

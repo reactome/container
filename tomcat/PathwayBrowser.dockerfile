@@ -22,3 +22,6 @@ RUN git clone https://github.com/reactome-pwp/analysis-client.git \
 WORKDIR /gitroot/browser
 RUN $MVN_CMD clean compile package
 RUN cp /gitroot/browser/target/PathwayBrowser*.war /webapps/PathwayBrowser.war && du -hscx /mvn/alt-m2/
+
+FROM alpine:3.8
+COPY --from=builder /webapps/PathwayBrowser.war /webapps/PathwayBrowser.war

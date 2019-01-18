@@ -24,3 +24,6 @@ RUN cd /gitroot/fireworks-js \
   && $MVN_CMD package -DskipTests \
   && ls -lht /gitroot/fireworks-js/target
 RUN cp /gitroot/fireworks-js/target/fireworks*war /webapps/
+
+FROM alpine:3.8
+COPY --from=builder /webapps /webapps
