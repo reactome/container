@@ -28,3 +28,8 @@ COPY ./run_fireworks_generator.sh /run_fireworks_generator.sh
 RUN chmod a+x /run_fireworks_generator.sh
 RUN mkdir /fireworks-json-files
 RUN /run_fireworks_generator.sh
+
+FROM alpine:3.8
+COPY --from=graphdb /fireworks-json-files /fireworks-json-files
+COPY --from=graphdb /fireworks/fireworks.log /fireworks/fireworks.log
+RUN ls -lht /fireworks-json-files
