@@ -1,43 +1,28 @@
+# name a whole bunch of base layers that contain pre-built components (applications and content/data files)
 FROM reactome/reactomerestfulapi as restfulapi
-
 FROM reactome/analysisservice as analysisservice
-RUN mkdir /webapps-final
-COPY --from=restfulapi /webapps/ /webapps-final/
-RUN cp /webapps/* /webapps-final/
-RUN ls /webapps-final
-
 FROM reactome/contentservice as contentservice
-RUN mkdir /webapps-final
-COPY --from=analysisservice /webapps-final/ /webapps-final/
-RUN cp /webapps/* /webapps-final/
-RUN ls /webapps-final
-
 FROM reactome/datacontent as datacontent
-RUN mkdir /webapps-final
-COPY --from=contentservice /webapps-final/ /webapps-final/
-RUN cp /webapps/* /webapps-final/
-RUN ls /webapps-final
-
 FROM reactome/pathwaybrowser as pathwaybrowser
-RUN mkdir /webapps-final
-COPY --from=datacontent /webapps-final/ /webapps-final/
-RUN cp /webapps/* /webapps-final/
-RUN ls /webapps-final
-
 FROM reactome/diagramjs as diagramjs
-RUN mkdir /webapps-final
-COPY --from=pathwaybrowser /webapps-final/ /webapps-final/
-RUN cp /webapps/* /webapps-final/
-RUN ls /webapps-final
-
 FROM reactome/fireworksjs as fireworksjs
-RUN mkdir /webapps-final
-COPY --from=diagramjs /webapps-final/ /webapps-final/
-RUN cp /webapps/* /webapps-final/
-RUN ls /webapps-final
-
+FROM reactome/analysis-core as analysiscore
+FROM reactome/fireworks-generator as fireworks
+FROM reactome/diagram-generator as diagramfiles
+# Final layer is Tomcat.
 FROM tomcat:8.5.35-jre8
-COPY --from=fireworksjs /webapps-final/ /usr/local/tomcat/webapps/
+# Copy in all the components that we need.
+COPY --from=restfulapi /webapps/*.war /usr/local/tomcat/webapps/
+COPY --from=analysisservice /webapps/*.war /usr/local/tomcat/webapps/
+COPY --from=contentservice /webapps/*.war /usr/local/tomcat/webapps/
+COPY --from=datacontent /webapps/*.war /usr/local/tomcat/webapps/
+COPY --from=pathwaybrowser /webapps/*.war /usr/local/tomcat/webapps/
+COPY --from=diagramjs /webapps/*.war /usr/local/tomcat/webapps/
+COPY --from=fireworksjs /webapps/*.war /usr/local/tomcat/webapps/
+COPY --from=analysiscore /output/analysis.bin /analysis.bin
+COPY --from=fireworks /fireworks-json-files /usr/local/tomcat/webapps/download/current/fireworks
+COPY --from=diagramfiles /diagrams /usr/local/tomcat/webapps/download/current/diagram
+
 RUN ln -s /usr/local/tomcat/webapps/diagram*.war /usr/local/tomcat/webapps/DiagramJs.war
 RUN ln -s /usr/local/tomcat/webapps/fireworks*.war /usr/local/tomcat/webapps/FireworksJs.war
 RUN ls -lht  /usr/local/tomcat/webapps/

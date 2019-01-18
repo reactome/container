@@ -2,7 +2,7 @@ version: '3.2'
 services:
 
   tomcat:
-    image: reactome_tomcat_alt2
+    image: reactome/tomcat
     container_name: tomcat-server
     hostname: tomcat-server
     build:
@@ -19,12 +19,14 @@ services:
       - neo4j-db
     entrypoint: bash -c "ls -lht /certs && /wait-for.sh neo4j-db:7687 -t 500 && /wait-for.sh neo4j-db:7474 -t 500 && /wait-for.sh solr-for-reactome:8983 -t 500 && /wait-for.sh mysql-for-tomcat:3306 -t 500 && /wait-for.sh joomla-sites:80 -t 500 && { echo yes | keytool -v -import -file /certs/server.crt -alias joomla-sites -keystore cacerts.jks -keypass changeit -storepass changeit || ( keytool -v -delete -alias joomla-sites -keystore  cacerts.jks -storepass changeit && echo yes | keytool -v -import -file /certs/server.crt -alias joomla-sites -keystore cacerts.jks -keypass changeit -storepass changeit ) ; } && catalina.sh run"
     volumes:
-      - ./java-application-builder/downloads/interactors.db:/interactors.db
-      - ./analysis-core/output/analysis.bin:/analysis.bin
-      - ./java-application-builder/downloads/diagrams_and_fireworks/fireworks:/usr/local/tomcat/webapps/download/current/fireworks
-      - ./java-application-builder/downloads/diagrams_and_fireworks/diagram:/usr/local/tomcat/webapps/download/current/diagram
+      # - ./java-application-builder/downloads/interactors.db:/interactors.db
+      # - ./analysis-core/output/analysis.bin:/analysis.bin
+      # - ./java-application-builder/downloads/diagrams_and_fireworks/fireworks:/usr/local/tomcat/webapps/download/current/fireworks
+      # - ./java-application-builder/downloads/diagrams_and_fireworks/diagram:/usr/local/tomcat/webapps/download/current/diagram
+      - fireworks-dir:/usr/local/tomcat/webapps/download/current/fireworks
+      - diagrams-dir:/usr/local/tomcat/webapps/download/current/diagram
       - ./wait-for.sh:/wait-for.sh
-      - ./tomcat/rewrite.config:/usr/local/tomcat/conf/Catalina/localhost/rewrite.config
+      # - ./tomcat/rewrite.config:/usr/local/tomcat/conf/Catalina/localhost/rewrite.config
       - ./tomcat/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
       - ./tomcat/tomcat-server.xml:/usr/local/tomcat/conf/server.xml
       - ./tomcat/tomcat-manager.xml:/usr/local/tomcat/conf/Catalina/localhost/manager.xml
@@ -47,7 +49,7 @@ services:
     container_name: solr-for-reactome
     hostname: solr-for-reactome
     ports:
-      - "8983:8983"
+      - 8983:8983
     volumes:
       # - ./solr/data/solr_data:/opt/solr/server/solr/mycores
       # - ./solr/solrconfig.xml:/opt/solr/server/solr/mycores/reactome/conf/solrconfig.xml
@@ -65,21 +67,21 @@ services:
     container_name: neo4j-db
     hostname: neo4j-db
     volumes:
-      # - ./neo4j/data:/var/lib/neo4j/data/databases
       - ./logs/neo4j/:/var/lib/neo4j/logs/
     ports:
       - 7474:7474
       - 7687:7687
 
   mysql-for-tomcat:
-    image: mysql
+    # image: mysql
     # image: reactome_gk_central:20181211_with_data
+    image: reactome/reactome-mysql:R67
     hostname: mysql-for-tomcat
     container_name: mysql-for-tomcat
     env_file:
       - tomcat.env
     volumes:
-      - ./mysql/tomcat_data/:/docker-entrypoint-initdb.d
+      # - ./mysql/tomcat_data/:/docker-entrypoint-initdb.d
       - ./mysql/init.sh:/init.sh
       - ./logs/mysql/tomcat:/var/log/mysql
       - mysql-for-tomcat-log:/backup
@@ -125,17 +127,21 @@ services:
       - ./joomla/php.ini:/usr/local/etc/php/php.ini
       - ./joomla/Secrets.pm:/var/www/html/cgi-modules/GKB/Secrets.pm
       - ./joomla/Config.pm:/var/www/html/cgi-modules/GKB/Config.pm
-      - ./tmp_files:/var/www/html/cgi-tmp
+      # - ./tmp_files:/var/www/html/cgi-tmp
       - ./joomla/cgi-modules/GKB/FrontPage3.pm:/var/www/html/cgi-modules/GKB/FrontPage3.pm
       - ./joomla/cgi-modules/GKB/Utils/InstructionLibrary.pm:/var/www/html/cgi-modules/GKB/Utils/InstructionLibrary.pm
       - ./joomla/cgi-modules/GKB/WebUtils.pm:/var/www/html/cgi-modules/GKB/WebUtils.pm
       - ./joomla/cgi-modules/GKB/Config.pm:/var/www/html/cgi-modules/GKB/Config.pm
       - ./joomla/cgi-modules/GKB/URLMaker.pm:/var/www/html/cgi-modules/GKB/URLMaker.pm
-      - ./java-application-builder/downloads/diagrams_and_fireworks/fireworks:/var/www/html/download/current/fireworks
-      - ./java-application-builder/downloads/diagrams_and_fireworks/diagram:/var/www/html/download/current/diagram
+      - fireworks-dir:/var/www/html/download/current/fireworks
+      - diagrams-dir:/var/www/html/download/current/diagram
+      # - ./java-application-builder/downloads/diagrams_and_fireworks/fireworks:/var/www/html/download/current/fireworks
+      # - ./java-application-builder/downloads/diagrams_and_fireworks/diagram:/var/www/html/download/current/diagram
       # - download-directory:/var/www/html/download
 
 volumes:
   mysql-for-joomla-log:
   mysql-for-tomcat-log:
-  download-directory:
+  fireworks-dir:
+  diagrams-dir:
+  # download-directory:
