@@ -10,17 +10,17 @@ echo "Waiting for Neo4j..."
 bash /wait-for.sh localhost:7687 -t 90 && bash /wait-for.sh localhost:7474 -t 90
 
 # Start MySQL
-MYSQL_ROOT_PASSWORD=root
-env
 /usr/local/bin/docker-entrypoint.sh mysqld &
 # service mysqld start &
 echo "Waiting for MySQL..."
 bash /wait-for.sh localhost:3306 -t 90
-# Run the diagram generator
-# NOTE: NEO4J_USER and NEO4J_PASSWORD are set in the dockerfile.
-# cat /etc/java-8-openjdk/accessibility.properties
+# If you don't "blank out" the accessibility.properties file, Java
+# will eventually crash when it tries to run/access some sort of accessibility-
+# related component that I don't think is necessary for generating the diagrams.
 echo -e "\n\n" > /etc/java-8-openjdk/accessibility.properties
 echo "Running diagram generator..."
+# Run the diagram generator
+# NOTE: NEO4J_USER and NEO4J_PASSWORD are set in the dockerfile.
 # The "| grep -v DEBUG > log" is because loggin config seems to produce a LOT of
 # "debug" noise. Mostly from the neo4j and spring libraries.
 cd /diagram-converter/
