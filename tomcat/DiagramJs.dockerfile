@@ -2,7 +2,6 @@ FROM maven:3.6.0-jdk-8 AS builder
 LABEL maintainer="solomon.shorser@oicr.on.ca"
 RUN mkdir /webapps
 RUN mkdir /gitroot
-
 COPY ./java-build-mounts/settings-docker.xml /mvn-settings.xml
 RUN mkdir -p /mvn/alt-m2/
 ENV MVN_CMD "mvn --global-settings /mvn-settings.xml -Dmaven.repo.local=/mvn/alt-m2/"

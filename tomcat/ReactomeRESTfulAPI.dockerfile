@@ -1,8 +1,10 @@
 FROM maven:3.6.0-jdk-8 AS builder
 LABEL maintainer="solomon.shorser@oicr.on.ca"
-RUN apt-get update && apt-get install -y ant && rm -rf /var/lib/apt/lists/*
 RUN mkdir /webapps
 RUN mkdir /gitroot
+COPY ./java-build-mounts/settings-docker.xml /mvn-settings.xml
+RUN mkdir -p /mvn/alt-m2/
+ENV MVN_CMD "mvn --global-settings /mvn-settings.xml -Dmaven.repo.local=/mvn/alt-m2/"
 
 # To build the RESTfulAPI, we also need libsbgn and Pathway-Exchange.
 # Let's start by building Pathway-Exchange
@@ -22,8 +24,7 @@ COPY ./java-build-mounts/ant-javafx.jar /gitroot/CuratorTool/lib/ant-javafx.jar
 RUN cd /gitroot/libsbgn && ant
 WORKDIR /gitroot/CuratorTool/ant
 RUN ant -buildfile ReactomeJar.xml
-#	&& ant -buildfile CuratorToolBuild.xml
-COPY ./java-build-mounts/settings-docker.xml /mvn-settings.xml
+
 RUN mkdir -p /mvn/alt-m2/
 ENV MVN_CMD "mvn --global-settings  /mvn-settings.xml -Dmaven.repo.local=/mvn/alt-m2/"
 RUN cd /gitroot/CuratorTool/ant && $MVN_CMD install:install-file -Dfile=/gitroot/CuratorTool/reactome.jar -DartifactId=Reactome -DgroupId=org.reactome -Dpackaging=jar -Dversion=UNKNOWN_VERSION
