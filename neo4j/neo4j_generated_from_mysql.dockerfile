@@ -8,9 +8,9 @@ WORKDIR /gitroot/graph-importer
 RUN git checkout $GRAPH_IMPORTER_VERSION
 RUN mvn clean compile package -DskipTests && ls -lht ./target
 RUN mkdir /graph-importer && cp /gitroot/graph-importer/target/GraphImporter-jar-with-dependencies.jar  /graph-importer/GraphImporter-jar-with-dependencies.jar
-
+ARG RELEASE_VERSION=R67
 # Add MySQL layer
-FROM reactome/reactome-mysql:R67 as relationaldb
+FROM reactome/reactome-mysql:$RELEASE_VERSION as relationaldb
 COPY --from=builder /graph-importer/GraphImporter-jar-with-dependencies.jar /graph-importer/GraphImporter-jar-with-dependencies.jar
 WORKDIR /
 RUN mkdir -p /usr/share/man/man1

@@ -8,9 +8,9 @@ WORKDIR /gitroot/search-indexer
 RUN git checkout $INDEXER_VERSION
 RUN mvn clean compile package -DskipTests && ls -lht ./target
 RUN mkdir /indexer && cp /gitroot/search-indexer/target/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
-
+ARG RELEASE_VERSION=R67
 # Now, rebase on the Reactome Neo4j image
-FROM reactome/reactome-neo4j:R-67 as graphdb
+FROM reactome/reactome-neo4j:$RELEASE_VERSION as graphdb
 RUN mkdir /indexer
 # bring the indexer from the prior image.
 COPY --from=builder /indexer/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
