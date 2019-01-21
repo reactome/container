@@ -47,4 +47,5 @@ RUN cd /var/www/html/ehld-icons/ && tar -zxf icon-lib-png.tgz && echo "$(du -hsx
 WORKDIR /var/www/html
 # Set up some directories for PDF/RTF export.
 RUN mkdir -p cgi-tmp/rtf && chown www-data:www-data cgi-tmp/rtf \
-  && mkdir -p cgi-tmp/pdf && chown www-data:www-data cgi-tmp/pdf
+  && mkdir -p cgi-tmp/pdf && chown www-data:www-data cgi-tmp/pdf \
+  && chown www-data:www-data ./cgi-tmp
