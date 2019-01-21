@@ -20,10 +20,12 @@ COPY --from=datacontent /webapps/*.war /usr/local/tomcat/webapps/
 COPY --from=pathwaybrowser /webapps/*.war /usr/local/tomcat/webapps/
 COPY --from=diagramjs /webapps/*.war /usr/local/tomcat/webapps/
 COPY --from=fireworksjs /webapps/*.war /usr/local/tomcat/webapps/
+# Don't forget to copy non-WAR files: analysis.bin, diagram JSON files, and Fireworks JSON files.
 COPY --from=analysiscore /output/analysis.bin /analysis.bin
 COPY --from=fireworks /fireworks-json-files /usr/local/tomcat/webapps/download/current/fireworks
 COPY --from=diagramfiles /diagrams /usr/local/tomcat/webapps/download/current/diagram
-
+# The DiagramJs and FireworksJs WAR files will have version numbers in their names, so
+# we'll just symlink them to the names that are needed.
 RUN ln -s /usr/local/tomcat/webapps/diagram*.war /usr/local/tomcat/webapps/DiagramJs.war
 RUN ln -s /usr/local/tomcat/webapps/fireworks*.war /usr/local/tomcat/webapps/FireworksJs.war
 RUN ls -lht  /usr/local/tomcat/webapps/
@@ -48,6 +50,11 @@ RUN cd /var/www/html/ehld-icons/ && tar -zxf icon-lib-png.tgz
 WORKDIR /usr/local/tomcat/webapps/
 
 COPY ./properties/content-service.ogm.properties /usr/local/tomcat/webapps/WEB-INF/classes/ogm.properties
+# This looks a little weird, so here's what's happening. We want to update the WAR files with custom properties files. This is done inseveral steps:
+# 1) touch the properties file to ensure it has a newer timestamp than that of the corresponding properties file inside the zip file.
+# 2) zip -u - this will UPDATE the WAR file with the properties file on the same path.
+# 3) capture the output of this operation. if `zip -u` returns a return-code of 12, it means that zip didn't need to do anything. Sometimes this
+# is ok and it should NOT break the build. So if we get a 12, then exit this step with a '0'. Otherwise, return whatever other return code came back from zip.
 RUN { touch WEB-INF/classes/ogm.properties; zip -u ContentService.war WEB-INF/classes/ogm.properties; rc=$?; echo $rc; if [ $rc -eq 12 ]; then exit 0; fi; exit $rc; }
 COPY ./properties/content-service.service.properties /usr/local/tomcat/webapps/WEB-INF/classes/service.properties
 RUN { touch WEB-INF/classes/service.properties; zip -u ContentService.war WEB-INF/classes/service.properties; rc=$?; echo $rc; if [ $rc -eq 12 ]; then exit 0; fi; exit $rc; }
@@ -62,6 +69,7 @@ RUN { touch WEB-INF/classes/analysis.properties; zip -u AnalysisService.war WEB-
 
 COPY ./properties/RESTfulAPI_application-context.xml /usr/local/tomcat/webapps/WEB-INF/applicationContext.xml
 RUN touch /usr/local/tomcat/webapps/WEB-INF/applicationContext.xml
+# For some reason, the ReactomeRESTfulAPI WAR sometimes makes zip complain about possible file errors, so run zip -F before trying to update the files inside it.
 RUN zip -F ReactomeRESTfulAPI.war --out ReactomeRESTfulAPI_fixed.war && mv ReactomeRESTfulAPI_fixed.war ReactomeRESTfulAPI.war
 RUN { zip -u ReactomeRESTfulAPI.war WEB-INF/applicationContext.xml; rc=$?; echo $rc; if [ $rc -eq 12 ]; then exit 0; fi; exit $rc; }
 
