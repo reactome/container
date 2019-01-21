@@ -91,7 +91,7 @@ services:
 
   joomla-sites:
     hostname: joomla-sites
-    image: joomla:4.8.1_for_reactome
+    image: reactome/joomla
     build:
       context: ./joomla
       dockerfile: joomla.dockerfile
