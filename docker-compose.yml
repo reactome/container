@@ -51,7 +51,7 @@ services:
     entrypoint: solr start -f
 
   neo4j-db:
-    image: reactome/graphdb:R67
+    image: reactome/graphdb:$RELEASE_VERSION
     build:
       context: ./neo4j
       dockerfile: neo4j_generated_from_mysql.dockerfile
