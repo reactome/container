@@ -62,3 +62,7 @@ docker build -t reactome/solr -f index-builder.dockerfile .
 
 # Let's display what was built.
 docker images | grep "reactome/"
+
+# Now it's time to build the remaining images for the Reactome stack (tomcat, joomla, mysql-for-joomla)
+cd ..
+docker-compose build
