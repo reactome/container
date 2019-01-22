@@ -1,4 +1,4 @@
-version: '3.2'
+version: '3.7'
 services:
 
   tomcat:
@@ -51,10 +51,12 @@ services:
     entrypoint: solr start -f
 
   neo4j-db:
-    image: reactome/reactome-neo4j:R-67
+    image: reactome/graphdb:R67
     build:
       context: ./neo4j
-      dockerfile: neo4j_stand-alone.dockerfile
+      dockerfile: neo4j_generated_from_mysql.dockerfile
+      args:
+        RELEASE_VERSION: $RELEASE_VERSION
     container_name: neo4j-db
     hostname: neo4j-db
     volumes:
@@ -64,7 +66,7 @@ services:
       - 7687:7687
 
   mysql-for-tomcat:
-    image: reactome/reactome-mysql:R67
+    image: reactome/reactome-mysql:$RELEASE_VERSION
     hostname: mysql-for-tomcat
     container_name: mysql-for-tomcat
     env_file:
