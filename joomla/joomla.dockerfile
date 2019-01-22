@@ -38,12 +38,15 @@ RUN cd /var/www/html/download/current/ && tar -zxf ehld.tgz && echo "$(ls ./ehld
 ADD https://reactome.org/download/current/ehld/svgsummary.txt /var/www/html/download/current/ehld/svgsummary.txt
 RUN chmod a+r /var/www/html/download/current/ehld/svgsummary.txt
 RUN mkdir -p /var/www/html/ehld-icons
-ADD https://reactome.org/ehld-icons/icon-lib-svg.tgz /var/www/html/ehld-icons/icon-lib-svg.tgz
-RUN cd /var/www/html/ehld-icons/ && tar -zxf icon-lib-svg.tgz && echo "$(du -hsxc lib/* | tail -n 1) space used."
-ADD https://reactome.org/ehld-icons/icon-lib-emf.tgz /var/www/html/ehld-icons/icon-lib-emf.tgz
-RUN cd /var/www/html/ehld-icons/ && tar -zxf icon-lib-emf.tgz && echo "$(du -hsxc lib/* | tail -n 1) space used."
-ADD https://reactome.org/ehld-icons/icon-lib-png.tgz /var/www/html/ehld-icons/icon-lib-png.tgz
-RUN cd /var/www/html/ehld-icons/ && tar -zxf icon-lib-png.tgz && echo "$(du -hsxc lib/* | tail -n 1) space used."
+RUN mkdir -p /var/www/html/Icons
+ADD https://reactome.org/ehld-icons/icon-lib-svg.tgz /var/www/html/Icons/icon-lib-svg.tgz
+RUN cd /var/www/html/Icons/ && tar -zxf icon-lib-svg.tgz && mv lib/*/* ./
+ADD https://reactome.org/ehld-icons/icon-lib-emf.tgz /var/www/html/Icons/icon-lib-emf.tgz
+RUN cd /var/www/html/Icons/ && tar -zxf icon-lib-emf.tgz && mv lib/*/* ./
+ADD https://reactome.org/ehld-icons/icon-lib-png.tgz /var/www/html/Icons/icon-lib-png.tgz
+RUN cd /var/www/html/Icons/ && tar -zxf icon-lib-png.tgz && mv lib/*/* ./
+RUN ls -lht /var/www/html/Icons/ | wc -l
+RUN rm /var/www/html/Icons/*.tgz
 WORKDIR /var/www/html
 # Set up some directories for PDF/RTF export.
 RUN mkdir -p cgi-tmp/rtf && chown www-data:www-data cgi-tmp/rtf \
