@@ -27,8 +27,7 @@ RUN /generate_graphdb.sh
 # Now re-base on neo4j
 FROM neo4j:3.4.9
 LABEL maintainer=solomon.shorser@oicr.on.ca
-ARG ReleaseVersion=67
-LABEL ReleaseVersion=$ReleaseVersion
+LABEL ReleaseVersion=$RELEASE_VERSION
 ENV EXTENSION_SCRIPT /data/neo4j-init.sh
 EXPOSE 7474 7473 7687
 COPY --from=relationaldb /graphdb /var/lib/neo4j/data/databases/reactome.graphdb
