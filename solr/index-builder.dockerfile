@@ -1,3 +1,4 @@
+ARG RELEASE_VERSION=R67
 FROM maven:3.6.0-jdk-8 AS builder
 
 RUN mkdir /gitroot
@@ -8,13 +9,12 @@ WORKDIR /gitroot/search-indexer
 RUN git checkout $INDEXER_VERSION
 RUN mvn clean compile package -DskipTests && ls -lht ./target
 RUN mkdir /indexer && cp /gitroot/search-indexer/target/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
-ARG RELEASE_VERSION=R67
+
 # Now, rebase on the Reactome Neo4j image
-FROM reactome/reactome-neo4j:$RELEASE_VERSION as graphdb
+FROM reactome/graphdb:$RELEASE_VERSION as graphdb
 RUN mkdir /indexer
 # bring the indexer from the prior image.
 COPY --from=builder /indexer/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
-
 # Now, rebase on Solr, but copy in everying else.
 FROM solr:6.6.5-alpine
 
@@ -29,7 +29,6 @@ COPY --from=builder  /gitroot/search-indexer/solr-conf/reactome/ /custom-solr-co
 RUN ls -lht /custom-solr-conf/
 
 # setup for neo4j
-COPY --from=graphdb /data/neo4j-init.sh /data/neo4j-init.sh
 COPY --from=graphdb /var/lib/neo4j/conf/neo4j.conf /var/lib/neo4j/conf/neo4j.conf
 RUN ls -lht /var/lib/neo4j/conf/neo4j.conf
 # Args for neo4j user/password - I'm not sure if ENV variables get inherited
@@ -40,11 +39,10 @@ ENV NEO4J_USER=$NEO4J_USER
 ARG NEO4J_PASSWORD=neo4j-password
 ENV NEO4J_PASSWORD=$NEO4J_PASSWORD
 ENV NEO4J_AUTH $NEO4J_USER/$NEO4J_PASSWORD
-# Neo4j extension script setting.
-ENV EXTENSION_SCRIPT /data/neo4j-init.sh
 
 COPY --from=graphdb /docker-entrypoint.sh /neo4j-entrypoint.sh
 COPY --from=graphdb /indexer/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
+RUN mkdir /indexer/logs && chmod a+rw /indexer/logs
 # we'll need netcat so that solr can "wait-for" neo4j to start
 RUN apk add netcat-openbsd su-exec shadow tini
 COPY ./wait-for.sh /wait-for.sh
@@ -59,14 +57,19 @@ COPY ./wait-for.sh /wait-for.sh
 #   -e  http://localhost:8983/solr/reactome -f "" -g "" \
 #   -i localhost -j 25 -k dummy
 
-COPY ./build_solr_index.sh /build_solr_index.sh
-RUN chmod a+x /build_solr_index.sh
 RUN useradd neo4j
 EXPOSE 7474 7687 8983
 ENV NEO4J_EDITION=community
 RUN ln -s /var/lib/neo4j/conf /conf
 WORKDIR /
-RUN /sbin/tini -g -- /neo4j-entrypoint.sh ls
+
 USER solr
 # Create a new core.
 RUN solr start && solr create -c reactome -p 8983 -d /custom-solr-conf/ && solr stop
+COPY ./build_solr_index.sh /build_solr_index.sh
+USER root
+RUN chmod a+x /build_solr_index.sh && chown -R neo4j:neo4j /var/lib/neo4j && chown -R neo4j:neo4j /data && chmod u+s /sbin/su-exec
+# Give the neo4j user access to the same stuff the solr user has.
+# RUN usermod -a solr -G neo4j
+USER neo4j
+RUN /build_solr_index.sh
