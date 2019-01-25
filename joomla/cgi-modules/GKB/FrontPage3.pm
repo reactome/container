@@ -138,6 +138,10 @@ sub get_index_html_content {
     $content =~ s|http:\/\/|https:\/\/|g;
     $content =~ s/favth\-content\-block\s?//g;
 
+	# Also need to remove the Google Analytics
+	$content =~ s/'<script async src="https:\/\/www\.googletagmanager\.com\/.*"><\/script>'//g;
+	$content =~ s/<script>\W+window\.dataLayer = window\.dataLayer \|\| \[\];\W+function gtag\(\)\{dataLayer\.push\(arguments\)\};\W+gtag\('js', new Date\(\)\);\W+gtag\('config', '.*'\);\W+<\/script>//g;
+
     return $content;
 }
 
