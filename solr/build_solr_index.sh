@@ -19,7 +19,7 @@ bash /wait-for.sh localhost:8983 -t 90
 echo "Now building the solr index."
 cd /indexer
 # run the indexer.
-java -jar ./Indexer-jar-with-dependencies.jar \
+su-exec root java -jar ./Indexer-jar-with-dependencies.jar \
   -a localhost -b 7474 -c $NEO4J_USER -d $NEO4J_PASSWORD \
   -e  http://localhost:8983/solr -o reactome -f "solr" -g "solr" \
   -i localhost -j 25 -k dummy -n

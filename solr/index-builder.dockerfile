@@ -11,7 +11,7 @@ RUN mvn clean compile package -DskipTests && ls -lht ./target
 RUN mkdir /indexer && cp /gitroot/search-indexer/target/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
 
 # Now, rebase on the Reactome Neo4j image
-FROM reactome/graphdb:$RELEASE_VERSION as graphdb
+FROM reactome/graphdb_from_prod:$RELEASE_VERSION as graphdb
 RUN mkdir /indexer
 # bring the indexer from the prior image.
 COPY --from=builder /indexer/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
@@ -72,4 +72,10 @@ RUN chmod a+x /build_solr_index.sh && chown -R neo4j:neo4j /var/lib/neo4j && cho
 # Give the neo4j user access to the same stuff the solr user has.
 # RUN usermod -a solr -G neo4j
 USER neo4j
+ENV EXTENSION_SCRIPT /data/neo4j-init.sh
+COPY ./Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
 RUN /build_solr_index.sh
+# now clean up neo4j stuff
+USER root
+RUN rm -rf /var/lib/neo4j && rm -rf /data
+USER solr
