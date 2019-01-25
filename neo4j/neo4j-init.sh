@@ -21,11 +21,12 @@ if [ ! -e /data/neo4j-import-done.flag ]; then
     tar -C reactome.graphdb --strip-components=1  -xzf reactome.graphdb.tgz
     cd $currentDir
     touch /data/neo4j-import-done.flag
-	ls -lht /data
+    ls -lht /data
     chown -R neo4j:neo4j /var/lib/neo4j/data/databases/
     echo "Data-extraction is complete!"
     # clean up - the tgz is no longer needed.
     rm /var/lib/neo4j/data/databases/reactome.graphdb.tgz
+    du -hscx /var/lib/neo4j/data/databases/reactome.graphdb
 else
     echo "The import has already been done."
 fi
