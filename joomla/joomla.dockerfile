@@ -31,20 +31,18 @@ RUN openssl x509 -req -sha256 -days 365 -in server.csr -signkey server.key -out 
 # RUN pwd && ls -lht
 RUN rm server.csr && rm server.pass.key
 
-RUN mkdir -p /var/www/html/download/current/
+RUN mkdir -p /var/www/html/download/current/ && mkdir -p /var/www/html/Icons && mkdir -p /var/www/html/ehld-icons
 RUN mkdir -p /var/www/html/cgi-tmp/img-fp/gk_current/ && chmod a+rw /var/www/html/cgi-tmp/img-fp/gk_current/
 ADD https://reactome.org/download/current/ehlds.tgz /var/www/html/download/current/ehld.tgz
 RUN cd /var/www/html/download/current/ && tar -zxf ehld.tgz && echo "$(ls ./ehld | wc -l) items, $(du -hsxc ehld/* | tail -n 1) space used."
 ADD https://reactome.org/download/current/ehld/svgsummary.txt /var/www/html/download/current/ehld/svgsummary.txt
 RUN chmod a+r /var/www/html/download/current/ehld/svgsummary.txt
-RUN mkdir -p /var/www/html/ehld-icons
-RUN mkdir -p /var/www/html/Icons
-ADD https://reactome.org/ehld-icons/icon-lib-svg.tgz /var/www/html/Icons/icon-lib-svg.tgz
-RUN cd /var/www/html/Icons/ && tar -zxf icon-lib-svg.tgz && mv lib/*/* ./
-ADD https://reactome.org/ehld-icons/icon-lib-emf.tgz /var/www/html/Icons/icon-lib-emf.tgz
-RUN cd /var/www/html/Icons/ && tar -zxf icon-lib-emf.tgz && mv lib/*/* ./
-ADD https://reactome.org/ehld-icons/icon-lib-png.tgz /var/www/html/Icons/icon-lib-png.tgz
-RUN cd /var/www/html/Icons/ && tar -zxf icon-lib-png.tgz && mv lib/*/* ./
+ADD https://reactome.org/icon/icon-lib-svg.tgz /var/www/html/Icons/icon-lib-svg.tgz
+RUN cd /var/www/html/Icons/ && tar -zxf icon-lib-svg.tgz
+ADD https://reactome.org/icon/icon-lib-emf.tgz /var/www/html/Icons/icon-lib-emf.tgz
+RUN cd /var/www/html/Icons/ && tar -zxf icon-lib-emf.tgz
+ADD https://reactome.org/icon/icon-lib-png.tgz /var/www/html/Icons/icon-lib-png.tgz
+RUN cd /var/www/html/Icons/ && tar -zxf icon-lib-png.tgz
 RUN ls -lht /var/www/html/Icons/ | wc -l
 RUN rm /var/www/html/Icons/*.tgz
 WORKDIR /var/www/html
