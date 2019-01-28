@@ -15,7 +15,7 @@ RUN mkdir /applications
 RUN cp ./target/analysis-core-jar-with-dependencies.jar /applications/analysis-core-jar-with-dependencies.jar
 ARG RELEASE_VERSION=R67
 # Now, rebase on the Reactome Neo4j image
-FROM reactome/reactome-neo4j:$RELEASE_VERSION as analysiscorebuilder
+FROM reactome/graphdb:$RELEASE_VERSION as analysiscorebuilder
 COPY --from=builder /applications/analysis-core-jar-with-dependencies.jar /applications/analysis-core-jar-with-dependencies.jar
 ARG NEO4J_USER=neo4j
 ENV NEO4J_USER=$NEO4J_USER
