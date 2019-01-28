@@ -9,11 +9,13 @@ NEO4J_PASSWORD=n304j
 
 # the MySQL database is the first piece that must be built - solr, neo4j, analysis-core,
 # diagrams generator, fireworks generator depend on it.
+echo "Building the MySQL image."
 cd ./mysql
 docker build -t reactome/reactome-mysql:$RELEASE_VERSION -f mysql.dockerfile .
 
 # Next, we need to create the graph database.
 cd ../neo4j
+echo "Building the graph database."
 docker build -t reactome/reactome-neo4j:$RELEASE_VERSION \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
 	--build-arg NEO4J_USER=$NEO4J_USER \
@@ -23,6 +25,7 @@ docker build -t reactome/reactome-neo4j:$RELEASE_VERSION \
 # Now, we can build everyting else!
 
 cd ../analysis-core
+echo "Generating the analysis.bin file."
 docker build -t reactome/analysis-core \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
 	--build-arg NEO4J_USER=$NEO4J_USER \
@@ -30,6 +33,7 @@ docker build -t reactome/analysis-core \
 	-f analysis-core.dockerfile .
 
 cd ../diagram-generator
+echo "Generating the diagram JSON files."
 docker build -t reactome/diagram-generator \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
 	--build-arg NEO4J_USER=$NEO4J_USER \
@@ -37,6 +41,7 @@ docker build -t reactome/diagram-generator \
 	-f diagram-generator.dockerfile .
 
 cd ../fireworks-generator
+echo "Generating the fireworks files."
 docker build -t reactome/fireworks-generator \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
 	--build-arg NEO4J_USER=$NEO4J_USER \
@@ -48,16 +53,25 @@ docker build -t reactome/fireworks-generator \
 # Hopefully that will change in the future...
 # $ANALYSIS_SERVICE_VERSION=
 cd ../tomcat
+echo "Building Java applications!"
+echo "Building AnalysisService"
 docker build -t reactome/analysisservice -f AnalysisService.dockerfile .
+echo "Building ContentService"
 docker build -t reactome/contentservice -f ContentService.dockerfile .
+echo "Building data-content"
 docker build -t reactome/datacontent -f data-content.dockerfile .
+echo "Building DiagramJs"
 docker build -t reactome/diagramjs -f DiagramJs.dockerfile .
+echo "Building FireworksJs"
 docker build -t reactome/fireworksjs -f FireworksJs.dockerfile .
+echo "Building PathwayBrowser"
 docker build -t reactome/pathwaybrowser -f PathwayBrowser.dockerfile .
+echo "Building ReactomeRESTfulAPI"
 docker build -t reactome/reactomerestfulapi -f ReactomeRESTfulAPI.dockerfile .
 
 # Finally, we will build the solr index.
 cd ../solr
+echo "Building the Solr index"
 docker build -t reactome/solr:$RELEASE_VERSION -f index-builder.dockerfile .
 
 # Let's display what was built.
@@ -65,4 +79,8 @@ docker images | grep "reactome/"
 
 # Now it's time to build the remaining images for the Reactome stack (tomcat, joomla, mysql-for-joomla)
 cd ..
+echo "Building everything else... the Joomla image, MySQL for Joomla, Tomcat, etc..."
 docker-compose build
+echo "All done. Reactome images:"
+# Let's display what was built.
+docker images | grep "reactome/"
