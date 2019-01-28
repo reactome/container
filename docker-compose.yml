@@ -38,9 +38,14 @@ services:
       - 8082:8080
 
   solr:
-    image: reactome/solr
+    image: "reactome/solr:${RELEASE_VERSION}"
     container_name: solr-for-reactome
     hostname: solr-for-reactome
+    build:
+      context: ./solr
+      dockerfile: index-builder.dockerfile
+      args:
+        RELEASE_VERSION: $RELEASE_VERSION
     ports:
       - 8983:8983
     volumes:
@@ -49,7 +54,7 @@ services:
     entrypoint: solr start -f
 
   neo4j-db:
-    image: reactome/graphdb:$RELEASE_VERSION
+    image: "reactome/graphdb_from_prod:${RELEASE_VERSION}"
     build:
       context: ./neo4j
       dockerfile: neo4j_generated_from_mysql.dockerfile
@@ -57,6 +62,8 @@ services:
         RELEASE_VERSION: $RELEASE_VERSION
     container_name: neo4j-db
     hostname: neo4j-db
+    env_file:
+      - neo4j.env
     volumes:
       - ./logs/neo4j/:/var/lib/neo4j/logs/
     ports:
