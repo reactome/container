@@ -6,7 +6,7 @@ The dockerfiles in this directory can be used to build docker images containing 
 
  Build this image like this:
 
-    ```bash
+```bash
 docker build -t reactome/grapdb:R999 \
     --build-arg NEO4J_USER=neo4j \
     --build-arg NEO4J_PASSWORD=xxxx \
