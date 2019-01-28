@@ -58,7 +58,7 @@ docker build -t reactome/reactomerestfulapi -f ReactomeRESTfulAPI.dockerfile .
 
 # Finally, we will build the solr index.
 cd ../solr
-docker build -t reactome/solr -f index-builder.dockerfile .
+docker build -t reactome/solr:$RELEASE_VERSION -f index-builder.dockerfile .
 
 # Let's display what was built.
 docker images | grep "reactome/"
