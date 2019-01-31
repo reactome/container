@@ -7,7 +7,7 @@ services:
     hostname: tomcat-server
     build:
       context: ./tomcat
-      dockerfile: tomcat.alt.dockerfile
+      dockerfile: tomcat.dockerfile
     depends_on:
       - mysql-for-tomcat
       - joomla-sites
@@ -54,7 +54,7 @@ services:
     entrypoint: solr start -f
 
   neo4j-db:
-    image: "reactome/graphdb_from_prod:${RELEASE_VERSION}"
+    image: "reactome/graphdb:${RELEASE_VERSION}"
     build:
       context: ./neo4j
       dockerfile: neo4j_generated_from_mysql.dockerfile
