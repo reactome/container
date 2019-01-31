@@ -6,7 +6,7 @@
 RELEASE_VERSION=R67
 NEO4J_USER=neo4j
 NEO4J_PASSWORD=n304j
-
+set -e
 # the MySQL database is the first piece that must be built - solr, neo4j, analysis-core,
 # diagrams generator, fireworks generator depend on it.
 echo "Building the MySQL image."
@@ -16,7 +16,7 @@ docker build -t reactome/reactome-mysql:$RELEASE_VERSION -f mysql.dockerfile .
 # Next, we need to create the graph database.
 cd ../neo4j
 echo "Building the graph database."
-docker build -t reactome/reactome-neo4j:$RELEASE_VERSION \
+docker build -t reactome/graphdb:$RELEASE_VERSION \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
 	--build-arg NEO4J_USER=$NEO4J_USER \
 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
@@ -84,3 +84,4 @@ docker-compose build
 echo "All done. Reactome images:"
 # Let's display what was built.
 docker images | grep "reactome/"
+set +e
