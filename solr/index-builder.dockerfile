@@ -11,7 +11,7 @@ RUN mvn clean compile package -DskipTests && ls -lht ./target
 RUN mkdir /indexer && cp /gitroot/search-indexer/target/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
 
 # Now, rebase on the Reactome Neo4j image
-FROM reactome/graphdb_from_prod:$RELEASE_VERSION as graphdb
+FROM reactome/graphdb:${RELEASE_VERSION} as graphdb
 RUN mkdir /indexer
 # bring the indexer from the prior image.
 COPY --from=builder /indexer/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
