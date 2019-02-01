@@ -1,3 +1,4 @@
+ARG RELEASE_VERSION=R67
 FROM maven:3.6.0-jdk-8 AS builder
 
 RUN mkdir /gitroot
@@ -8,9 +9,9 @@ WORKDIR /gitroot/diagram-converter
 RUN git checkout $DIAGRAM_CONVERTER_VERSION
 RUN mvn clean compile package -DskipTests && ls -lht ./target
 RUN mkdir /diagram-converter && cp /gitroot/diagram-converter/target/diagram-converter-jar-with-dependencies.jar /diagram-converter/diagram-converter-jar-with-dependencies.jar
-ARG RELEASE_VERSION=R67
+
 # Now, rebase on the Reactome Neo4j image
-FROM reactome/reactome-neo4j:$RELEASE_VERSION as graphdb
+FROM reactome/graphdb:$RELEASE_VERSION as graphdb
 
 # Add MySQL layer, but name it "diagrambuilder" since this is where we will actually create the diagrams.
 FROM reactome/reactome-mysql:$RELEASE_VERSION as diagrambuilder

@@ -1,3 +1,4 @@
+ARG RELEASE_VERSION=R67
 FROM maven:3.5-jdk-8 AS builder
 ENV PATHWAY_BROWSER_VERSION=master
 RUN mkdir -p /gitroot
@@ -13,7 +14,7 @@ RUN ls -lht ./target
 
 RUN mkdir /applications
 RUN cp ./target/analysis-core-jar-with-dependencies.jar /applications/analysis-core-jar-with-dependencies.jar
-ARG RELEASE_VERSION=R67
+
 # Now, rebase on the Reactome Neo4j image
 FROM reactome/graphdb:$RELEASE_VERSION as analysiscorebuilder
 COPY --from=builder /applications/analysis-core-jar-with-dependencies.jar /applications/analysis-core-jar-with-dependencies.jar

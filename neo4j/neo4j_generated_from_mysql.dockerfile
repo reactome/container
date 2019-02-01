@@ -4,6 +4,7 @@ FROM maven:3.6.0-jdk-8 AS builder
 RUN mkdir /gitroot
 ENV GRAPH_IMPORTER_VERSION=master
 WORKDIR /gitroot/
+
 RUN git clone https://github.com/reactome/graph-importer.git
 WORKDIR /gitroot/graph-importer
 RUN git checkout $GRAPH_IMPORTER_VERSION
@@ -33,7 +34,7 @@ EXPOSE 7474 7473 7687
 COPY --from=relationaldb /graphdb /var/lib/neo4j/data/databases/reactome.graphdb
 RUN touch /data/neo4j-import-done.flag
 COPY ./conf/neo4j.conf /var/lib/neo4j/conf/neo4j.conf
-# COPY ./neo4j-init.sh /data/neo4j-init.sh
+COPY ./neo4j-init.sh /data/neo4j-init.sh
 ARG NEO4J_USER=neo4j
 ARG NEO4J_PASSWORD=neo4j-password
 ENV NEO4J_AUTH $NEO4J_USER/$NEO4J_PASSWORD
