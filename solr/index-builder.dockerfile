@@ -73,7 +73,6 @@ RUN chmod a+x /build_solr_index.sh && chown -R neo4j:neo4j /var/lib/neo4j && cho
 # RUN usermod -a solr -G neo4j
 USER neo4j
 ENV EXTENSION_SCRIPT /data/neo4j-init.sh
-COPY ./Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
 RUN /build_solr_index.sh
 # now clean up neo4j stuff
 USER root
