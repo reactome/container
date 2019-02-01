@@ -46,7 +46,7 @@ docker build -t reactome/fireworks-generator \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
 	--build-arg NEO4J_USER=$NEO4J_USER \
 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
-	-f diagram-generator.dockerfile .
+	-f fireworks-generator.dockerfile .
 
 # Build all of the Java web applications.
 # Right now, we always build from master because no repos are have release tags.
