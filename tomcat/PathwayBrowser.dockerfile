@@ -6,7 +6,7 @@ COPY ./java-build-mounts/settings-docker.xml /mvn-settings.xml
 RUN mkdir -p /mvn/alt-m2/
 ENV MVN_CMD "mvn --global-settings /mvn-settings.xml -Dmaven.repo.local=/mvn/alt-m2/"
 
-
+WORKDIR /gitroot
 ENV PATHWAY_BROWSER_VERSION=master
 RUN git clone https://github.com/reactome-pwp/browser.git \
   && cd /gitroot/browser \
