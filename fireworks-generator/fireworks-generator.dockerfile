@@ -1,3 +1,5 @@
+ARG RELEASE_VERSION=R67
+
 FROM maven:3.6.0-jdk-8 AS builder
 
 RUN mkdir /gitroot
@@ -10,7 +12,7 @@ RUN git checkout $FIREWORKS_SRC_VERSION
 RUN mvn clean compile package -DskipTests && ls -lht ./target
 
 # Now, rebase on the Reactome Neo4j image
-FROM reactome/reactome-neo4j:R-67 as graphdb
+FROM reactome/graphdb:${RELEASE_VERSION} as graphdb
 
 ARG NEO4J_USER=neo4j
 ENV NEO4J_USER=$NEO4J_USER
