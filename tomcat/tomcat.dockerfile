@@ -9,6 +9,7 @@ FROM reactome/fireworksjs as fireworksjs
 FROM reactome/analysis-core as analysiscore
 FROM reactome/fireworks-generator as fireworks
 FROM reactome/diagram-generator as diagramfiles
+FROM reactome/experiments-digester as experimentsdigester
 
 # Final layer is Tomcat.
 FROM tomcat:8.5.35-jre8
@@ -24,6 +25,9 @@ COPY --from=fireworksjs /webapps/*.war /usr/local/tomcat/webapps/
 COPY --from=analysiscore /output/analysis.bin /analysis.bin
 COPY --from=fireworks /fireworks-json-files /usr/local/tomcat/webapps/download/current/fireworks
 COPY --from=diagramfiles /diagrams /usr/local/tomcat/webapps/download/current/diagram
+COPY --from=experimentsdigester /webapps/experiments.bin /experiments.bin
+COPY --from=experimentsdigester /webapps/*.war /usr/local/tomcat/webapps/
+
 # The DiagramJs and FireworksJs WAR files will have version numbers in their names, so
 # we'll just symlink them to the names that are needed.
 RUN ln -s /usr/local/tomcat/webapps/diagram*.war /usr/local/tomcat/webapps/DiagramJs.war
@@ -38,13 +42,13 @@ ADD https://reactome.org/download/current/ehlds.tgz /usr/local/tomcat/webapps/do
 RUN cd /usr/local/tomcat/webapps/download/current && tar -zxf ehld.tgz
 ADD https://reactome.org/download/current/ehld/svgsummary.txt /usr/local/tomcat/webapps/download/current/ehld/svgsummary.txt
 RUN chmod a+r /usr/local/tomcat/webapps/download/current/ehld/svgsummary.txt
-RUN mkdir -p /var/www/html/ehld-icons
-ADD https://reactome.org/ehld-icons/icon-lib-svg.tgz /var/www/html/ehld-icons/icon-lib-svg.tgz
-RUN cd /var/www/html/ehld-icons/ && tar -zxf icon-lib-svg.tgz
-ADD https://reactome.org/ehld-icons/icon-lib-emf.tgz /var/www/html/ehld-icons/icon-lib-emf.tgz
-RUN cd /var/www/html/ehld-icons/ && tar -zxf icon-lib-emf.tgz
-ADD https://reactome.org/ehld-icons/icon-lib-png.tgz /var/www/html/ehld-icons/icon-lib-png.tgz
-RUN cd /var/www/html/ehld-icons/ && tar -zxf icon-lib-png.tgz
+# RUN mkdir -p /var/www/html/ehld-icons
+# ADD https://reactome.org/ehld-icons/icon-lib-svg.tgz /var/www/html/ehld-icons/icon-lib-svg.tgz
+# RUN cd /var/www/html/ehld-icons/ && tar -zxf icon-lib-svg.tgz
+# ADD https://reactome.org/ehld-icons/icon-lib-emf.tgz /var/www/html/ehld-icons/icon-lib-emf.tgz
+# RUN cd /var/www/html/ehld-icons/ && tar -zxf icon-lib-emf.tgz
+# ADD https://reactome.org/ehld-icons/icon-lib-png.tgz /var/www/html/ehld-icons/icon-lib-png.tgz
+# RUN cd /var/www/html/ehld-icons/ && tar -zxf icon-lib-png.tgz
 
 # Now,update the properties files in the applications.
 WORKDIR /usr/local/tomcat/webapps/

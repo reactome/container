@@ -5,6 +5,13 @@
   <localRepository>/mvn/alt-m2/</localRepository>
   <profiles>
 	  <profile>
+	  <id>Experiment-Digester-Local</id>
+      <properties>
+          <!-- Path to the experiments binary file -->
+          <experiments.data.file>/experiments.bin</experiments.data.file>
+      </properties>
+  	</profile>
+	  <profile>
 		  <id>AnalysisService-Local</id>
 		  <properties>
 			  <!-- Analysis -->
