@@ -95,7 +95,6 @@ services:
       - mysql-for-joomla-log:/backup
     command: bash -c "/init.sh && exec /entrypoint.sh mysqld"
 
-
   joomla-sites:
     hostname: joomla-sites
     image: reactome/joomla
