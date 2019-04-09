@@ -1,4 +1,4 @@
-ARG RELEASE_VERSION=R67
+ARG RELEASE_VERSION=R68
 FROM maven:3.6.0-jdk-8 AS builder
 
 RUN mkdir /gitroot
@@ -56,7 +56,7 @@ COPY ./wait-for.sh /wait-for.sh
 #   -a neo4j -b 7474 -c $NEO4J_USER -d $NEO4J_PASSWORD \
 #   -e  http://localhost:8983/solr/reactome -f "" -g "" \
 #   -i localhost -j 25 -k dummy
-
+COPY ./Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
 RUN useradd neo4j
 EXPOSE 7474 7687 8983
 ENV NEO4J_EDITION=community
