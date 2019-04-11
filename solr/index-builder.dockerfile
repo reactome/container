@@ -42,6 +42,15 @@ ENV NEO4J_AUTH $NEO4J_USER/$NEO4J_PASSWORD
 
 COPY --from=graphdb /docker-entrypoint.sh /neo4j-entrypoint.sh
 COPY --from=graphdb /indexer/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
+
+# we'll need Icon XML files.
+COPY ./get_icon_xml_files.sh /get_icon_xml_files.sh
+RUN bash /get_icon_xml_files.sh
+# We'll also need EHLD files
+RUN mkdir /tmp/ehld
+ADD https://reactome.org/download/current/ehlds.tgz /tmp/ehld.tgz
+RUN cd /tmp/ && tar -zxf ehld.tgz
+
 RUN mkdir /indexer/logs && chmod a+rw /indexer/logs
 # we'll need netcat so that solr can "wait-for" neo4j to start
 RUN apk add netcat-openbsd su-exec shadow tini
