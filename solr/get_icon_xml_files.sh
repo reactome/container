@@ -13,7 +13,7 @@ ls -lht *.svg | wc -l
 # done
 
 # The for-loop above takes 3 to 5 minutes. Using GNU Parallel takes ~30 seconds.
-apt-get install -y parallel
+# apt-get install -y parallel
 ls *.svg | parallel "wget -O {.}.xml https://reactome.org/icon/{.}.xml 2>&1" > wget.log
 
 echo "Number of *.xml files"

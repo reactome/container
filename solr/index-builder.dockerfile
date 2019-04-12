@@ -43,6 +43,10 @@ ENV NEO4J_AUTH $NEO4J_USER/$NEO4J_PASSWORD
 COPY --from=graphdb /docker-entrypoint.sh /neo4j-entrypoint.sh
 COPY --from=graphdb /indexer/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
 
+# we'll need netcat so that solr can "wait-for" neo4j to start. parallel is to
+# speed up the download of Icon XML Metadata files.
+RUN apk add parallel netcat-openbsd su-exec shadow tini
+
 # we'll need Icon XML files.
 COPY ./get_icon_xml_files.sh /get_icon_xml_files.sh
 RUN bash /get_icon_xml_files.sh
@@ -52,8 +56,7 @@ ADD https://reactome.org/download/current/ehlds.tgz /tmp/ehld.tgz
 RUN cd /tmp/ && tar -zxf ehld.tgz
 
 RUN mkdir /indexer/logs && chmod a+rw /indexer/logs
-# we'll need netcat so that solr can "wait-for" neo4j to start
-RUN apk add netcat-openbsd su-exec shadow tini
+
 COPY ./wait-for.sh /wait-for.sh
 # The Neo4j entrypoint script will be the entrypoint, and then we will explicitly
 # invoke the solr entrypoint before running the indexer.
@@ -65,7 +68,7 @@ COPY ./wait-for.sh /wait-for.sh
 #   -a neo4j -b 7474 -c $NEO4J_USER -d $NEO4J_PASSWORD \
 #   -e  http://localhost:8983/solr/reactome -f "" -g "" \
 #   -i localhost -j 25 -k dummy
-COPY ./Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
+# COPY ./Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
 RUN useradd neo4j
 EXPOSE 7474 7687 8983
 ENV NEO4J_EDITION=community

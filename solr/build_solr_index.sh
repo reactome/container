@@ -22,6 +22,6 @@ cd /indexer
 su-exec root java -jar ./Indexer-jar-with-dependencies.jar \
   -a localhost -b 7474 -c $NEO4J_USER -d $NEO4J_PASSWORD \
   -e  http://localhost:8983/solr -o reactome -f "solr" -g "solr" \
-  -q /tmp/icon-lib -r /tmp/ehlds -i localhost -j 25 -k dummy -n
+  -q /tmp/icon-lib -r /tmp/ehlds -n true -l true
 
 set +e
