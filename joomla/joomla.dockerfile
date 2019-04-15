@@ -50,3 +50,4 @@ WORKDIR /var/www/html
 RUN mkdir -p cgi-tmp/rtf && chown www-data:www-data cgi-tmp/rtf \
   && mkdir -p cgi-tmp/pdf && chown www-data:www-data cgi-tmp/pdf \
   && chown www-data:www-data ./cgi-tmp
+# RUN a2enmod dump_io
