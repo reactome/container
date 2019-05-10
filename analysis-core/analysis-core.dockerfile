@@ -8,7 +8,7 @@ ENV ANALYSIS_CORE_VERSION=master
 RUN git clone https://github.com/reactome/analysis-core.git
 RUN cd analysis-core && git checkout $ANALYSIS_CORE_VERSION
 WORKDIR /gitroot/analysis-core
-RUN mvn clean compile package
+RUN mvn clean compile package -DskipTests
 RUN mkdir -p /analysis-core
 RUN ls -lht ./target
 
