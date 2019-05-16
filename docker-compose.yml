@@ -83,7 +83,7 @@ services:
     command: bash -c "/init.sh && exec /entrypoint.sh mysqld"
 
   mysql-for-joomla:
-    image: mysql
+    image: mysql:5.7.24
     hostname: mysql-for-joomla
     container_name: mysql-for-joomla
     env_file:

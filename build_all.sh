@@ -68,6 +68,8 @@ echo "Building PathwayBrowser"
 docker build -t reactome/pathwaybrowser -f PathwayBrowser.dockerfile .
 echo "Building ReactomeRESTfulAPI"
 docker build -t reactome/reactomerestfulapi -f ReactomeRESTfulAPI.dockerfile .
+echo "Building experiments-digester"
+docker build -t reactome/experiments-digester -f ExperimentsDigester.dockerfile .
 
 # Finally, we will build the solr index.
 cd ../solr
