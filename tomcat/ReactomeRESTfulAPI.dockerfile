@@ -13,7 +13,7 @@ RUN cd /gitroot/ && git clone https://github.com/reactome/Pathway-Exchange.git
 # then we'll need libsbgn (version: "milestone2") and CuratorTool, and *they* both requires ant
 RUN cd /gitroot/ && git clone https://github.com/sbgn/libsbgn.git \
   && cd /gitroot/libsbgn && git checkout milestone2
-RUN cd /gitroot/ && git clone https://github.com/reactome/CuratorTool.git && cd CuratorTool && git checkout v1.2.22
+RUN cd /gitroot/ && git clone https://github.com/reactome/CuratorTool.git
 WORKDIR /gitroot/libsbgn
 
 # Build projects from the CuratorTool - need to build reactome.jar before building RestfulAPI
