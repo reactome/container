@@ -4,8 +4,8 @@ cd /tmp
 mkdir -p icon-lib && cd icon-lib
 wget -O icon-lib-svg.tgz https://reactome.org/icon/icon-lib-svg.tgz
 tar -xf icon-lib-svg.tgz
-echo "Number of *.svg files"
-ls -lht *.svg | wc -l
+echo "Number of *.svg files in $(pwd)"
+ls *.svg | wc -l
 # for f in $(ls *.svg) ; do
 # 	FILENAME=$(basename $f)
 # 	FILENAME=${FILENAME%.svg}
@@ -16,6 +16,6 @@ ls -lht *.svg | wc -l
 # apt-get install -y parallel
 ls *.svg | parallel "wget -O {.}.xml https://reactome.org/icon/{.}.xml 2>&1" > wget.log
 
-echo "Number of *.xml files"
-ls -lht *.xml | wc -l
+echo "Number of *.xml files in $(pwd)"
+ls *.xml | wc -l
 cd -
