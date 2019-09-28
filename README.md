@@ -61,7 +61,7 @@ cd container
 git submodule update --init --recursive
 ```
 
-## Bulding the docker images
+## Building the docker images
 
 A number of docker images need to be built in order to run the Reactome services. Many images are used to compile applications or create data. The diagram below illustrates the relationships between these images, and their dependencies.
 
@@ -74,6 +74,17 @@ bash ./build_all.sh
 ```
 
 This will build all of the intermediate images which create data or Java applications, as well as the final images which will be run as a part of your Reactome system.
+
+## Log folder permissions
+
+If solr or neo4j log folders have the wrong permissions, the containers will fail to run. To fix this you need to change the following permissions (assuming base directory): 
+
+```bash
+chown -R 8983:8983 ./logs/solr
+chown -R 100:101 ./logs/neo4j
+```
+
+If docker namespacing is set up, just sum uid/gid values with your namespace user's uid/gid.
 
 ## How to run
 
