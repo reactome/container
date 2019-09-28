@@ -2,7 +2,7 @@ ARG RELEASE_VERSION=R68
 FROM maven:3.6.0-jdk-8 AS builder
 
 RUN mkdir /gitroot
-ENV INDEXER_VERSION=master
+ENV INDEXER_VERSION=fix-IconIndexing-NPE
 WORKDIR /gitroot/
 RUN git clone https://github.com/reactome/search-indexer.git
 WORKDIR /gitroot/search-indexer
