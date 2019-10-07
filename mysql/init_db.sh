@@ -7,7 +7,8 @@ time /extra_stuff/wait-for.sh localhost:3306 -t 900
 # need to sleep and then wait for the reboot to complete successfully.
 sleep 20
 /extra_stuff/wait-for.sh localhost:3306 -t 900
-rm /docker-entrypoint-initdb.d/gk_current*
+# clean up any remaining database files.
+rm /docker-entrypoint-initdb.d/*current*
 # Normally, the datadir is /var/lib/mysql but the problem is it is delcared
 # as a VOLUME, so persistence is problematic. Specifying datadir=/data/mysql
 # means that the database will be physically located in a directory that is not
