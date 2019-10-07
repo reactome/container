@@ -14,7 +14,7 @@ echo "Generating the graph database..."
 java -jar ./GraphImporter-jar-with-dependencies.jar \
 	-h localhost \
 	-s 3306 \
-	-d gk_current \
+	-d current \
 	-u root \
 	-p $MYSQL_ROOT_PASSWORD \
 	-n /graphdb \

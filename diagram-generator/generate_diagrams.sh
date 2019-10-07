@@ -30,7 +30,7 @@ java -jar /diagram-converter/diagram-converter-jar-with-dependencies.jar \
 	 -c $NEO4J_USER \
 	 -d $NEO4J_PASSWORD \
 	 -e localhost \
-	 -f gk_current \
+	 -f current \
 	 -g root \
 	 -h $MYSQL_ROOT_PASSWORD\
 	 -o /diagrams | grep -v DEBUG > log

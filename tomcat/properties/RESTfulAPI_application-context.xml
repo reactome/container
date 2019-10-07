@@ -10,7 +10,7 @@
     <bean id="dba" class="org.gk.persistence.MySQLAdaptor">
       <constructor-arg index="0" value="mysql-for-tomcat"/>
 <!--       <constructor-arg index="1" value="nursa_082917"/> -->
-      <constructor-arg index="1" value="gk_current" />
+      <constructor-arg index="1" value="current" />
       <constructor-arg index="2" value="root"/>
       <constructor-arg index="3" value="root"/>
         <!-- useCache should be set to false for gk_central deployed in the curator machine

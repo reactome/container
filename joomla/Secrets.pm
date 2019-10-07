@@ -13,6 +13,6 @@ $GK_DB_PORT
 $GK_DB_HOST  = 'mysql-for-tomcat';
 $GK_DB_USER  = 'root';
 $GK_DB_PASS  = 'root';
-$GK_DB_NAME  = 'gk_current';
+$GK_DB_NAME  = 'current';
 $GK_IDB_NAME = 'stable_identifiers';
 $GK_DB_PORT  = 3306;

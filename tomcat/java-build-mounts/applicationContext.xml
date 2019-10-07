@@ -9,7 +9,7 @@
 
     <bean id="dba" class="org.gk.persistence.MySQLAdaptor">
       <constructor-arg index="0" value="mysql-for-tomcat"/> <!-- host was localhost -->
-      <constructor-arg index="1" value="gk_current"/> <!-- database name was gk_current -->
+      <constructor-arg index="1" value="current"/> <!-- database name was gk_current -->
       <constructor-arg index="2" value="root"/> <!-- username was reactome_user -->
       <constructor-arg index="3" value="root"/> <!-- password was reactome_pass -->
         <!-- useCache should be set to false for gk_central deployed in the curator machine
