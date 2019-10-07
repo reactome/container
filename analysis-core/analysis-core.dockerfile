@@ -4,7 +4,7 @@ ENV PATHWAY_BROWSER_VERSION=master
 RUN mkdir -p /gitroot
 WORKDIR /gitroot
 
-ENV ANALYSIS_CORE_VERSION=master
+ENV ANALYSIS_CORE_VERSION=c70dbe70bd933ebe286fae181095b5ba2e40181f
 RUN git clone https://github.com/reactome/analysis-core.git
 RUN cd analysis-core && git checkout $ANALYSIS_CORE_VERSION
 WORKDIR /gitroot/analysis-core

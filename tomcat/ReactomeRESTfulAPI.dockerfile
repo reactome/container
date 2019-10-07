@@ -47,7 +47,7 @@ RUN cd /gitroot/Pathway-Exchange \
 # Build RESTfulAPI - the one I copied as a WAR doesn't seem to work right.
 RUN cd /gitroot/ && git clone https://github.com/reactome/RESTfulAPI.git \
   && cd /gitroot/RESTfulAPI \
-  && git checkout master
+  && git checkout 3760bbbfb3901be4fb684af50e3ae0c51a39997b
 COPY ./java-build-mounts/RESTfulAPI-pom.xml /gitroot/RESTfulAPI/pom.xml
 COPY ./java-build-mounts/settings-docker.xml /mvn-settings.xml
 RUN cd /gitroot/RESTfulAPI \

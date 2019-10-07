@@ -7,7 +7,7 @@ RUN mkdir -p /mvn/alt-m2/
 ENV MVN_CMD "mvn --global-settings /mvn-settings.xml -Dmaven.repo.local=/mvn/alt-m2/"
 
 # Build the ContentService application
-ENV CONTENT_SERVICE_VERSION=master
+ENV CONTENT_SERVICE_VERSION=5c1f59b749eb9ebef1f6a7c8af32e6793ce688ca
 RUN cd /gitroot/ && git clone https://github.com/reactome/content-service.git \
   && cd /gitroot/content-service \
   && git checkout $CONTENT_SERVICE_VERSION

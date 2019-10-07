@@ -6,7 +6,7 @@ COPY ./java-build-mounts/settings-docker.xml /mvn-settings.xml
 RUN mkdir -p /mvn/alt-m2/
 ENV MVN_CMD "mvn --global-settings /mvn-settings.xml -Dmaven.repo.local=/mvn/alt-m2/"
 
-ENV EXPERIMENT_DIGESTER_VERSION=master
+ENV EXPERIMENT_DIGESTER_VERSION=4b0ed8ff2dcb1779d5f3877a1e3f5be45dfad029
 RUN cd /gitroot/ && git clone https://github.com/reactome/experiment-digester.git \
   && cd /gitroot/experiment-digester \
   && git checkout $EXPERIMENT_DIGESTER_VERSION

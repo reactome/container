@@ -7,7 +7,7 @@ RUN mkdir -p /mvn/alt-m2/
 ENV MVN_CMD "mvn --global-settings /mvn-settings.xml -Dmaven.repo.local=/mvn/alt-m2/"
 
 
-ENV DATA_CONTENT_VERSION=master
+ENV DATA_CONTENT_VERSION=da21f0f1541110ccd861ea9845a631093ee08172
 RUN cd /gitroot/ && git clone https://github.com/reactome/data-content.git \
   && cd /gitroot/data-content \
   && git checkout $DATA_CONTENT_VERSION

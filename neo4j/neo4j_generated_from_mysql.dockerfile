@@ -2,7 +2,7 @@ ARG RELEASE_VERSION=R68
 FROM maven:3.6.0-jdk-8 AS builder
 
 RUN mkdir /gitroot
-ENV GRAPH_IMPORTER_VERSION=master
+ENV GRAPH_IMPORTER_VERSION=409a2237aa2e0f03142a7d5816603c3ca5b2da7d
 WORKDIR /gitroot/
 
 RUN git clone https://github.com/reactome/graph-importer.git
@@ -26,7 +26,7 @@ COPY ./wait-for.sh /wait-for.sh
 RUN /generate_graphdb.sh
 
 # Now re-base on neo4j
-FROM neo4j:3.4.9
+FROM neo4j:3.5.3
 LABEL maintainer=solomon.shorser@oicr.on.ca
 LABEL ReleaseVersion=$RELEASE_VERSION
 ENV EXTENSION_SCRIPT /data/neo4j-init.sh
