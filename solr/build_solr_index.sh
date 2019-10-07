@@ -15,13 +15,17 @@ cd /opt/docker-solr/scripts/
 su-exec solr solr start
 echo "Waiting for solr..."
 set -e
+
 bash /wait-for.sh localhost:8983 -t 90
-echo "Now building the solr index."
+echo "Now building the solr index..."
 cd /indexer
 # run the indexer.
-su-exec root java -jar ./Indexer-jar-with-dependencies.jar \
+time su-exec root java -jar ./Indexer-jar-with-dependencies.jar \
   -a localhost -b 7474 -c $NEO4J_USER -d $NEO4J_PASSWORD \
   -e  http://localhost:8983/solr -o reactome -f "solr" -g "solr" \
-  -q /tmp/icon-lib -r /tmp/ehlds -n true -l true
+  -q /tmp/icon-lib -r /tmp/ehld -n true -l true
+
+echo "Tail of log output: "
+tail -n 50 /indexer/logs/*
 
 set +e
