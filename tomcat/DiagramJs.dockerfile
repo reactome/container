@@ -6,7 +6,7 @@ COPY ./java-build-mounts/settings-docker.xml /mvn-settings.xml
 RUN mkdir -p /mvn/alt-m2/
 ENV MVN_CMD "mvn --global-settings /mvn-settings.xml -Dmaven.repo.local=/mvn/alt-m2/"
 
-ENV DIAGRAMJS_VERSION=master
+ENV DIAGRAMJS_VERSION=efabe4d78a654c0c50671f0661258d33d072644e
 RUN cd /gitroot/ && git clone https://github.com/reactome-pwp/diagram-js.git \
   && cd /gitroot/diagram-js \
   && git checkout $DIAGRAMJS_VERSION

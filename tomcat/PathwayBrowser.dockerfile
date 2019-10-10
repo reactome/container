@@ -7,7 +7,7 @@ RUN mkdir -p /mvn/alt-m2/
 ENV MVN_CMD "mvn --global-settings /mvn-settings.xml -Dmaven.repo.local=/mvn/alt-m2/"
 
 WORKDIR /gitroot
-ENV PATHWAY_BROWSER_VERSION=master
+ENV PATHWAY_BROWSER_VERSION=720480b70632adcfeac1c9ca11953e0d571bc16c
 RUN git clone https://github.com/reactome-pwp/browser.git \
   && cd /gitroot/browser \
   && git checkout $PATHWAY_BROWSER_VERSION

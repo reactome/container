@@ -2,12 +2,17 @@ ARG RELEASE_VERSION=R68
 FROM maven:3.6.0-jdk-8 AS builder
 
 RUN mkdir /gitroot
-ENV INDEXER_VERSION=fix-IconIndexing-NPE
+
+# The commit ID for the "speed-up" version of search-indexer. Runs faster than normal, by using multiple threads.
+ENV INDEXER_VERSION=4184c653e4fa1a2fe350f2ff238183956a22ab75
+
 WORKDIR /gitroot/
+RUN mkdir /gitroot/search-indexer
 RUN git clone https://github.com/reactome/search-indexer.git
+# COPY search-indexer search-indexer
 WORKDIR /gitroot/search-indexer
 RUN git checkout $INDEXER_VERSION
-RUN mvn clean compile package -DskipTests && ls -lht ./target
+RUN mvn -q clean compile package -DskipTests && ls -lht ./target
 RUN mkdir /indexer && cp /gitroot/search-indexer/target/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
 
 # Now, rebase on the Reactome Neo4j image
@@ -53,7 +58,7 @@ RUN bash /get_icon_xml_files.sh
 # We'll also need EHLD files
 RUN mkdir /tmp/ehld
 ADD https://reactome.org/download/current/ehlds.tgz /tmp/ehld.tgz
-RUN cd /tmp/ && tar -zxf ehld.tgz
+RUN cd /tmp/ && tar -zxf ehld.tgz && echo "Files in /tmp/ehld " && ls ehld/* | wc -l
 
 RUN mkdir /indexer/logs && chmod a+rw /indexer/logs
 

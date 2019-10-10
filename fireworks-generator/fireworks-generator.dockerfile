@@ -3,7 +3,7 @@ ARG RELEASE_VERSION=R67
 FROM maven:3.6.0-jdk-8 AS builder
 
 RUN mkdir /gitroot
-ENV FIREWORKS_SRC_VERSION=master
+ENV FIREWORKS_SRC_VERSION=692e99ccf2a9f75cb0308dc1e955c068243cb3f0
 
 WORKDIR /gitroot/
 RUN git clone https://github.com/reactome-pwp/fireworks-layout.git

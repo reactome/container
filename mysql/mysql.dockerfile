@@ -10,9 +10,9 @@ RUN apt-get update && apt-get install wget netcat pigz -y
 # Get the zipped data
 RUN wget -nv https://reactome.org/download/current/databases/gk_current.sql.gz
 RUN ls -lht
-RUN unpigz gk_current.sql.gz
+RUN unpigz gk_current.sql.gz && mv gk_current.sql current.sql
 RUN ls -lht
-ENV MYSQL_DATABASE=gk_current
+ENV MYSQL_DATABASE=current
 ENV MYSQL_ROOT_PASSWORD=root
 RUN mkdir /extra_stuff
 COPY ./wait-for.sh /extra_stuff/wait-for.sh

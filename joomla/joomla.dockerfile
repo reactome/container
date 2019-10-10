@@ -32,7 +32,7 @@ RUN openssl x509 -req -sha256 -days 365 -in server.csr -signkey server.key -out 
 RUN rm server.csr && rm server.pass.key
 
 RUN mkdir -p /var/www/html/download/current/ && mkdir -p /var/www/html/Icons && mkdir -p /var/www/html/ehld-icons
-RUN mkdir -p /var/www/html/cgi-tmp/img-fp/gk_current/ && chmod a+rw /var/www/html/cgi-tmp/img-fp/gk_current/
+RUN mkdir -p /var/www/html/cgi-tmp/img-fp/current/ && chmod a+rw /var/www/html/cgi-tmp/img-fp/current/
 ADD https://reactome.org/download/current/ehlds.tgz /var/www/html/download/current/ehld.tgz
 RUN cd /var/www/html/download/current/ && tar -zxf ehld.tgz && echo "$(ls ./ehld | wc -l) items, $(du -hsxc ehld/* | tail -n 1) space used."
 ADD https://reactome.org/download/current/ehld/svgsummary.txt /var/www/html/download/current/ehld/svgsummary.txt

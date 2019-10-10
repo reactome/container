@@ -4,7 +4,7 @@
 # You can pass in build arguments for neo4j username and password, and also for release number.
 # With build args: `docker build -t reactome/reactome-neo4j:R-999 --build-arg NEO4J_USER=neo4j --build-arg NEO4J_PASSWORD=xxxx --build-arg ReleaseVersion=999 -f ./neo4j_stand-alone.dockerfile .`
 # To run this, execute: `docker run --rm -p 7474:7474 -p 7687:7687 --name reactome-neo4j reactome/reactome-neo4j:R62`
-FROM neo4j:3.4.9
+FROM neo4j:3.5.3
 
 ARG RELEASE_VERSION=R67
 ARG NEO4J_USER=neo4j

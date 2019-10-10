@@ -2,7 +2,7 @@ ARG RELEASE_VERSION=R67
 FROM maven:3.6.0-jdk-8 AS builder
 
 RUN mkdir /gitroot
-ENV DIAGRAM_CONVERTER_VERSION=master
+ENV DIAGRAM_CONVERTER_VERSION=ca5846969ab362ea5eb83b4dfd553cdecd2b97f2
 WORKDIR /gitroot/
 RUN git clone https://github.com/reactome-pwp/diagram-converter.git
 WORKDIR /gitroot/diagram-converter
