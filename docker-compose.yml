@@ -1,6 +1,56 @@
 version: '3.7'
 services:
 
+  mysql-for-tomcat:
+    image: reactome/reactome-mysql:$RELEASE_VERSION
+    build:
+      context: ./mysql
+      dockerfile: mysql.dockerfile
+      args:
+        RELEASE_VERSION: $RELEASE_VERSION
+    hostname: mysql-for-tomcat
+    container_name: mysql-for-tomcat
+    env_file:
+      - tomcat.env
+    volumes:
+      - ./mysql/init.sh:/init.sh
+      - ./logs/mysql/tomcat:/var/log/mysql
+      - mysql-for-tomcat-log:/backup
+    command: bash -c "/init.sh && exec /entrypoint.sh mysqld"
+
+  neo4j-db:
+    image: "reactome/graphdb:${RELEASE_VERSION}"
+    build:
+      context: ./neo4j
+      dockerfile: neo4j_generated_from_mysql.dockerfile
+      args:
+        RELEASE_VERSION: $RELEASE_VERSION
+    container_name: neo4j-db
+    hostname: neo4j-db
+    env_file:
+      - neo4j.env
+    volumes:
+      - ./logs/neo4j/:/var/lib/neo4j/logs/
+    ports:
+      - 7474:7474
+      - 7687:7687
+
+  solr:
+    image: "reactome/solr:${RELEASE_VERSION}"
+    container_name: solr-for-reactome
+    hostname: solr-for-reactome
+    build:
+      context: ./solr
+      dockerfile: index-builder.dockerfile
+      args:
+        RELEASE_VERSION: $RELEASE_VERSION
+    ports:
+      - 8983:8983
+    volumes:
+      - ./logs/solr/:/opt/solr/server/logs/
+      - ./solr/solr-security.json:/opt/solr/server/solr/security.json:rw
+    entrypoint: solr start -f
+
   tomcat:
     image: reactome/tomcat
     container_name: tomcat-server
@@ -36,51 +86,6 @@ services:
       - tomcat.env
     ports:
       - 8082:8080
-
-  solr:
-    image: "reactome/solr:${RELEASE_VERSION}"
-    container_name: solr-for-reactome
-    hostname: solr-for-reactome
-    build:
-      context: ./solr
-      dockerfile: index-builder.dockerfile
-      args:
-        RELEASE_VERSION: $RELEASE_VERSION
-    ports:
-      - 8983:8983
-    volumes:
-      - ./logs/solr/:/opt/solr/server/logs/
-      - ./solr/solr-security.json:/opt/solr/server/solr/security.json:rw
-    entrypoint: solr start -f
-
-  neo4j-db:
-    image: "reactome/graphdb:${RELEASE_VERSION}"
-    build:
-      context: ./neo4j
-      dockerfile: neo4j_generated_from_mysql.dockerfile
-      args:
-        RELEASE_VERSION: $RELEASE_VERSION
-    container_name: neo4j-db
-    hostname: neo4j-db
-    env_file:
-      - neo4j.env
-    volumes:
-      - ./logs/neo4j/:/var/lib/neo4j/logs/
-    ports:
-      - 7474:7474
-      - 7687:7687
-
-  mysql-for-tomcat:
-    image: reactome/reactome-mysql:$RELEASE_VERSION
-    hostname: mysql-for-tomcat
-    container_name: mysql-for-tomcat
-    env_file:
-      - tomcat.env
-    volumes:
-      - ./mysql/init.sh:/init.sh
-      - ./logs/mysql/tomcat:/var/log/mysql
-      - mysql-for-tomcat-log:/backup
-    command: bash -c "/init.sh && exec /entrypoint.sh mysqld"
 
   mysql-for-joomla:
     image: mysql:5.7.24
