@@ -82,7 +82,7 @@ USER solr
 RUN solr start && solr create -c reactome -p 8983 -d /custom-solr-conf/ && solr stop
 COPY ./build_solr_index.sh /build_solr_index.sh
 USER root
-RUN chmod a+x /build_solr_index.sh && chown -R neo4j:neo4j /var/lib/neo4j && chown -R neo4j:neo4j /data && chmod u+s /sbin/su-exec
+RUN chmod a+x /build_solr_index.sh && chown -R neo4j:neo4j /var/lib/neo4j && chown -R neo4j:neo4j /data && chmod u+s /sbin/su-exec && mkdir /logs && chmod a+rw /logs
 # Give the neo4j user access to the same stuff the solr user has.
 # RUN usermod -a solr -G neo4j
 USER neo4j
