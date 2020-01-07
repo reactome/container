@@ -6,7 +6,7 @@
 # To run this, execute: `docker run --rm -p 7474:7474 -p 7687:7687 --name reactome-neo4j reactome/graphdb:R999`
 FROM neo4j:3.5.3
 # RELEASE_VERSION should be given when building the image.
-ARG RELEASE_VERSION=R71
+ARG RELEASE_VERSION=R70
 # If you want to override user/password at RUN time, do it as 'docker run -e NEO4J_AUTH="neo4j/PASSWORD" ... reactome/graphdb'
 ARG NEO4J_USER=neo4j
 ARG NEO4J_PASSWORD=neo4j-password
