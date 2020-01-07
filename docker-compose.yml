@@ -1,6 +1,5 @@
-version: '3.7'
+version: '3.6'
 services:
-
   mysql-for-tomcat:
     image: reactome/reactome-mysql:$RELEASE_VERSION
     build:
