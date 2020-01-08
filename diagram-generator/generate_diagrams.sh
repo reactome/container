@@ -1,13 +1,16 @@
 #! /bin/bash
 
 PATH=$PATH:/var/lib/neo4j/bin/
-
+mkdir -p /var/lib/neo4j/certificates/
+chown neo4j:neo4j /var/lib/neo4j/certificates/
+chown neo4j:neo4j /var/lib/neo4j/logs/
+chown neo4j:neo4j /logs
 # Start Neo4j
 cd /var/lib/neo4j
 bash /neo4j-entrypoint.sh neo4j &
 
 echo "Waiting for Neo4j..."
-bash /wait-for.sh localhost:7687 -t 90 && bash /wait-for.sh localhost:7474 -t 90
+bash /wait-for.sh localhost:7687 -t 120 && bash /wait-for.sh localhost:7474 -t 120
 
 # Start MySQL
 /usr/local/bin/docker-entrypoint.sh mysqld &
@@ -21,7 +24,7 @@ echo -e "\n\n" > /etc/java-8-openjdk/accessibility.properties
 echo "Running diagram generator..."
 # Run the diagram generator
 # NOTE: NEO4J_USER and NEO4J_PASSWORD are set in the dockerfile.
-# The "| grep -v DEBUG > log" is because loggin config seems to produce a LOT of
+# The "| grep -v DEBUG > log" is because logging config seems to produce a LOT of
 # "debug" noise. Mostly from the neo4j and spring libraries.
 cd /diagram-converter/
 java -jar /diagram-converter/diagram-converter-jar-with-dependencies.jar \

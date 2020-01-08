@@ -1,8 +1,8 @@
-ARG RELEASE_VERSION=R67
+ARG RELEASE_VERSION=R71a
 FROM maven:3.6.0-jdk-8 AS builder
 
 RUN mkdir /gitroot
-ENV DIAGRAM_CONVERTER_VERSION=ca5846969ab362ea5eb83b4dfd553cdecd2b97f2
+ENV DIAGRAM_CONVERTER_VERSION=master
 WORKDIR /gitroot/
 RUN git clone https://github.com/reactome-pwp/diagram-converter.git
 WORKDIR /gitroot/diagram-converter
@@ -17,6 +17,7 @@ FROM reactome/graphdb:$RELEASE_VERSION as graphdb
 FROM reactome/reactome-mysql:$RELEASE_VERSION as diagrambuilder
 COPY --from=builder /diagram-converter/diagram-converter-jar-with-dependencies.jar /diagram-converter/diagram-converter-jar-with-dependencies.jar
 COPY --from=graphdb /var/lib/neo4j /var/lib/neo4j
+COPY --from=graphdb /var/lib/neo4j/logs /var/lib/neo4j/logs
 COPY --from=graphdb /var/lib/neo4j/bin/neo4j-admin /var/lib/neo4j/bin/neo4j-admin
 COPY --from=graphdb /data /var/lib/neo4j/data
 COPY --from=graphdb /data/neo4j-init.sh /data/neo4j-init.sh
@@ -37,16 +38,17 @@ ENV MYSQL_ROOT_PASSWORD=root
 ENV EXTENSION_SCRIPT=/data/neo4j-init.sh
 ENV NEO4J_EDITION=community
 RUN ln -s /var/lib/neo4j/conf /conf
-RUN ls -lht /data
+# RUN ls -lht /data
 # RUN ls -lht /neo4j-data
-RUN ls -lht /diagram-converter/
-RUN env
+# RUN ls -lht /diagram-converter/
+# RUN env
 WORKDIR /
 RUN mkdir -p /usr/share/man/man1
-RUN apt-get update && apt-get install gosu openjdk-8-jdk-headless openjdk-8-jre-headless netcat -y
 # neo4j-entrypoint expects su-exec, but there doesn't seem to be a package for that. gosu should be able to do the same thing.
-RUN ln -s  $(which gosu) /bin/su-exec
-RUN mkdir /diagrams
+RUN apt-get update && apt-get install gosu openjdk-8-jdk-headless openjdk-8-jre-headless netcat -y \
+  && ln -s  $(which gosu) /bin/su-exec \
+  && mkdir /diagrams
+
 COPY ./generate_diagrams.sh /diagram-converter/generate_diagrams.sh
 RUN chmod a+x /diagram-converter/generate_diagrams.sh && /diagram-converter/generate_diagrams.sh
 
@@ -54,3 +56,4 @@ RUN chmod a+x /diagram-converter/generate_diagrams.sh && /diagram-converter/gene
 FROM alpine:3.8
 COPY --from=diagrambuilder /diagrams /diagrams
 COPY --from=diagrambuilder /diagram-converter/log /diagram-converter.log
+RUN ls /diagrams | wc -l
