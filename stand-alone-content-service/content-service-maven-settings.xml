@@ -12,7 +12,7 @@
                 <neo4j.user>neo4j</neo4j.user>
                 <neo4j.password>neo4j-password</neo4j.password>
                 <!-- SolR Configuration -->
-                <solr.host>http://solr-for-reactome:8983/solr/reactome</solr.host>
+                <solr.host>http://localhost:8983/solr/</solr.host>
                 <solr.user>solr</solr.user>
                 <solr.password>solr</solr.password>
                 <solr.core>reactome</solr.core>

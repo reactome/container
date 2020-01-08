@@ -1,19 +1,25 @@
 #! /bin/bash
-echo "starting neo4j..."
-cd /neo4j/neo4j-community-3.4.10/bin/
+PATH=$PATH:/var/lib/neo4j/bin/:/opt/solr/bin:/opt/docker-solr/scripts
 
-echo -e "dbms.active_database=graph.db\ndbms.security.auth_enabled=false\ndbms.allow_format_migration=true\n" >>  /neo4j/neo4j-community-3.4.10/conf/neo4j.conf
+ln -s /var/lib/neo4j/conf /conf
 
-./neo4j start &
-end="$((SECONDS+60))"
-echo "waiting for neo4j to start up..."
-while true; do
-	echo "waiting..."
-    [[ "200" = "$(curl --silent --write-out %{http_code} --output /dev/null http://localhost:7474)" ]] && break
-    [[ "${SECONDS}" -ge "${end}" ]] && exit 1
-    sleep 1
-done
+mkdir -p /var/lib/neo4j/certificates && chown neo4j:neo4j /var/lib/neo4j/certificates
+
+chown neo4j:neo4j /logs
+# Start Neo4j
+cd /var/lib/neo4j
+bash /neo4j-entrypoint.sh neo4j &
+
+echo "Waiting for Neo4j..."
+bash /wait-for.sh localhost:7687 -t 90 && bash /wait-for.sh localhost:7474 -t 90
+chmod a+rw /opt/solr/server/solr/reactome/data/index/write.lock
+chmod a+rw -R /opt/solr/server/logs
+chmod a+rw /opt/solr/server/solr/reactome/data/tlog/*
+echo "Waiting for solr..."
+su-exec solr solr-foreground &
+bash /wait-for.sh localhost:8983 -t 90
+
 echo "Starting tomcat..."
-# Now that Neo4j has been started, we can run tomcat
+# Now that Neo4j and solr have been started, we can run tomcat
 cd /usr/local/tomcat
 catalina.sh run
