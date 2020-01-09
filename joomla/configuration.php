@@ -15,7 +15,7 @@ class JConfig {
   public $host = 'mysql-for-joomla';
   public $user = 'root'; # Set this before running the container
   public $password = 'root'; # Set this before running the container
-  public $db = 'joomla';
+  public $db = 'website';
   public $dbprefix = 'rlp_';
   public $live_site = '';
   public $secret = 'joomla_secret';
