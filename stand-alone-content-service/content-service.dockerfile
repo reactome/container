@@ -25,11 +25,13 @@ RUN cd /gitroot/content-service && $MVN_CMD package -P ContentService-Local \
 
 # Get graph database from existing image.
 FROM reactome/graphdb:R71a AS graphdb
-
 # Get solr index
 FROM reactome/solr:R71a as solr
-
-# Ok, now re-base the image as Tomcat
+# Get diagram files.
+FROM reactome/diagram-generator as diagrams
+# Get Fireworks files
+FROM reactome/fireworks-generator as fireworks
+# Final re-base will be Tomcat
 FROM tomcat:8.5.35-jre8
 
 ENV EXTENSION_SCRIPT=/data/neo4j-init.sh
@@ -66,6 +68,8 @@ COPY --from=solr /opt/mysolrhome /opt/mysolrhome
 COPY --from=solr /opt/solr /opt/solr
 COPY --from=solr /custom-solr-conf /custom-solr-conf
 COPY --from=solr /docker-entrypoint-initdb.d /docker-entrypoint-initdb.d
+COPY --from=diagrams /diagrams /usr/local/diagram/static
+COPY --from=fireworks /fireworks-json-files /usr/local/tomcat/webapps/download/current/fireworks
 RUN chmod a+x /content-service-entrypoint.sh
 CMD ["/content-service-entrypoint.sh"]
 
