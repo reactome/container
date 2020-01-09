@@ -1,4 +1,4 @@
-ARG RELEASE_VERSION=R68
+ARG RELEASE_VERSION=R71
 FROM maven:3.6.0-jdk-8 AS builder
 
 RUN mkdir /gitroot
@@ -52,11 +52,7 @@ RUN apk add parallel netcat-openbsd su-exec shadow tini
 
 # we'll need Icon XML files.
 COPY ./get_icon_xml_files.sh /get_icon_xml_files.sh
-RUN bash /get_icon_xml_files.sh
-# We'll also need EHLD files
-RUN mkdir /tmp/ehld
-ADD https://reactome.org/download/current/ehlds.tgz /tmp/ehld.tgz
-RUN cd /tmp/ && tar -zxf ehld.tgz && echo "Files in /tmp/ehld " && ls ehld/* | wc -l
+# RUN bash /get_icon_xml_files.sh
 
 RUN mkdir /indexer/logs && chmod a+rw /indexer/logs
 
@@ -77,6 +73,11 @@ ENV NEO4J_EDITION=community
 RUN ln -s /var/lib/neo4j/conf /conf
 WORKDIR /
 
+# We'll also need EHLD files
+RUN mkdir /tmp/ehld
+ADD https://reactome.org/download/current/ehlds.tgz /tmp/ehld.tgz
+# RUN cd /tmp/ && tar -zxf ehld.tgz && echo "Files in /tmp/ehld " && ls ehld/* | wc -l
+
 USER solr
 # Create a new core.
 RUN solr start && solr create -c reactome -p 8983 -d /custom-solr-conf/ && solr stop
@@ -88,7 +89,8 @@ RUN chmod a+x /build_solr_index.sh && chown -R neo4j:neo4j /var/lib/neo4j && cho
 USER neo4j
 ENV EXTENSION_SCRIPT /data/neo4j-init.sh
 RUN /build_solr_index.sh
-# now clean up neo4j stuff
 USER root
-RUN rm -rf /var/lib/neo4j && rm -rf /data
+RUN chmod a+rw /opt/solr/server/solr/reactome/data/index/write.lock && \
+  chmod a+rw -R /opt/solr/server/logs && \
+  chmod a+rw /opt/solr/server/solr/reactome/data/tlog/*
 USER solr

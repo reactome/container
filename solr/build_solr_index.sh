@@ -2,6 +2,10 @@
 
 PATH=$PATH:/var/lib/neo4j/bin/
 # env
+echo "Getting icon XML files..."
+bash /get_icon_xml_files.sh
+
+cd /tmp/ && tar -zxf ehld.tgz && echo "Files in /tmp/ehld " && ls ehld/* | wc -l
 
 cd /var/lib/neo4j
 bash /neo4j-entrypoint.sh neo4j &
@@ -27,5 +31,6 @@ time su-exec root java -jar ./Indexer-jar-with-dependencies.jar \
 
 echo "Tail of log output: "
 tail -n 50 /indexer/logs/*
-
+# clean up Neo4j stuff
+rm -rf /var/lib/neo4j && rm -rf /data
 set +e
