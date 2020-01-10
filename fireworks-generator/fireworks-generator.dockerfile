@@ -1,15 +1,15 @@
-ARG RELEASE_VERSION=R67
+ARG RELEASE_VERSION=R71
 
-FROM maven:3.6.0-jdk-8 AS builder
+FROM maven:3.6.3-jdk-8 AS builder
 
 RUN mkdir /gitroot
-ENV FIREWORKS_SRC_VERSION=692e99ccf2a9f75cb0308dc1e955c068243cb3f0
+ENV FIREWORKS_SRC_VERSION=master
 
 WORKDIR /gitroot/
 RUN git clone https://github.com/reactome-pwp/fireworks-layout.git
 WORKDIR /gitroot/fireworks-layout
 RUN git checkout $FIREWORKS_SRC_VERSION
-RUN mvn clean compile package -DskipTests && ls -lht ./target
+RUN mvn --no-transfer-progress clean compile package -DskipTests && ls -lht ./target
 
 # Now, rebase on the Reactome Neo4j image
 FROM reactome/graphdb:${RELEASE_VERSION} as graphdb
