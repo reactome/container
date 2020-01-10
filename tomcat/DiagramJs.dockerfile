@@ -1,12 +1,12 @@
-FROM maven:3.6.0-jdk-8 AS builder
+FROM maven:3.6.3-jdk-8 AS builder
 LABEL maintainer="solomon.shorser@oicr.on.ca"
 RUN mkdir /webapps
 RUN mkdir /gitroot
 COPY ./java-build-mounts/settings-docker.xml /mvn-settings.xml
 RUN mkdir -p /mvn/alt-m2/
-ENV MVN_CMD "mvn --global-settings /mvn-settings.xml -Dmaven.repo.local=/mvn/alt-m2/"
+ENV MVN_CMD "mvn --no-transfer-progress --global-settings /mvn-settings.xml -Dmaven.repo.local=/mvn/alt-m2/"
 
-ENV DIAGRAMJS_VERSION=efabe4d78a654c0c50671f0661258d33d072644e
+ENV DIAGRAMJS_VERSION=master
 RUN cd /gitroot/ && git clone https://github.com/reactome-pwp/diagram-js.git \
   && cd /gitroot/diagram-js \
   && git checkout $DIAGRAMJS_VERSION
