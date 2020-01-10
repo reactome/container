@@ -1,14 +1,14 @@
 ARG RELEASE_VERSION=R71a
-FROM maven:3.6.0-jdk-8 AS builder
+FROM maven:3.6.3-jdk-8 AS builder
 
 RUN mkdir /gitroot
 ENV DIAGRAM_CONVERTER_VERSION=master
 WORKDIR /gitroot/
-RUN git clone https://github.com/reactome-pwp/diagram-converter.git
-WORKDIR /gitroot/diagram-converter
-RUN git checkout $DIAGRAM_CONVERTER_VERSION
-RUN mvn clean compile package -DskipTests && ls -lht ./target
-RUN mkdir /diagram-converter && cp /gitroot/diagram-converter/target/diagram-converter-jar-with-dependencies.jar /diagram-converter/diagram-converter-jar-with-dependencies.jar
+RUN git clone https://github.com/reactome-pwp/diagram-converter.git && \
+	cd /gitroot/diagram-converter && git checkout $DIAGRAM_CONVERTER_VERSION && \
+	mvn --no-transfer-progress clean compile package -DskipTests && ls -lht ./target && \
+	mkdir /diagram-converter && \
+	cp /gitroot/diagram-converter/target/diagram-converter-jar-with-dependencies.jar /diagram-converter/diagram-converter-jar-with-dependencies.jar
 
 # Now, rebase on the Reactome Neo4j image
 FROM reactome/graphdb:$RELEASE_VERSION as graphdb
@@ -43,14 +43,13 @@ RUN ln -s /var/lib/neo4j/conf /conf
 # RUN ls -lht /diagram-converter/
 # RUN env
 WORKDIR /
-RUN mkdir -p /usr/share/man/man1
-# neo4j-entrypoint expects su-exec, but there doesn't seem to be a package for that. gosu should be able to do the same thing.
-RUN apt-get update && apt-get install gosu openjdk-8-jdk-headless openjdk-8-jre-headless netcat -y \
-  && ln -s  $(which gosu) /bin/su-exec \
-  && mkdir /diagrams
-
 COPY ./generate_diagrams.sh /diagram-converter/generate_diagrams.sh
-RUN chmod a+x /diagram-converter/generate_diagrams.sh && /diagram-converter/generate_diagrams.sh
+# neo4j-entrypoint expects su-exec, but there doesn't seem to be a package for that. gosu should be able to do the same thing.
+RUN mkdir -p /usr/share/man/man1 && \
+  apt-get update && apt-get install gosu openjdk-8-jdk-headless openjdk-8-jre-headless netcat -y \
+  && ln -s  $(which gosu) /bin/su-exec \
+  && mkdir /diagrams \
+  && chmod a+x /diagram-converter/generate_diagrams.sh && /diagram-converter/generate_diagrams.sh
 
 # Ok, now that diagrams are generated, maybe we should rebase on something smaller and only copy over what we need.
 FROM alpine:3.8

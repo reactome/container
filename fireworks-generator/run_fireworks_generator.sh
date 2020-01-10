@@ -8,7 +8,7 @@ bash /docker-entrypoint.sh neo4j &
 
 echo "Waiting for Neo4j..."
 bash /wait-for.sh localhost:7687 -t 90 && bash /wait-for.sh localhost:7474 -t 90
-env
+# env
 # Generate the fireworks files for all species
 echo "Running Fireworks generator..."
 cd /fireworks
