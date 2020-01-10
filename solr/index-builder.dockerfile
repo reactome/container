@@ -1,17 +1,18 @@
 ARG RELEASE_VERSION=R71
-FROM maven:3.6.0-jdk-8 AS builder
+FROM maven:3.6.3-jdk-8 AS builder
 
 RUN mkdir /gitroot
 # The commit ID for the "speed-up" version of search-indexer. Runs faster than normal, by using multiple threads.
 ENV INDEXER_VERSION=4184c653e4fa1a2fe350f2ff238183956a22ab75
 WORKDIR /gitroot/
 RUN mkdir /gitroot/search-indexer
-RUN git clone https://github.com/reactome/search-indexer.git
-# COPY search-indexer search-indexer
-WORKDIR /gitroot/search-indexer
-RUN git checkout $INDEXER_VERSION
-RUN mvn -q clean compile package -DskipTests && ls -lht ./target
-RUN mkdir /indexer && cp /gitroot/search-indexer/target/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
+RUN git clone https://github.com/reactome/search-indexer.git && \
+	cd /gitroot/search-indexer && \
+	git checkout $INDEXER_VERSION && \
+	mvn --no-transfer-progress clean compile package -DskipTests && ls -lht ./target && \
+	mkdir /indexer && \
+	cp /gitroot/search-indexer/target/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar && \
+	rm -rf ~/.m2
 
 # Now, rebase on the Reactome Neo4j image
 FROM reactome/graphdb:${RELEASE_VERSION} as graphdb
@@ -29,7 +30,7 @@ COPY --from=graphdb /var/lib/neo4j/bin/neo4j-admin /var/lib/neo4j/bin/neo4j-admi
 
 RUN mkdir /custom-solr-conf/
 COPY --from=builder  /gitroot/search-indexer/solr-conf/reactome/ /custom-solr-conf/
-RUN ls -lht /custom-solr-conf/
+# RUN ls -lht /custom-solr-conf/
 
 # setup for neo4j
 COPY --from=graphdb /var/lib/neo4j/conf/neo4j.conf /var/lib/neo4j/conf/neo4j.conf
