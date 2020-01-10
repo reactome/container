@@ -1,19 +1,17 @@
-ARG RELEASE_VERSION=R67
-FROM maven:3.5-jdk-8 AS builder
+ARG RELEASE_VERSION=R71
+FROM maven:3.6.3-jdk-8 AS builder
 ENV PATHWAY_BROWSER_VERSION=master
 RUN mkdir -p /gitroot
 WORKDIR /gitroot
 
-ENV ANALYSIS_CORE_VERSION=c70dbe70bd933ebe286fae181095b5ba2e40181f
-RUN git clone https://github.com/reactome/analysis-core.git
-RUN cd analysis-core && git checkout $ANALYSIS_CORE_VERSION
-WORKDIR /gitroot/analysis-core
-RUN mvn clean compile package -DskipTests
-RUN mkdir -p /analysis-core
-RUN ls -lht ./target
-
-RUN mkdir /applications
-RUN cp ./target/analysis-core-jar-with-dependencies.jar /applications/analysis-core-jar-with-dependencies.jar
+ENV ANALYSIS_CORE_VERSION=master
+RUN git clone https://github.com/reactome/analysis-core.git && \
+	cd analysis-core && git checkout $ANALYSIS_CORE_VERSION && \
+	cd /gitroot/analysis-core && \
+	mvn --no-transfer-progress clean compile package -DskipTests && \
+	mkdir -p /analysis-core && \
+	mkdir /applications && \
+	cp ./target/analysis-core-jar-with-dependencies.jar /applications/analysis-core-jar-with-dependencies.jar
 
 # Now, rebase on the Reactome Neo4j image
 FROM reactome/graphdb:$RELEASE_VERSION as analysiscorebuilder
@@ -30,8 +28,8 @@ RUN apk add curl
 COPY ./entrypoint.sh /build_analysis_core.sh
 RUN chmod a+x /build_analysis_core.sh
 COPY ./wait-for.sh /wait-for.sh
-RUN mkdir /output
-RUN /build_analysis_core.sh
+RUN mkdir /output && \
+	/build_analysis_core.sh
 # Switch to alpine and then copy over the data since we don't need anything else at this point.
 FROM alpine:3.8
 COPY --from=analysiscorebuilder /output/analysis.bin /output/analysis.bin
