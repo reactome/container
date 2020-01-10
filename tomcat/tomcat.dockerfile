@@ -30,16 +30,15 @@ COPY --from=experimentsdigester /webapps/*.war /usr/local/tomcat/webapps/
 
 # The DiagramJs and FireworksJs WAR files will have version numbers in their names, so
 # we'll just symlink them to the names that are needed.
-RUN ln -s /usr/local/tomcat/webapps/diagram*.war /usr/local/tomcat/webapps/DiagramJs.war
-RUN ln -s /usr/local/tomcat/webapps/fireworks*.war /usr/local/tomcat/webapps/FireworksJs.war
+RUN ln -s /usr/local/tomcat/webapps/diagram*.war /usr/local/tomcat/webapps/DiagramJs.war \
+  && ln -s /usr/local/tomcat/webapps/fireworks*.war /usr/local/tomcat/webapps/FireworksJs.war
 RUN ls -lht  /usr/local/tomcat/webapps/
-
+RUN mkdir -p /usr/local/interactors/tuple && mkdir -p /var/www/html/download/current/
 RUN apt-get update && apt-get install -y netcat zip && rm -rf /var/lib/apt/lists/*
-RUN mkdir -p /usr/local/interactors/tuple
-RUN mkdir -p /var/www/html/download/current/
+
 # WORKDIR /usr/local/tomcat/webapps/download/
 ADD https://reactome.org/download/current/ehlds.tgz /usr/local/tomcat/webapps/download/current/ehld.tgz
-RUN cd /usr/local/tomcat/webapps/download/current && tar -zxf ehld.tgz
+RUN cd /usr/local/tomcat/webapps/download/current && tar -zxf ehld.tgz && rm ehld.tgz
 ADD https://reactome.org/download/current/ehld/svgsummary.txt /usr/local/tomcat/webapps/download/current/ehld/svgsummary.txt
 RUN chmod a+r /usr/local/tomcat/webapps/download/current/ehld/svgsummary.txt
 # RUN mkdir -p /var/www/html/ehld-icons
@@ -77,5 +76,4 @@ RUN touch /usr/local/tomcat/webapps/WEB-INF/applicationContext.xml
 RUN zip -F ReactomeRESTfulAPI.war --out ReactomeRESTfulAPI_fixed.war && mv ReactomeRESTfulAPI_fixed.war ReactomeRESTfulAPI.war
 RUN { zip -u ReactomeRESTfulAPI.war WEB-INF/applicationContext.xml; rc=$?; echo $rc; if [ $rc -eq 12 ]; then exit 0; fi; exit $rc; }
 
-RUN mkdir -p /ContentService/custom
-RUN mkdir -p /AnalysisService/tokens
+RUN mkdir -p /ContentService/custom && mkdir -p /AnalysisService/tokens
