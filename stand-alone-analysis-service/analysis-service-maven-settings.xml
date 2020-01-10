@@ -28,13 +28,16 @@
 				<neo4j.host>localhost</neo4j.host>
 				<neo4j.port>7474</neo4j.port>
 				<neo4j.user>neo4j</neo4j.user>
-				<neo4j.password></neo4j.password>
+				<neo4j.password>neo4j-password</neo4j.password>
 
 				<diagram.json.folder>/tmp/diagrams</diagram.json.folder>
 				<ehld.folder>/tmp/ehld</ehld.folder>
 				<fireworks.json.folder>/tmp/fireworks</fireworks.json.folder>
 				<analysis.data.tmp>/tmp/analysis-data</analysis.data.tmp>
 				<svg.summary.file>/tmp/svg</svg.summary.file>
+				<cnf.startup.notification>false</cnf.startup.notification>
+				<cnf.startup.notification.from></cnf.startup.notification.from>
+				<cnf.startup.notification.to></cnf.startup.notification.to>
 
 				<report.user>report.user</report.user>
 				<report.password>report.password</report.password>
