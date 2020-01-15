@@ -23,12 +23,12 @@ ENV NEO4J_PASSWORD=$NEO4J_PASSWORD
 ENV NEO4J_AUTH $NEO4J_USER/$NEO4J_PASSWORD
 # Neo4j extension script setting
 ENV EXTENSION_SCRIPT /data/neo4j-init.sh
-RUN apk add curl
 # TODO: better name for script outside of container
 COPY ./entrypoint.sh /build_analysis_core.sh
 RUN chmod a+x /build_analysis_core.sh
 COPY ./wait-for.sh /wait-for.sh
-RUN mkdir /output && \
+RUN apt-get update && apt-get install curl -y && \
+	mkdir /output && \
 	/build_analysis_core.sh
 # Switch to alpine and then copy over the data since we don't need anything else at this point.
 FROM alpine:3.8
