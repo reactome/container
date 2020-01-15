@@ -1,4 +1,4 @@
-ARG RELEASE_VERSION=R71a
+ARG RELEASE_VERSION=R71
 FROM maven:3.6.3-jdk-8 AS builder
 
 RUN mkdir /gitroot
@@ -6,6 +6,18 @@ ENV DIAGRAM_CONVERTER_VERSION=master
 WORKDIR /gitroot/
 RUN git clone https://github.com/reactome-pwp/diagram-converter.git && \
 	cd /gitroot/diagram-converter && git checkout $DIAGRAM_CONVERTER_VERSION && \
+	cd src/main/resources && \
+	echo "log4j.logger.httpclient.wire.header=WARN" >> log4j.properties && \
+	echo "log4j.logger.httpclient.wire.content=WARN" >> log4j.properties && \
+	echo "log4j.logger.org.apache.commons.httpclient=WARN" >> log4j.properties && \
+	echo "log4j.logger.org.apache=WARN" >> log4j.properties && \
+	echo "org.neo4j=WARN" >> log4j.properties && \
+	echo "logging.level.org.neo4j.ogm.drivers.bolt.request.BoltRequest=WARN" >> log4j.properties && \
+	echo "logging.level.org.neo4j.ogm.drivers.embedded.request.EmbeddedRequest=WARN" >> log4j.properties && \
+	echo "org.springframework=WARN" >> log4j.properties && \
+	sed -i -e 's/<\/configuration>/<logger name="org.apache" level="WARN"\/><logger name="org.springframework" level="WARN"\/><logger name="org.neo4j" level="WARN"\/><logger name="httpclient" level="WARN"\/><\/configuration>/g' logback.xml && \
+	cd /gitroot/diagram-converter && \
+	sed -i -e 's/<exclude>\*\*\/logback\.xml<\/exclude>/ /g' pom.xml && \
 	mvn --no-transfer-progress clean compile package -DskipTests && ls -lht ./target && \
 	mkdir /diagram-converter && \
 	cp /gitroot/diagram-converter/target/diagram-converter-jar-with-dependencies.jar /diagram-converter/diagram-converter-jar-with-dependencies.jar

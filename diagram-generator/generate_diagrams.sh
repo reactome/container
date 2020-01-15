@@ -24,8 +24,6 @@ echo -e "\n\n" > /etc/java-8-openjdk/accessibility.properties
 echo "Running diagram generator..."
 # Run the diagram generator
 # NOTE: NEO4J_USER and NEO4J_PASSWORD are set in the dockerfile.
-# The "| grep -v DEBUG > log" is because logging config seems to produce a LOT of
-# "debug" noise. Mostly from the neo4j and spring libraries.
 cd /diagram-converter/
 java -jar /diagram-converter/diagram-converter-jar-with-dependencies.jar \
 	 -a localhost \
@@ -36,6 +34,7 @@ java -jar /diagram-converter/diagram-converter-jar-with-dependencies.jar \
 	 -f current \
 	 -g root \
 	 -h $MYSQL_ROOT_PASSWORD\
-	 -o /diagrams | grep -v DEBUG > log
+	 -o /diagrams
 echo "Diagram generation is complete!"
 ls -lht /diagrams | head
+gzip /diagram-converter/*.log
