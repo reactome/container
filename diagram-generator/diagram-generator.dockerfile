@@ -66,5 +66,6 @@ RUN mkdir -p /usr/share/man/man1 && \
 # Ok, now that diagrams are generated, maybe we should rebase on something smaller and only copy over what we need.
 FROM alpine:3.8
 COPY --from=diagrambuilder /diagrams /diagrams
-COPY --from=diagrambuilder /diagram-converter/log /diagram-converter.log
+COPY --from=diagrambuilder /diagram-converter/logs/ /diagram-converter-logs
+COPY --from=diagrambuilder /diagram-converter/reports/ /diagram-converter-reports
 RUN ls /diagrams | wc -l
