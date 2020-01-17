@@ -37,4 +37,3 @@ java -jar /diagram-converter/diagram-converter-jar-with-dependencies.jar \
 	 -o /diagrams
 echo "Diagram generation is complete!"
 ls -lht /diagrams | head
-gzip /diagram-converter/*.log
