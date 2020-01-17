@@ -31,9 +31,10 @@ COPY --from=experimentsdigester /webapps/*.war /usr/local/tomcat/webapps/
 # The DiagramJs and FireworksJs WAR files will have version numbers in their names, so
 # we'll just symlink them to the names that are needed.
 RUN ln -s /usr/local/tomcat/webapps/diagram*.war /usr/local/tomcat/webapps/DiagramJs.war \
-  && ln -s /usr/local/tomcat/webapps/fireworks*.war /usr/local/tomcat/webapps/FireworksJs.war
-RUN ls -lht  /usr/local/tomcat/webapps/
-RUN mkdir -p /usr/local/interactors/tuple && mkdir -p /var/www/html/download/current/
+  && ln -s /usr/local/tomcat/webapps/fireworks*.war /usr/local/tomcat/webapps/FireworksJs.war \
+  && mkdir -p /usr/local/interactors/tuple && mkdir -p /var/www/html/download/current/
+# RUN ls -lht  /usr/local/tomcat/webapps/
+# RUN mkdir -p /usr/local/interactors/tuple && mkdir -p /var/www/html/download/current/
 RUN apt-get update && apt-get install -y netcat zip && rm -rf /var/lib/apt/lists/*
 
 # WORKDIR /usr/local/tomcat/webapps/download/
