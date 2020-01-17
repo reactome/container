@@ -173,13 +173,13 @@ mvn install:install-file -Dfile=./lib/sbml/libsbmlj.jar -DgroupId=org.sbml -Dart
         <repository>
             <id>mvnrepository</id>
             <name>mvnrepository</name>
-            <url>http://central.maven.org/maven2/</url>
+            <url>https://central.maven.org/maven2/</url>
         </repository>
         <repository>
             <id>central</id>
             <name>Maven Repository Switchboard</name>
             <layout>default</layout>
-            <url>http://repo1.maven.org/maven2/</url>
+            <url>https://repo1.maven.org/maven2/</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
