@@ -9,6 +9,8 @@ RUN mkdir /gitroot/search-indexer
 RUN git clone https://github.com/reactome/search-indexer.git && \
 	cd /gitroot/search-indexer && \
 	git checkout $INDEXER_VERSION && \
+	sed -i -e 's/http:\/\/repo1/https:\/\/repo1/g' pom.xml && \
+	sed -i -e 's/http:\/\/repo/https:\/\/repo/g' pom.xml && \
 	mvn --no-transfer-progress clean compile package -DskipTests && ls -lht ./target && \
 	mkdir /indexer && \
 	cp /gitroot/search-indexer/target/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar && \

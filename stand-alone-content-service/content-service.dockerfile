@@ -1,4 +1,4 @@
-ARG RELEASE_VERSION=R71a
+ARG RELEASE_VERSION=R71
 FROM maven:3.6.3-jdk-8 AS builder
 RUN mkdir -p /gitroot
 WORKDIR /gitroot
@@ -24,9 +24,9 @@ RUN cd /gitroot/content-service && $MVN_CMD package -P ContentService-Local \
   && cp /gitroot/content-service/target/ContentService*.war /webapps/ContentService.war
 
 # Get graph database from existing image.
-FROM reactome/graphdb:R71a AS graphdb
+FROM reactome/graphdb:R71 AS graphdb
 # Get solr index
-FROM reactome/solr:R71a as solr
+FROM reactome/solr:R71 as solr
 # Get diagram files.
 FROM reactome/diagram-generator as diagrams
 # Get Fireworks files

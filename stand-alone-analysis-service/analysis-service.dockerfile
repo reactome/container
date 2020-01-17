@@ -22,12 +22,13 @@ RUN cd /gitroot/ && git clone https://github.com/reactome/analysis-report.git \
 	&& ${MVN_CMD} clean compile package install \
 	&& ls ./target/ \
 	&& cd /gitroot/analysis-service \
+	&& sed -i -e 's/http:\/\/repo\.maven/https:\/\/repo\.maven/g' pom.xml \
 	&& ${MVN_CMD} clean compile package -P AnalysisService-Local \
-	&& mv target/*.war /webapps/ \
+	&& ls -lht target && mv target/*.war /webapps/ \
 	&& rm -rf /mvn/alt-m2/
 
 FROM reactome/analysis-core AS analysiscorebuilder
-FROM reactome/graphdb:R71a AS graphdb
+FROM reactome/graphdb:R71 AS graphdb
 FROM reactome/fireworks-generator as fireworks
 # Ok, now re-base the image as Tomcat
 FROM tomcat:8.5.35-jre8
