@@ -32,5 +32,5 @@ time su-exec root java -jar ./Indexer-jar-with-dependencies.jar \
 echo "Tail of log output: "
 tail -n 50 /indexer/logs/*
 # clean up Neo4j stuff
-rm -rf /var/lib/neo4j && rm -rf /data && rm -rf /tmp/icon-lib && rm -rf /tmp/ehld*
+su-exec root rm -rf /var/lib/neo4j && su-exec root rm -rf /data && su-exec root rm -rf /tmp/icon-lib && su-exec root rm -rf /tmp/ehld*
 set +e
