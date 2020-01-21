@@ -3,6 +3,9 @@ PATH=$PATH:/var/lib/neo4j/bin/
 
 # Start Neo4j
 cd /var/lib/neo4j
+
+chmod a+rw -R /data/databases/reactome.graphdb
+
 bash /docker-entrypoint.sh neo4j &
 
 echo "Waiting for Neo4j..."
