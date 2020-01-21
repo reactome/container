@@ -26,15 +26,22 @@ COPY ./wait-for.sh /wait-for.sh
 RUN chmod a+x /generate_graphdb.sh && \
 	apt-get update && apt-get install gosu openjdk-8-jdk-headless openjdk-8-jre-headless netcat -y && apt-get autoremove && \
 	/generate_graphdb.sh
-
+RUN chmod a+rw -R /graphdb
 # Now re-base on neo4j
-FROM neo4j:3.5.3
+FROM neo4j:3.5.14
 ENV NEO4J_AUTH $NEO4J_USER/$NEO4J_PASSWORD
 LABEL maintainer=solomon.shorser@oicr.on.ca
 LABEL ReleaseVersion=$RELEASE_VERSION
-ENV EXTENSION_SCRIPT /data/neo4j-init.sh
 EXPOSE 7474 7473 7687
 COPY --from=relationaldb /graphdb /var/lib/neo4j/data/databases/reactome.graphdb
-RUN touch /data/neo4j-import-done.flag
+USER root
 COPY ./conf/neo4j.conf /var/lib/neo4j/conf/neo4j.conf
+RUN touch /data/neo4j-import-done.flag \
+	&& chown -R neo4j:neo4j /data/databases/reactome.graphdb \
+	&& chown neo4j:neo4j /var/lib/neo4j/conf/neo4j.conf \
+	&& chmod u+rw /var/lib/neo4j/conf/neo4j.conf \
+	&& chmod a+rw -R /data/databases/* \
+	&& chmod a+rw -R /data/*
+# USER neo4j
+ENV EXTENSION_SCRIPT /data/neo4j-init.sh
 COPY ./neo4j-init.sh /data/neo4j-init.sh

@@ -33,6 +33,7 @@ if [ -e /var/lib/neo4j/data/databases/reactome.graphdb.tgz ] ; then
     rm /var/lib/neo4j/data/databases/reactome.graphdb.tgz
     du -hscx /var/lib/neo4j/data/databases/reactome.graphdb
 else
+	chown -R neo4j:neo4j /var/lib/neo4j/data/databases/
     echo "The graphdb file reactome.graphdb.tgz was not present as \"/var/lib/neo4j/data/databases/reactome.graphdb.tgz\" - perhaps it has already been imported and the tgz has been removed."
 fi
 echo "The extension script is complete!"

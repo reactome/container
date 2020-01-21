@@ -19,5 +19,7 @@ java -jar ./GraphImporter-jar-with-dependencies.jar \
 	-p $MYSQL_ROOT_PASSWORD \
 	-n /graphdb \
 	-i
+	
+chmod a+rw -R /data/databases/reactome.graphdb
 echo "Contents of /graphdb: "
 ls -hlt /graphdb
