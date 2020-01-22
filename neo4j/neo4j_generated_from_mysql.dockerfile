@@ -34,6 +34,8 @@ LABEL maintainer=solomon.shorser@oicr.on.ca
 LABEL ReleaseVersion=$RELEASE_VERSION
 EXPOSE 7474 7473 7687
 COPY --from=relationaldb /graphdb /var/lib/neo4j/data/databases/reactome.graphdb
+# Let's keep a copy of the graph-importer's logs.
+COPY --from=relationaldb /graphdb/graph-importer-logs.tgz /graph-importer-logs.tgz
 USER root
 COPY ./conf/neo4j.conf /var/lib/neo4j/conf/neo4j.conf
 RUN touch /data/neo4j-import-done.flag \
