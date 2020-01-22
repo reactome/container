@@ -34,16 +34,18 @@ RUN mkdir -p /var/www/html/download/current/ && mkdir -p /var/www/html/Icons && 
 ADD https://reactome.org/download/current/ehlds.tgz /var/www/html/download/current/ehld.tgz
 RUN cd /var/www/html/download/current/ && tar -zxf ehld.tgz && echo "$(ls ./ehld | wc -l) items, $(du -hsxc ehld/* | tail -n 1) space used."
 ADD https://reactome.org/download/current/ehld/svgsummary.txt /var/www/html/download/current/ehld/svgsummary.txt
-RUN chmod a+r /var/www/html/download/current/ehld/svgsummary.txt
 ADD https://reactome.org/icon/icon-lib-svg.tgz /var/www/html/Icons/icon-lib-svg.tgz
-RUN cd /var/www/html/Icons/ && tar -zxf icon-lib-svg.tgz && rm icon-lib-svg.tgz
 ADD https://reactome.org/icon/icon-lib-emf.tgz /var/www/html/Icons/icon-lib-emf.tgz
-RUN cd /var/www/html/Icons/ && tar -zxf icon-lib-emf.tgz && rm icon-lib-emf.tgz
 ADD https://reactome.org/icon/icon-lib-png.tgz /var/www/html/Icons/icon-lib-png.tgz
-RUN cd /var/www/html/Icons/ && tar -zxf icon-lib-png.tgz && rm icon-lib-png.tgz
+
+RUN chmod a+r /var/www/html/download/current/ehld/svgsummary.txt \
+	&& cd /var/www/html/Icons/ && tar -zxf icon-lib-svg.tgz && rm icon-lib-svg.tgz \
+	&& cd /var/www/html/Icons/ && tar -zxf icon-lib-emf.tgz && rm icon-lib-emf.tgz \
+	&& cd /var/www/html/Icons/ && tar -zxf icon-lib-png.tgz && rm icon-lib-png.tgz
 
 WORKDIR /var/www/html
 # Set up some directories for PDF/RTF export.
 RUN mkdir -p cgi-tmp/rtf && chown www-data:www-data cgi-tmp/rtf \
 	&& mkdir -p cgi-tmp/pdf && chown www-data:www-data cgi-tmp/pdf \
 	&& chown www-data:www-data ./cgi-tmp
+RUN apt-get update && apt-get install git -y && git clone https://github.com/reactome-pwp/reacfoam.git
