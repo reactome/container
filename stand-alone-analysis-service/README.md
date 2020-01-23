@@ -1,22 +1,29 @@
 # :construction: Stand-alone Reactome Analysis service :construction:
 
-This document explains how to build and run Reactome's AnalysisService as a stand-alone service that runs in its own docker container.
+`analysis-service.dockerfile` will let you build and run a stand-alone version of Reactome's [AnalysisService](https://reactome.org/dev/analysis-service) inside a docker image.
 
-1. Clone this repository and navigate to this Directory
+AnalysisService relies on a number of other components so those docker iamges will need to be built first:
+ - [analysis-core](../analysis-core)
+ - [graphdb](../neo4j)
+ - [fireworks](../fireworks)
 
-2. Build the docker image:
+Once those images have been successfuly built, you can build the AnalysisService image like this:
+
 ```bash
-docker build -t reactome_analysis_service -f analysis-service.dockerfile .
+docker build -t reactome/stand-alone-analysis-service:R71 -f analysis-service.dockerfile .
+```
+(Replace "R71" with a tag that is reflective of the version you are working with).
+
+Run this as:
+```bash
+docker run --name reactome-analysis-service -p 8888:8080 reactome/stand-alone-analysis-service:R71
 ```
 
-3. Download the Reactome graph database and extract it to the stand-alone-analysis-service directory:
+Access in you browser: http://localhost:8888/AnalysisService - this will let you see the various services.
+
+To use from the command-line:
 ```bash
-wget https://reactome.org/download/current/reactome.graphdb.tgz
-tar -xzf reactome.graphdb.tgz
+curl -X GET "http://localhost:8888/AnalysisService/database/name" -H "accept: text/plain"
 ```
 
-4. Run the docker container which you just built. This can be done with the command:
-```bash
-docker run --name analysis-service --rm -v $(pwd)/reactome.graphdb.v66:/neo4j/neo4j-community-3.4.10/data/databases/graph.db -p 8888:8080 reactome_analysis_service
-```
-:warning: **NOTE:** You may need to change the mount for the graph database, depending on the version of the file you download (the "_v66_" in the mount: `reactome.graphdb.v66:/neo4j/neo4j-community-3.4.10/data/databases/graph.db`).
+:warning: **Attention!** :warning: This docker image of the AnalysisService is a work-in-progress. Some endpoints might not be 100% functional yet.
