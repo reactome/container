@@ -1,37 +1,35 @@
 # :construction: Stand-alone Reactome Content service :construction:
 
-This document explains how to build and run Reactome's ContentService as a stand-alone Docker image.
+`content-service.dockerfile` can be used to build a stand-alond docker image that contains everything necessary to run Reactome's [ContentService](https://reactome.org/dev/content-service).
 
-1. Clone this repository, checkout the feature/Joomla branch and `cd` to `stand-alone-content-service`.
-```bash
-git clone https://github.com/reactome/container.git
-git checkout feature/Joomla
-cd stand-alone-content-service
-```
+Because the ContentService relies on a number of other Reactome components, those will need to be built first.
 
-2. Build the docker image. This can be done with the command:
-```bash
-docker build -t reactome_content_service -f content-service.dockerfile .
-```
+The images that this image depends on are:
+ - [graphdb](../neo4j)
+ - [solr](../solr)
+ - [diagrams](../diagram-generator)
+ - [fireworks](../fireworks-generator)
 
-3. Download the Reactome graph database and extract it to the stand-alone-content-service directory:
-```bash
-wget https://reactome.org/download/current/reactome.graphdb.tgz
-tar -xzf reactome.graphdb.tgz
-```
-
-4. Run the docker container which you just built. This can be done with the command:
-```bash
-docker run --name content-service --rm -v $(pwd)/reactome.graphdb.v66:/neo4j/neo4j-community-3.4.10/data/databases/graph.db -p 8888:8080 reactome_content_service
-```
-:warning: **NOTE:** You may need to change the mount for the graph database, depending on the version of the file you download (the "_v66_" in the mount: `reactome.graphdb.v66:/neo4j/neo4j-community-3.4.10/data/databases/graph.db`).
-
-5. You should now be able to access the ContentService at [http://localhost:8888/ContentService](http://localhost:8888/ContentService). On this page you will see a listing of endpoints for the ContentService which you can test interactively
-
-If you prefer to access the ContentService from the command line, you can use the content service like this:
+Once these images have been built locally, you can build the ContentService. This is as simple as:
 
 ```bash
-wget http://localhost:8888/ContentService/exporter/event/R-HSA-5205682.sbgn > R-HSA-5205682.sbgn
+docker build -t reactome/stand-alone-content-service:R71 -f content-service.dockerfile .
 ```
 
-:warning: **Attention!** :warning: This docker image of the ContentService is a work-in-progress. Some endpoints might not be 100% functional yet. So far, only `/exporter/event/{identifier}.sbgn` and `/exporter/event/{identifier}.sbml` have been tested. Others _may_ work, but no guarantees are given at this time.
+(Replace "R71" with a tag that is reflective of the version you are working with).
+
+Run this as:
+```bash
+docker run --name reactome-content-service -p 8888:8080 reactome/stand-alone-content-service:R71
+```
+Access in you browser: http://localhost:8888/ContentService - this will let you see the various services.
+To use from the command-line:
+```bash
+curl -X GET "http://localhost:8888/ContentService/data/complex/R-HSA-5674003/subunits?excludeStructures=false" -H "accept: application/json"
+```
+For exporter endpoints the return PDF files or images, be sure to use "--output FILE" with curl. For example:
+```bash
+curl --output R-HSA-177929_event.PDF -X GET "http://localhost:8888/ContentService/exporter/document/event/R-HSA-177929.pdf?level%20%5B0%20-%201%5D=1&diagramProfile=Modern&resource=total&analysisProfile=Standard" -H "accept: application/pdf"
+```
+
+:warning: **Attention!** :warning: This docker image of the ContentService is a work-in-progress. Some endpoints might not be 100% functional yet.

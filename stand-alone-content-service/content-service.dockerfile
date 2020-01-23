@@ -13,20 +13,20 @@ RUN cd /gitroot/ && git clone https://github.com/reactome/content-service.git \
 # Build the content service
 WORKDIR /gitroot/content-service/src/main/resources
 # Set logging levels to WARN - otherwise there is a lot of noise on the console.
-RUN echo "log4j.logger.httpclient.wire.header=WARN" >> log4j.properties && echo "log4j.logger.httpclient.wire.content=WARN" >> log4j.properties && echo  "log4j.logger.org.apache.commons.httpclient=WARN" >> log4j.properties
-RUN sed -i -e 's/<\/configuration>/<logger name="org.apache" level="WARN"\/><logger name="httpclient" level="WARN"\/><\/configuration>/g' logback.xml
+RUN echo "log4j.logger.httpclient.wire.header=WARN" >> log4j.properties && echo "log4j.logger.httpclient.wire.content=WARN" >> log4j.properties && echo  "log4j.logger.org.apache.commons.httpclient=WARN" >> log4j.properties \
+	&& sed -i -e 's/<\/configuration>/<logger name="org.apache" level="WARN"\/><logger name="httpclient" level="WARN"\/><\/configuration>/g' logback.xml \
 # an empty header/footer is probably OK. The files just need to be present.
-RUN cd /gitroot/content-service/src/main/webapp/WEB-INF/pages/ && touch header.jsp && touch footer.jsp
-RUN mkdir /webapps
+	&& cd /gitroot/content-service/src/main/webapp/WEB-INF/pages/ && touch header.jsp && touch footer.jsp \
+	&& mkdir /webapps
 COPY ./content-service-maven-settings.xml /mvn-settings.xml
 ENV MVN_CMD "mvn --no-transfer-progress --global-settings  /mvn-settings.xml"
 RUN cd /gitroot/content-service && $MVN_CMD package -P ContentService-Local \
   && cp /gitroot/content-service/target/ContentService*.war /webapps/ContentService.war
 
 # Get graph database from existing image.
-FROM reactome/graphdb:R71 AS graphdb
+FROM reactome/graphdb:${RELEASE_VERSION} AS graphdb
 # Get solr index
-FROM reactome/solr:R71 as solr
+FROM reactome/solr:${RELEASE_VERSION} as solr
 # Get diagram files.
 FROM reactome/diagram-generator as diagrams
 # Get Fireworks files
@@ -72,5 +72,9 @@ COPY --from=diagrams /diagrams /usr/local/diagram/static
 COPY --from=fireworks /fireworks-json-files /usr/local/tomcat/webapps/download/current/fireworks
 RUN chmod a+x /content-service-entrypoint.sh
 CMD ["/content-service-entrypoint.sh"]
-
-# Run this as: docker run --name content-service --rm -v $(pwd)/reactome.graphdb.v66:/neo4j/neo4j-community-3.4.10/data/databases/graph.db -p 8888:8080 reactome_content_service
+# Run this as: docker run --name reactome-content-service -p 8888:8080 reactome/stand-alone-content-service:R71
+# Access in you browser: http://localhost:8888/ContentService - this will let you see the various services.
+# To use from the command-line:
+# curl -X GET "http://localhost:8888/ContentService/data/complex/R-HSA-5674003/subunits?excludeStructures=false" -H "accept: application/json"
+# For exporter endpoints the return PDF files or images, be sure to use "--output FILE" with curl. For example:
+# curl --output R-HSA-177929_event.PDF -X GET "http://localhost:8888/ContentService/exporter/document/event/R-HSA-177929.pdf?level%20%5B0%20-%201%5D=1&diagramProfile=Modern&resource=total&analysisProfile=Standard" -H "accept: application/pdf"
