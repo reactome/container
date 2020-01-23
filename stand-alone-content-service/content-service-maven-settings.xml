@@ -51,7 +51,7 @@
                 <ehld.folder>/var/www/html/download/current/ehld</ehld.folder>
                 <svg.summary.file>/var/www/html/download/current/ehld/svgsummary.txt</svg.summary.file>
                 <analysis.server>https://localhost/</analysis.server>
-                <startup.notification>true</startup.notification>
+                <startup.notification>false</startup.notification>
                 <fireworks.json.folder>/usr/local/tomcat/webapps/download/current/fireworks</fireworks.json.folder>
                 <report.user>report_user</report.user>
                 <report.password>report_user</report.password>
