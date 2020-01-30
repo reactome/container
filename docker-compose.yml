@@ -124,7 +124,6 @@ services:
       - ./joomla/configuration.php:/var/www/html/configuration.php
       - ./certificates:/certs
       - ./joomla/Secrets.pm:/var/www/html/cgi-modules/GKB/Secrets.pm
-      - ./joomla/Config.pm:/var/www/html/cgi-modules/GKB/Config.pm
       - ./joomla/cgi-modules/GKB/FrontPage3.pm:/var/www/html/cgi-modules/GKB/FrontPage3.pm
       - ./joomla/cgi-modules/GKB/Utils/InstructionLibrary.pm:/var/www/html/cgi-modules/GKB/Utils/InstructionLibrary.pm
       - ./joomla/cgi-modules/GKB/WebUtils.pm:/var/www/html/cgi-modules/GKB/WebUtils.pm

@@ -8,7 +8,7 @@ FROM reactome/diagramjs as diagramjs
 FROM reactome/fireworksjs as fireworksjs
 FROM reactome/analysis-core as analysiscore
 FROM reactome/fireworks-generator as fireworks
-FROM reactome/diagram-generator as diagramfiles
+FROM reactome/diagram-generator:latest as diagramfiles
 FROM reactome/experiments-digester as experimentsdigester
 
 # Final layer is Tomcat.
@@ -61,20 +61,19 @@ COPY ./properties/content-service.ogm.properties /usr/local/tomcat/webapps/WEB-I
 # is ok and it should NOT break the build. So if we get a 12, then exit this step with a '0'. Otherwise, return whatever other return code came back from zip.
 RUN { touch WEB-INF/classes/ogm.properties; zip -u ContentService.war WEB-INF/classes/ogm.properties; rc=$?; echo $rc; if [ $rc -eq 12 ]; then exit 0; fi; exit $rc; }
 COPY ./properties/content-service.service.properties /usr/local/tomcat/webapps/WEB-INF/classes/service.properties
-RUN { touch WEB-INF/classes/service.properties; zip -u ContentService.war WEB-INF/classes/service.properties; rc=$?; echo $rc; if [ $rc -eq 12 ]; then exit 0; fi; exit $rc; }
-
 COPY ./properties/data-content.ogm.properties /usr/local/tomcat/webapps/WEB-INF/classes/ogm.properties
-RUN { touch WEB-INF/classes/ogm.properties; zip -u content.war WEB-INF/classes/ogm.properties; rc=$?; echo $rc; if [ $rc -eq 12 ]; then exit 0; fi; exit $rc; }
 COPY ./properties/data-content.service.properties /usr/local/tomcat/webapps/WEB-INF/classes/core.properties
-RUN { touch WEB-INF/classes/core.properties; zip -u content.war WEB-INF/classes/core.properties; rc=$?; echo $rc; if [ $rc -eq 12 ]; then exit 0; fi; exit $rc; }
-
 COPY ./properties/analysis-service.service.properties /usr/local/tomcat/webapps/WEB-INF/classes/analysis.properties
+COPY ./properties/RESTfulAPI_application-context.xml /usr/local/tomcat/webapps/WEB-INF/applicationContext.xml
+
+RUN { touch WEB-INF/classes/service.properties; zip -u ContentService.war WEB-INF/classes/service.properties; rc=$?; echo $rc; if [ $rc -eq 12 ]; then exit 0; fi; exit $rc; }
+RUN { touch WEB-INF/classes/ogm.properties; zip -u content.war WEB-INF/classes/ogm.properties; rc=$?; echo $rc; if [ $rc -eq 12 ]; then exit 0; fi; exit $rc; }
+RUN { touch WEB-INF/classes/core.properties; zip -u content.war WEB-INF/classes/core.properties; rc=$?; echo $rc; if [ $rc -eq 12 ]; then exit 0; fi; exit $rc; }
 RUN { touch WEB-INF/classes/analysis.properties; zip -u AnalysisService.war WEB-INF/classes/analysis.properties; rc=$?; echo $rc; if [ $rc -eq 12 ]; then exit 0; fi; exit $rc; }
 
-COPY ./properties/RESTfulAPI_application-context.xml /usr/local/tomcat/webapps/WEB-INF/applicationContext.xml
-RUN touch /usr/local/tomcat/webapps/WEB-INF/applicationContext.xml
 # For some reason, the ReactomeRESTfulAPI WAR sometimes makes zip complain about possible file errors, so run zip -F before trying to update the files inside it.
-RUN zip -F ReactomeRESTfulAPI.war --out ReactomeRESTfulAPI_fixed.war && mv ReactomeRESTfulAPI_fixed.war ReactomeRESTfulAPI.war
+RUN touch /usr/local/tomcat/webapps/WEB-INF/applicationContext.xml && \
+	zip -F ReactomeRESTfulAPI.war --out ReactomeRESTfulAPI_fixed.war && mv ReactomeRESTfulAPI_fixed.war ReactomeRESTfulAPI.war
 RUN { zip -u ReactomeRESTfulAPI.war WEB-INF/applicationContext.xml; rc=$?; echo $rc; if [ $rc -eq 12 ]; then exit 0; fi; exit $rc; }
 
 RUN mkdir -p /ContentService/custom && mkdir -p /AnalysisService/tokens

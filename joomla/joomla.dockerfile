@@ -29,19 +29,22 @@ RUN openssl genrsa -des3 -passout pass:xxxxx -out server.pass.key 2048 && \
 	openssl x509 -req -sha256 -days 365 -in server.csr -signkey server.key -out server.crt && \
 	rm server.csr && rm server.pass.key
 
-RUN mkdir -p /var/www/html/download/current/ && mkdir -p /var/www/html/Icons && mkdir -p /var/www/html/ehld-icons && \
+RUN mkdir -p /var/www/html/download/current/ehld && mkdir -p /var/www/html/Icons && mkdir -p /var/www/html/ehld-icons && \
 	mkdir -p /var/www/html/cgi-tmp/img-fp/current/ && chmod a+rw /var/www/html/cgi-tmp/img-fp/current/
-ADD https://reactome.org/download/current/ehlds.tgz /var/www/html/download/current/ehld.tgz
-RUN cd /var/www/html/download/current/ && tar -zxf ehld.tgz && echo "$(ls ./ehld | wc -l) items, $(du -hsxc ehld/* | tail -n 1) space used."
-ADD https://reactome.org/download/current/ehld/svgsummary.txt /var/www/html/download/current/ehld/svgsummary.txt
-ADD https://reactome.org/icon/icon-lib-svg.tgz /var/www/html/Icons/icon-lib-svg.tgz
-ADD https://reactome.org/icon/icon-lib-emf.tgz /var/www/html/Icons/icon-lib-emf.tgz
-ADD https://reactome.org/icon/icon-lib-png.tgz /var/www/html/Icons/icon-lib-png.tgz
+# ADD https://reactome.org/download/current/ehlds.tgz /var/www/html/download/current/ehld.tgz
+# RUN cd /var/www/html/download/current/ && tar -zxf ehld.tgz && echo "$(ls ./ehld | wc -l) items, $(du -hsxc ehld/* | tail -n 1) space used."
+# ADD https://reactome.org/download/current/ehld/svgsummary.txt /var/www/html/download/current/ehld/svgsummary.txt
+# ADD https://reactome.org/icon/icon-lib-svg.tgz /var/www/html/Icons/icon-lib-svg.tgz
+# ADD https://reactome.org/icon/icon-lib-emf.tgz /var/www/html/Icons/icon-lib-emf.tgz
+# ADD https://reactome.org/icon/icon-lib-png.tgz /var/www/html/Icons/icon-lib-png.tgz
 
-RUN chmod a+r /var/www/html/download/current/ehld/svgsummary.txt \
-	&& cd /var/www/html/Icons/ && tar -zxf icon-lib-svg.tgz && rm icon-lib-svg.tgz \
-	&& cd /var/www/html/Icons/ && tar -zxf icon-lib-emf.tgz && rm icon-lib-emf.tgz \
-	&& cd /var/www/html/Icons/ && tar -zxf icon-lib-png.tgz && rm icon-lib-png.tgz
+RUN cd /var/www/html/download/current/ehld/ \
+	&& wget https://reactome.org/download/current/ehld/svgsummary.txt \
+	&& chmod a+r /var/www/html/download/current/ehld/svgsummary.txt \
+	&& wget https://reactome.org/download/current/ehlds.tgz && tar -zxf ehlds.tgz && echo "$(ls ./ehld | wc -l) items, $(du -hsxc ehld/* | tail -n 1) space used."\
+	&& wget https://reactome.org/icon/icon-lib-svg.tgz && tar -zxf icon-lib-svg.tgz && rm icon-lib-svg.tgz \
+	&& wget https://reactome.org/icon/icon-lib-emf.tgz && tar -zxf icon-lib-emf.tgz && rm icon-lib-emf.tgz \
+	&& wget https://reactome.org/icon/icon-lib-png.tgz && tar -zxf icon-lib-png.tgz && rm icon-lib-png.tgz
 
 WORKDIR /var/www/html
 # Set up some directories for PDF/RTF export.
