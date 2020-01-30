@@ -3,7 +3,7 @@
 # simple script to build ALL of the images necessary to run Reactome in docker containers.
 
 #TODO: get the Release version as well as Neo4j username/password from a file.
-RELEASE_VERSION=R71
+RELEASE_VERSION=Release71
 NEO4J_USER=neo4j
 NEO4J_PASSWORD=n304j
 set -e
@@ -87,7 +87,11 @@ echo "Building remaining joomla-sites image"
 docker-compose build joomla-sites
 echo "Building MySQL database for Joomla"
 docker-compose build mysql-for-joomla
+# need to set up the logs for solr (has problems if you don't make it writable on the outside, first)
+mkdir -p ./logs/solr
+chmod a+rw ./logs/solr
 echo "All done. Reactome images:"
 # Let's display what was built.
 docker images | grep "reactome/"
+echo -e "\nAll finished!\nYou can run Reactom by executing 'docker-compose up'. To shut down, run 'docker-compose down -v' (the -v cleans up shared named volumes, important if you are doing development work on a component that populates those volumes)"
 set +e
