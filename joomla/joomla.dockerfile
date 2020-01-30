@@ -10,8 +10,7 @@ RUN apt-get update && apt-get install -y netcat cpanminus wget \
 	ln -s /usr/bin/perl /usr/local/bin/perl && \
 	docker-php-ext-install mysqli
 COPY ./Website /var/www/html/
-RUN mkdir -p /var/www/html/cgi-bin/ && \
-	chmod a+x /var/www/html/cgi-bin/* && \
+RUN chmod a+x /var/www/html/cgi-bin/* && \
 	a2enmod rewrite && \
 	a2enmod ssl && \
 	a2enmod proxy && \
