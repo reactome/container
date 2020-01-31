@@ -39,7 +39,7 @@ docker build -t reactome/diagram-generator \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
 	-f content-service.dockerfile .
 
-cd $STARTING_DIR
+cd $STARTING_DIR/
 
 echo "===\nImages built: "
 # We are building 4 "reactome" images, so lets display them
