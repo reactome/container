@@ -37,7 +37,7 @@ docker build -t reactome/diagram-generator \
 	--build-arg NEO4J_USER=$NEO4J_USER \
 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
-	-f diagram-generator.dockerfile .
+	-f content-service.dockerfile .
 
 cd $STARTING_DIR
 
