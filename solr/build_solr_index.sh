@@ -1,11 +1,15 @@
 #! /bin/bash
-
+set -e
 PATH=$PATH:/var/lib/neo4j/bin/
 # env
 echo "Getting icon XML files..."
 bash /get_icon_xml_files.sh
 
-cd /tmp/ && tar -zxf ehld.tgz && echo "Files in /tmp/ehld " && ls ehld/* | wc -l
+cd /tmp/
+ls -lht
+tar -zxf ehld.tgz
+echo "Files in /tmp/ehld "
+ls ehld/* | wc -l
 
 cd /var/lib/neo4j
 bash /neo4j-entrypoint.sh neo4j &
@@ -18,7 +22,7 @@ cd /opt/docker-solr/scripts/
 # solr start
 su-exec solr solr start
 echo "Waiting for solr..."
-set -e
+
 
 bash /wait-for.sh localhost:8983 -t 90
 echo "Now building the solr index..."

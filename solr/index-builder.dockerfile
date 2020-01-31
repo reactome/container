@@ -77,8 +77,10 @@ RUN ln -s /var/lib/neo4j/conf /conf
 WORKDIR /
 
 # We'll also need EHLD files
-RUN mkdir /tmp/ehld
+# RUN mkdir /tmp/ehld
 ADD https://reactome.org/download/current/ehlds.tgz /tmp/ehld.tgz
+USER root
+RUN chmod a+rw /tmp && chmod a+rw /tmp/ehld.tgz
 # RUN cd /tmp/ && tar -zxf ehld.tgz && echo "Files in /tmp/ehld " && ls ehld/* | wc -l
 
 USER solr
