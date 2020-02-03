@@ -8,7 +8,7 @@ STARTING_DIR=$(pwd)
 set -e
 echo -e "===\nBuilding graph database...\n"
 cd $STARTING_DIR/neo4j
-docker build -t reactome/grapdb:$RELEASE_VERSION \
+docker build -t reactome/graphdb:$RELEASE_VERSION \
 	--build-arg NEO4J_USER=$NEO4J_USER \
 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
