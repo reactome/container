@@ -16,26 +16,30 @@ RUN git clone https://github.com/reactome/search-indexer.git && \
 	cp /gitroot/search-indexer/target/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar && \
 	rm -rf ~/.m2
 
-# Now, rebase on the Reactome Neo4j image
+# We'll need to get stuff from graphdb
 FROM reactome/graphdb:${RELEASE_VERSION} as graphdb
-RUN mkdir /indexer
-# bring the indexer from the prior image.
-COPY --from=builder /indexer/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
-# Now, rebase on Solr, but copy in everying else.
+# final base images is solr
 FROM solr:6.6.5-alpine
-
 USER root
-# copy neo4j
+RUN mkdir /indexer
+# bring the indexer from the "builder" image.
+COPY --from=builder /indexer/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
+COPY --from=graphdb /docker-entrypoint.sh /neo4j-entrypoint.sh
 COPY --from=graphdb /data /data
 COPY --from=graphdb /var/lib/neo4j /var/lib/neo4j
 COPY --from=graphdb /var/lib/neo4j/bin/neo4j-admin /var/lib/neo4j/bin/neo4j-admin
-
-RUN mkdir /custom-solr-conf/
+COPY --from=graphdb /var/lib/neo4j/conf/neo4j.conf /var/lib/neo4j/conf/neo4j.conf
 COPY --from=builder  /gitroot/search-indexer/solr-conf/reactome/ /custom-solr-conf/
+
+
+# copy neo4j
+
+
+
 # RUN ls -lht /custom-solr-conf/
 
 # setup for neo4j
-COPY --from=graphdb /var/lib/neo4j/conf/neo4j.conf /var/lib/neo4j/conf/neo4j.conf
+
 RUN ls -lht /var/lib/neo4j/conf/neo4j.conf
 # Args for neo4j user/password - I'm not sure if ENV variables get inherited
 # when I do "FROM ..." but this way, a user can redefine them for this
@@ -46,8 +50,7 @@ ARG NEO4J_PASSWORD=neo4j-password
 ENV NEO4J_PASSWORD=$NEO4J_PASSWORD
 ENV NEO4J_AUTH $NEO4J_USER/$NEO4J_PASSWORD
 
-COPY --from=graphdb /docker-entrypoint.sh /neo4j-entrypoint.sh
-COPY --from=graphdb /indexer/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
+
 
 # we'll need netcat so that solr can "wait-for" neo4j to start. parallel is to
 # speed up the download of Icon XML Metadata files.
