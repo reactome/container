@@ -1,4 +1,6 @@
 ARG RELEASE_VERSION=R71
+ARG NEO4J_USER=neo4j
+ARG NEO4J_PASSWORD=neo4j-password
 FROM maven:3.6.3-jdk-8 AS builder
 RUN mkdir -p /gitroot
 WORKDIR /gitroot
@@ -36,7 +38,7 @@ FROM tomcat:8.5.35-jre8
 
 ENV EXTENSION_SCRIPT=/data/neo4j-init.sh
 ENV NEO4J_EDITION=community
-ENV NEO4J_AUTH=neo4j/neo4j-password
+ENV NEO4J_AUTH=${NEO4J_USER}/${NEO4J_PASSWORD}
 RUN useradd neo4j
 RUN useradd solr
 

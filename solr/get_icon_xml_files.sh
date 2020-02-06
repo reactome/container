@@ -1,5 +1,5 @@
 #! /bin/bash
-
+set -e
 cd /tmp
 mkdir -p icon-lib && cd icon-lib
 wget -O icon-lib-svg.tgz https://reactome.org/icon/icon-lib-svg.tgz
@@ -19,3 +19,4 @@ ls *.svg | parallel "wget -O {.}.xml https://reactome.org/icon/{.}.xml 2>&1" > w
 echo "Number of *.xml files in $(pwd)"
 ls *.xml | wc -l
 cd -
+set +e
