@@ -47,7 +47,7 @@ services:
     ports:
       - 8983:8983
     volumes:
-      - ./logs/solr/:/opt/solr/server/logs/
+      - ./logs/solr/:/opt/solr/server/logs/:rw
       - ./solr/solr-security.json:/opt/solr/server/solr/security.json:rw
     entrypoint: solr start -f
 
