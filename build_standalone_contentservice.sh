@@ -23,6 +23,12 @@ docker build -t reactome/solr:$RELEASE_VERSION \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
 	-f index-builder.dockerfile .
 
+echo -e "===\nBuilding relational database...\n"
+cd $STARTING_DIR/mysql
+docker build -t reactome/reactome-mysql:$RELEASE_VERSION \
+	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
+	-f mysql.dockerfile .
+
 echo -e "===\nGenerating diagram files...\n"
 cd $STARTING_DIR/diagram-generator
 docker build -t reactome/diagram-generator \
