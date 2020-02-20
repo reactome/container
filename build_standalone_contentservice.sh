@@ -39,7 +39,7 @@ docker build -t reactome/diagram-generator \
 
 echo -e "===\nBuilding content-service image...\n"
 cd $STARTING_DIR/stand-alone-content-service
-docker build -t reactome/diagram-generator \
+docker build -t reactome/stand-alone-content-service \
 	--build-arg NEO4J_USER=$NEO4J_USER \
 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
