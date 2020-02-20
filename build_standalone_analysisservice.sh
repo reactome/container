@@ -33,7 +33,7 @@ docker build -t reactome/fireworks-generator \
 
 echo -e "===\nBuilding analysis-service image...\n"
 cd $STARTING_DIR/stand-alone-analysis-service
-docker build -t reactome/diagram-generator \
+docker build -t reactome/stand-alone-analysis-service \
 	--build-arg NEO4J_USER=$NEO4J_USER \
 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
