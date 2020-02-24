@@ -1,29 +1,36 @@
 ARG RELEASE_VERSION=R71
-ARG NEO4J_USER=neo4j
-ARG NEO4J_PASSWORD=neo4j-password
 FROM maven:3.6.3-jdk-8 AS builder
+
 RUN mkdir -p /gitroot
 WORKDIR /gitroot
 LABEL maintainer="solomon.shorser@oicr.on.ca"
 
 # Build the ContentService application
 ENV CONTENT_SERVICE_VERSION=master
-RUN cd /gitroot/ && git clone https://github.com/reactome/content-service.git \
-  && cd /gitroot/content-service \
-  && git checkout $CONTENT_SERVICE_VERSION
 
 # Build the content service
-WORKDIR /gitroot/content-service/src/main/resources
-# Set logging levels to WARN - otherwise there is a lot of noise on the console.
-RUN echo "log4j.logger.httpclient.wire.header=WARN" >> log4j.properties && echo "log4j.logger.httpclient.wire.content=WARN" >> log4j.properties && echo  "log4j.logger.org.apache.commons.httpclient=WARN" >> log4j.properties \
-	&& sed -i -e 's/<\/configuration>/<logger name="org.apache" level="WARN"\/><logger name="httpclient" level="WARN"\/><\/configuration>/g' logback.xml \
-# an empty header/footer is probably OK. The files just need to be present.
-	&& cd /gitroot/content-service/src/main/webapp/WEB-INF/pages/ && touch header.jsp && touch footer.jsp \
-	&& mkdir /webapps
 COPY ./content-service-maven-settings.xml /mvn-settings.xml
+ARG NEO4J_USER=neo4j
+ARG NEO4J_PASSWORD=neo4j-password
+ENV NEO4J_USER ${NEO4J_USER}
+ENV NEO4J_PASSWORD ${NEO4J_PASSWORD}
+ENV NEO4J_AUTH="${NEO4J_USER}/${NEO4J_PASSWORD}"
 ENV MVN_CMD "mvn --no-transfer-progress --global-settings  /mvn-settings.xml"
-RUN cd /gitroot/content-service && $MVN_CMD package -P ContentService-Local \
-  && cp /gitroot/content-service/target/ContentService*.war /webapps/ContentService.war
+RUN cd /gitroot/ && git clone https://github.com/reactome/content-service.git && \
+	cd /gitroot/content-service && \
+	git checkout $CONTENT_SERVICE_VERSION && \
+	cd /gitroot/content-service/src/main/resources && \
+# Set logging levels to WARN - otherwise there is a lot of noise on the console.
+	echo "log4j.logger.httpclient.wire.header=WARN" >> log4j.properties && echo "log4j.logger.httpclient.wire.content=WARN" >> log4j.properties && echo  "log4j.logger.org.apache.commons.httpclient=WARN" >> log4j.properties && \
+	sed -i -e 's/<\/configuration>/<logger name="org.apache" level="WARN"\/><logger name="httpclient" level="WARN"\/><\/configuration>/g' logback.xml && \
+# an empty header/footer is probably OK. The files just need to be present.
+	cd /gitroot/content-service/src/main/webapp/WEB-INF/pages/ && touch header.jsp && touch footer.jsp && \
+	mkdir /webapps && \
+	sed -i -e 's/<neo4j\.password>.*<\/neo4j\.password>/<neo4j\.password>${NEO4J_PASSWORD}<\/neo4j\.password>/g' /mvn-settings.xml && \
+	sed -i -e 's/<neo4j\.user>.*<\/neo4j\.user>/<neo4j\.user>${NEO4J_USER}<\/neo4j\.user>/g' /mvn-settings.xml && \
+# Build the applications
+	cd /gitroot/content-service && ${MVN_CMD} package -P ContentService-Local && \
+	cp /gitroot/content-service/target/ContentService*.war /webapps/ContentService.war && rm -rf ~/.m2
 
 # Get graph database from existing image.
 FROM reactome/graphdb:${RELEASE_VERSION} AS graphdb
@@ -38,7 +45,7 @@ FROM tomcat:8.5.35-jre8
 
 ENV EXTENSION_SCRIPT=/data/neo4j-init.sh
 ENV NEO4J_EDITION=community
-ENV NEO4J_AUTH=${NEO4J_USER}/${NEO4J_PASSWORD}
+
 RUN useradd neo4j
 RUN useradd solr
 
@@ -48,12 +55,16 @@ EXPOSE 8080
 RUN mkdir -p /usr/local/diagram/static && \
 	mkdir -p /usr/local/diagram/exporter && \
 	mkdir -p /var/www/html/download/current/ehld && \
-	mkdir -p /usr/local/interactors/tuple
-RUN apt-get update && apt-get install netcat gosu procps -y && apt-get autoremove && ln -s  $(which gosu) /bin/su-exec
+	mkdir -p /usr/local/interactors/tuple && \
+	apt-get update && apt-get install netcat gosu procps -y && apt-get autoremove && ln -s  $(which gosu) /bin/su-exec
 # load and set entrypoint
 COPY ./wait-for.sh /wait-for.sh
 COPY ./entrypoint.sh /content-service-entrypoint.sh
-
+ARG NEO4J_USER=neo4j
+ARG NEO4J_PASSWORD=neo4j-password
+ENV NEO4J_USER ${NEO4J_USER}
+ENV NEO4J_PASSWORD ${NEO4J_PASSWORD}
+ENV NEO4J_AUTH="${NEO4J_USER}/${NEO4J_PASSWORD}"
 # Copy the web applications created in the builder stage.
 COPY --from=builder /webapps/ /usr/local/tomcat/webapps/
 # Copy graph database
@@ -74,6 +85,7 @@ COPY --from=diagrams /diagrams /usr/local/diagram/static
 COPY --from=fireworks /fireworks-json-files /usr/local/tomcat/webapps/download/current/fireworks
 RUN chmod a+x /content-service-entrypoint.sh
 CMD ["/content-service-entrypoint.sh"]
+
 # Run this as: docker run --name reactome-content-service -p 8888:8080 reactome/stand-alone-content-service:R71
 # Access in you browser: http://localhost:8888/ContentService - this will let you see the various services.
 # To use from the command-line:
