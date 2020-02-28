@@ -67,4 +67,4 @@ COPY ./wait-for.sh /wait-for.sh
 
 CMD ["/analysis-service-entrypoint.sh"]
 RUN apt-get update && apt-get install netcat gosu procps -y && apt-get autoremove && ln -s  $(which gosu) /bin/su-exec
-# Run this as: docker run --name analysis-service --rm -v $(pwd)/reactome.graphdb.v66:/neo4j/neo4j-community-3.4.10/data/databases/graph.db -p 8888:8080 reactome_analysis_service
+# Run this as: docker run --name reactome-analysis-service -p 8080:8080 reactome/stand-alone-analysis-service:Release71
