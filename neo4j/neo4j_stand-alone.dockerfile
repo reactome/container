@@ -22,7 +22,7 @@
 # The Neo4j web interface will be available at http://localhost:7474
 FROM neo4j:3.5.14
 # RELEASE_VERSION should be given when building the image.
-ARG RELEASE_VERSION=R71
+ARG RELEASE_VERSION=Release72
 # If you want to override user/password at RUN time, do it as 'docker run -e NEO4J_AUTH="neo4j/PASSWORD" ... reactome/graphdb'
 ARG NEO4J_USER=neo4j
 ARG NEO4J_PASSWORD=neo4j-password
