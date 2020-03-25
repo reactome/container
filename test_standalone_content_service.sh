@@ -60,14 +60,14 @@ check_vals ContentService/data/eventsHierarchy/9606 'Human event hierarchy'
 # check_vals 'ContentService/exporter/diagram/R-HSA-177929.svg?quality=5&flgInteractors=true&title=true&margin=15&ehld=true&diagramProfile=Modern&resource=total&analysisProfile=Standard' "SVG_Export"
 # It seems like for SBGN, the order of output elements might also be non-deterministic, so I guess only SBML is going to be easy to test...
 
-#   echo -e "\nChecking SBML export"
-# check_vals 'ContentService/exporter/event/R-HSA-5205682.sbml' 'SBML_Export'
-#
-# echo -e "\nChecking interactors - psiquic summary"
-# check_vals 'ContentService/interactors/psicquic/molecule/MINT/Q13501/summary' 'Interactors_psiquic_summary'
-#
-# echo -e "\nChecking interactors - list of psiquic resources"
-# check_vals 'ContentService/interactors/psicquic/resources' 'Interactors_psiquic_resources'
+echo -e "\nChecking SBML export"
+check_vals 'ContentService/exporter/event/R-HSA-5205682.sbml' 'SBML_Export'
+
+echo -e "\nChecking interactors - psiquic summary"
+check_vals 'ContentService/interactors/psicquic/molecule/MINT/Q13501/summary' 'Interactors_psiquic_summary'
+
+echo -e "\nChecking interactors - list of psiquic resources"
+check_vals 'ContentService/interactors/psicquic/resources' 'Interactors_psiquic_resources'
 
 echo -e "\nChecking interactors - pathays with molecule"
 check_vals 'ContentService/interactors/static/molecule/Q9BXM7-1/pathways' 'Interactors_molecule_pathways'
@@ -80,3 +80,30 @@ check_vals 'ContentService/data/orthology/R-HSA-6799198/species/49633' 'ortholog
 
 echo -e "\nChecking participants"
 check_vals 'ContentService/data/participants/5205685' 'participants'
+
+echo -e "\nChecking events contained in pathways"
+check_vals 'ContentService/data/pathway/R-HSA-5673001/containedEvents' 'events_contained_in_pathways'
+
+echo -e "\nCheck top level pathways in species"
+check_vals 'ContentService/data/pathways/top/Gallus%2Bgallus' 'top_level_pathways_for_species_ggallus'
+
+echo -e "\nCheck person endpoint - search by name"
+check_vals 'ContentService/data/people/name/Steve%20Jupe' 'lookup_steve_jupe'
+
+echo -e "\nCheck person endpoint - pathways authoured by Person"
+check_vals 'ContentService/data/person/391309/authoredPathways' 'authoured_pathways'
+
+echo -e "\nCheck enhanced query"
+check_vals 'ContentService/data/query/enhanced/R-HSA-60140' 'query'
+
+echo -e "\nCheck cross-references lookup"
+check_vals 'ContentService/references/mapping/15377' 'cross-references'
+
+echo -e "\nCheck number of entries for a schema type (Pathway)"
+check_vals 'ContentService/data/schema/Pathway/count' 'schema_count'
+
+echo -e "\nCheck Solr"
+check_vals 'ContentService/search/facet_query?query=TP53' 'solr_facet_search'
+
+echo -e "\nCheck species list"
+check_vals 'ContentService/data/species/all' 'species_list'
