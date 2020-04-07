@@ -1,7 +1,13 @@
 #! /bin/bash
 
+# Before running this test script, start the stand-alone AnalysisService:
+# docker run --rm -p 8080:8080 reactome/stand-alone-analysis-service
+
+# Getting the path to `time` ensures that we don't use the built-in *shell* command with the same name.
+# This "other" time command allows some better formatting options for output.
 PATH_TO_TIMECMD=$(which time)
 
+# Checks valus via GET
 function check_vals()
 {
   ENDPOINT=$1
@@ -16,6 +22,7 @@ function check_vals()
 
   LOCAL_VAL=""
   REMOTE_VAL=""
+  # process the returned value with jq if a jq filter was given.
   if [ ! -z "$JQ_FILTER" ] ; then
     LOCAL_VAL=$(cat /tmp/LOCALOUT | jq -S "$JQ_FILTER")
     REMOTE_VAL=$(cat /tmp/REMOTEOUT | jq -S "$JQ_FILTER")
@@ -23,7 +30,7 @@ function check_vals()
     LOCAL_VAL=$(cat /tmp/LOCALOUT)
     REMOTE_VAL=$(cat /tmp/REMOTEOUT)
   fi
-
+  # If values don't match, write them to temp files, then output the diff.
   if [ "$LOCAL_VAL" != "$REMOTE_VAL" ] ; then
     echo "$VAL_NAME don't match!"
     echo $LOCAL_VAL > /tmp/${VAL_NAME}_L
@@ -34,6 +41,7 @@ function check_vals()
   fi
 }
 
+# Checks values via POST
 check_vals_post()
 {
   ENDPOINT=$1
@@ -42,7 +50,6 @@ check_vals_post()
   JQ_FILTER=$4
 
   echo "Checking remote..."
-  # Use jq to remove the token element - it will always cause a comparison to fail, since each server will generate a different token.
   $PATH_TO_TIMECMD -f %E curl -X POST --output /tmp/REMOTEOUT -H "Accept: application/json" -H "content-type: text/plain" -d "$POSTDATA" -s "https://reactome.org/$ENDPOINT"
   echo "checking local..."
   $PATH_TO_TIMECMD -f %E curl -X POST --output /tmp/LOCALOUT -H "Accept: application/json" -H "content-type: text/plain" -d "$POSTDATA" -s "http://localhost:8080/$ENDPOINT"
@@ -56,9 +63,9 @@ check_vals_post()
     REMOTE_VAL=$(cat /tmp/REMOTEOUT )
   fi
 
-
   if [ "$LOCAL_VAL" != "$REMOTE_VAL" ] ; then
     echo "$VAL_NAME don't match!"
+    # "jq '.'" ensures that JSON gets pretty-formatted before it's output to file. Makes debugging easier."
     echo $LOCAL_VAL | jq '.' > /tmp/${VAL_NAME}_L
     echo $REMOTE_VAL | jq '.' > /tmp/${VAL_NAME}_R
     diff /tmp/${VAL_NAME}_L /tmp/${VAL_NAME}_R
@@ -66,7 +73,6 @@ check_vals_post()
     echo -e "$VAL_NAME test passed.\n"
   fi
 }
-
 
 echo -e "\nChecking names..."
 check_vals AnalysisService/database/name 'Names'

@@ -1,7 +1,12 @@
 #! /bin/bash
 
+# Before running this test script, start the stand-alone ContentService:
+# docker run --rm -p 8080:8080 reactome/stand-alone-content-service
+
+# get path to shell-independent "time" command. Many shells define a "time" keyword which is not what we want here.
 PATH_TO_TIMECMD=$(which time)
 
+# Check values at local and remote ContentService
 function check_vals()
 {
   ENDPOINT=$1
@@ -11,7 +16,7 @@ function check_vals()
   $PATH_TO_TIMECMD -f %E curl --output /tmp/REMOTEOUT -s "https://reactome.org/$ENDPOINT" && REMOTE_VAL=$(cat /tmp/REMOTEOUT)
   echo "checking local..."
   $PATH_TO_TIMECMD -f %E curl --output /tmp/LOCALOUT -s "http://localhost:8080/$ENDPOINT" && LOCAL_VAL=$(cat /tmp/LOCALOUT)
-
+  # If values from the different servers don't match, output the diff to the console.
   if [ "$LOCAL_VAL" != "$REMOTE_VAL" ] ; then
     echo "$VAL_NAME don't match!"
     echo $LOCAL_VAL > /tmp/${VAL_NAME}_L
