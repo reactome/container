@@ -33,9 +33,15 @@ function check_vals()
   # If values don't match, write them to temp files, then output the diff.
   if [ "$LOCAL_VAL" != "$REMOTE_VAL" ] ; then
     echo "$VAL_NAME don't match!"
-    echo $LOCAL_VAL > /tmp/${VAL_NAME}_L
-    echo $REMOTE_VAL > /tmp/${VAL_NAME}_R
-    diff /tmp/LOCALOUT /tmp/REMOTEOUT
+
+    if [ ! -z "$JQ_FILTER" ] ; then
+      echo $LOCAL_VAL | jq '.' > /tmp/${VAL_NAME}_L
+      echo $REMOTE_VAL | jq '.' > /tmp/${VAL_NAME}_R
+    else
+      echo $LOCAL_VAL > /tmp/${VAL_NAME}_L
+      echo $REMOTE_VAL > /tmp/${VAL_NAME}_R
+    fi
+    diff  /tmp/${VAL_NAME}_L /tmp/${VAL_NAME}_R
   else
     echo -e "$VAL_NAME test passed.\n"
   fi
@@ -93,4 +99,4 @@ echo -e "\nCheck identifier mappings projection"
 check_vals_post 'AnalysisService/mapping/projection?interactors=true' 'IdentifierMappingProjection' 'TGFBR2, 15611' '.'
 
 echo -e "\nCheck species comparison"
-check_vals 'AnalysisService/species/homoSapiens/49646?pageSize=20&page=1&sortBy=ENTITIES_PVALUE&order=ASC&resource=TOTAL&pValue=1' 'SpeciesComparison' 'del( .summary.token )'
+check_vals 'AnalysisService/species/homoSapiens/49646?pageSize=20&page=1&sortBy=ENTITIES_PVALUE&order=ASC&resource=TOTAL&pValue=1&includeDisease=true' 'SpeciesComparison' 'del( .summary.token )'
