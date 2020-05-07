@@ -20,6 +20,10 @@ RUN git clone https://github.com/reactome-pwp/browser.git \
   && cd /gitroot/browser \
   && git checkout $PATHWAY_BROWSER_VERSION \
   && cd /gitroot/browser \
+	&& sed -i 's/\(DownloadsTab\.Display downloads = new\)/\/\/ \1/g' ./src/main/java/org/reactome/web/pwp/client/AppController.java \
+	&& sed -i 's/\(new DownloadsTabPresenter(this\.eventBus, downloads);\)/\/\/ \1/g' ./src/main/java/org/reactome/web/pwp/client/AppController.java \
+	&& sed -i 's/\(DETAILS_TABS\.add(downloads);\)/\/\/ \1/g' ./src/main/java/org/reactome/web/pwp/client/AppController.java \
+	# && grep -A 40 'private void initialiseDetailsTabsList\(\)' ./src/main/java/org/reactome/web/pwp/client/AppController.java \
 	# && mv /tmp/PwB-web.xml ./src/main/webapp/WEB-INF/web.xml \
   && $MVN_CMD gwt:import-sources compile package \
   && mv /gitroot/browser/target/PathwayBrowser*.war /webapps/PathwayBrowser.war
