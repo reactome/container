@@ -1,5 +1,6 @@
-ARG RELEASE_VERSION=R71
+ARG RELEASE_VERSION=Release72
 FROM maven:3.6.3-jdk-8 AS builder
+# JDK 11 complains about missing package javax.annotation
 ENV PATHWAY_BROWSER_VERSION=master
 RUN mkdir -p /gitroot && \
 	mkdir -p /webapps
@@ -37,7 +38,7 @@ FROM reactome/analysis-core AS analysiscorebuilder
 FROM reactome/graphdb:${RELEASE_VERSION} AS graphdb
 FROM reactome/fireworks-generator as fireworks
 # Ok, now re-base the image as Tomcat
-FROM tomcat:8.5.35-jre8
+FROM tomcat:9.0.35-jdk11-openjdk
 ENV EXTENSION_SCRIPT=/data/neo4j-init.sh
 ENV NEO4J_EDITION=community
 ARG NEO4J_USER=neo4j

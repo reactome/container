@@ -1,5 +1,5 @@
-ARG RELEASE_VERSION=R71
-FROM maven:3.6.3-jdk-8 AS builder
+ARG RELEASE_VERSION=Release72
+FROM maven:3.6.3-jdk-11 AS builder
 ENV PATHWAY_BROWSER_VERSION=master
 RUN mkdir -p /gitroot
 WORKDIR /gitroot
