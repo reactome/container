@@ -1,5 +1,9 @@
-ARG RELEASE_VERSION=R71
+ARG RELEASE_VERSION=Release72
 FROM maven:3.6.3-jdk-8 AS builder
+# Cannot build content-service with Java 11, maven error is:
+#    [ERROR] Failed to execute goal on project content-service:
+#    Could not resolve dependencies for project org.reactome.server.service:content-service:war:2.0.0:
+#    Could not find artifact jdk.tools:jdk.tools:jar:1.6 at specified path /usr/local/openjdk-11/../lib/tools.jar -> [Help 1]
 
 RUN mkdir -p /gitroot
 WORKDIR /gitroot
@@ -41,7 +45,7 @@ FROM reactome/diagram-generator as diagrams
 # Get Fireworks files
 FROM reactome/fireworks-generator as fireworks
 # Final re-base will be Tomcat
-FROM tomcat:8.5.35-jre8
+FROM tomcat:9.0.35-jdk8-openjdk
 
 ENV EXTENSION_SCRIPT=/data/neo4j-init.sh
 ENV NEO4J_EDITION=community
@@ -78,6 +82,7 @@ COPY --from=graphdb /docker-entrypoint.sh /neo4j-entrypoint.sh
 COPY --from=graphdb /data /var/lib/neo4j/data
 COPY --from=solr /opt/docker-solr /opt/docker-solr
 COPY --from=solr /opt/mysolrhome /opt/mysolrhome
+# The version of solr we're using (6.6.5) does not work with Java 11
 COPY --from=solr /opt/solr /opt/solr
 COPY --from=solr /custom-solr-conf /custom-solr-conf
 COPY --from=solr /docker-entrypoint-initdb.d /docker-entrypoint-initdb.d

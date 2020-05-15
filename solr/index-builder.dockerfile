@@ -1,6 +1,6 @@
-ARG RELEASE_VERSION=R71
+ARG RELEASE_VERSION=Release72
 FROM maven:3.6.3-jdk-8 AS builder
-
+# problems building with Java 11: missing XML classes: JAXBException, etc..., also: javax.xml.bind.annotation package does not exist.
 RUN mkdir /gitroot
 # The commit ID for the "speed-up" version of search-indexer. Runs faster than normal, by using multiple threads.
 ENV INDEXER_VERSION=4184c653e4fa1a2fe350f2ff238183956a22ab75

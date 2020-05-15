@@ -1,6 +1,7 @@
 ARG RELEASE_VERSION=R71
 FROM maven:3.6.3-jdk-8 AS builder
-
+# Java 11 causes issues with building diagram-converter: missing package javax.xml.bind.annotation
+# Also, missing classes such as XmlType, JAXBException...
 RUN mkdir /gitroot
 ENV DIAGRAM_CONVERTER_VERSION=master
 WORKDIR /gitroot/
