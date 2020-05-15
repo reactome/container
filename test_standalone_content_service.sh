@@ -11,11 +11,24 @@ function check_vals()
 {
   ENDPOINT=$1
   VAL_NAME=$2
+  JQ_FILTER=$3
 
   echo "Checking remote..."
-  $PATH_TO_TIMECMD -f %E curl --output /tmp/REMOTEOUT -s "https://reactome.org/$ENDPOINT" && REMOTE_VAL=$(cat /tmp/REMOTEOUT)
+  $PATH_TO_TIMECMD -f %E curl --output /tmp/REMOTEOUT -s "https://reactome.org/$ENDPOINT"
   echo "checking local..."
-  $PATH_TO_TIMECMD -f %E curl --output /tmp/LOCALOUT -s "http://localhost:8080/$ENDPOINT" && LOCAL_VAL=$(cat /tmp/LOCALOUT)
+  $PATH_TO_TIMECMD -f %E curl --output /tmp/LOCALOUT -s "http://localhost:8080/$ENDPOINT"
+
+  LOCAL_VAL=""
+  REMOTE_VAL=""
+  # process the returned value with jq if a jq filter was given.
+  if [ ! -z "$JQ_FILTER" ] ; then
+    LOCAL_VAL=$(cat /tmp/LOCALOUT | jq -S "$JQ_FILTER")
+    REMOTE_VAL=$(cat /tmp/REMOTEOUT | jq -S "$JQ_FILTER")
+  else
+    LOCAL_VAL=$(cat /tmp/LOCALOUT)
+    REMOTE_VAL=$(cat /tmp/REMOTEOUT)
+  fi
+
   # If values from the different servers don't match, output the diff to the console.
   if [ "$LOCAL_VAL" != "$REMOTE_VAL" ] ; then
     echo "$VAL_NAME don't match!"
@@ -34,25 +47,25 @@ echo -e "\nChecking versions..."
 check_vals ContentService/data/database/version 'Version'
 
 echo -e "\nChecking \"discover\"..."
-check_vals ContentService/data/discover/R-HSA-446203 'Discovery'
+check_vals ContentService/data/discover/R-HSA-446203 'Discovery' '.'
 
 echo -e "\nChecking \"discover\"..."
-check_vals ContentService/data/discover/R-HSA-446203 'Discovery'
+check_vals ContentService/data/discover/R-HSA-446203 'Discovery' '.'
 
 echo -e "\nChecking diseases..."
-check_vals ContentService/data/diseases 'Diseases'
+check_vals ContentService/data/diseases 'Diseases' '.'
 
 echo -e "\nChecking disease DOIDs..."
-check_vals ContentService/data/diseases/doid 'Disease DOIDs'
+check_vals ContentService/data/diseases/doid 'Disease DOIDs' 
 
 echo -e "\nChecking complex (subunits)"
-check_vals ContentService/data/complex/R-HSA-5674003/subunits?excludeStructures=false 'Complex (subunits)'
+check_vals ContentService/data/complex/R-HSA-5674003/subunits?excludeStructures=false 'Complex (subunits)' '.'
 
 echo -e "\nChecking entity; componentOf"
-check_vals ContentService/data/entity/R-HSA-199420/componentOf 'Entity - componentOf'
+check_vals ContentService/data/entity/R-HSA-199420/componentOf 'Entity - componentOf' '.'
 
 echo -e "\nChecking event hierarchy (Human)"
-check_vals ContentService/data/eventsHierarchy/9606 'Human event hierarchy'
+check_vals ContentService/data/eventsHierarchy/9606 'Human event hierarchy' '.'
 
 # PDF diffs cause problems
 # echo -e "\nChecking PDF export"
@@ -87,22 +100,22 @@ echo -e "\nChecking participants"
 check_vals 'ContentService/data/participants/5205685' 'participants'
 
 echo -e "\nChecking events contained in pathways"
-check_vals 'ContentService/data/pathway/R-HSA-5673001/containedEvents' 'events_contained_in_pathways'
+check_vals 'ContentService/data/pathway/R-HSA-5673001/containedEvents' 'events_contained_in_pathways' '.'
 
 echo -e "\nCheck top level pathways in species"
-check_vals 'ContentService/data/pathways/top/Gallus%2Bgallus' 'top_level_pathways_for_species_ggallus'
+check_vals 'ContentService/data/pathways/top/Gallus%2Bgallus' 'top_level_pathways_for_species_ggallus' '.'
 
 echo -e "\nCheck person endpoint - search by name"
-check_vals 'ContentService/data/people/name/Steve%20Jupe' 'lookup_steve_jupe'
+check_vals 'ContentService/data/people/name/Steve%20Jupe' 'lookup_steve_jupe' '.'
 
 echo -e "\nCheck person endpoint - pathways authoured by Person"
-check_vals 'ContentService/data/person/391309/authoredPathways' 'authoured_pathways'
+check_vals 'ContentService/data/person/391309/authoredPathways' 'authoured_pathways' '.'
 
 echo -e "\nCheck enhanced query"
-check_vals 'ContentService/data/query/enhanced/R-HSA-60140' 'query'
+check_vals 'ContentService/data/query/enhanced/R-HSA-60140' 'query'  '.'
 
 echo -e "\nCheck cross-references lookup"
-check_vals 'ContentService/references/mapping/15377' 'cross-references'
+check_vals 'ContentService/references/mapping/15377' 'cross-references' '.'
 
 echo -e "\nCheck number of entries for a schema type (Pathway)"
 check_vals 'ContentService/data/schema/Pathway/count' 'schema_count'
@@ -111,4 +124,4 @@ echo -e "\nCheck Solr"
 check_vals 'ContentService/search/facet_query?query=TP53' 'solr_facet_search'
 
 echo -e "\nCheck species list"
-check_vals 'ContentService/data/species/all' 'species_list'
+check_vals 'ContentService/data/species/all' 'species_list' '.'
