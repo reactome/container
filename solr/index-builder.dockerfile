@@ -1,5 +1,5 @@
 ARG RELEASE_VERSION=Release72
-FROM maven:3.6.3-jdk-8 AS builder
+FROM maven:3.6.3-jdk-11 AS builder
 # problems building with Java 11: missing XML classes: JAXBException, etc..., also: javax.xml.bind.annotation package does not exist.
 RUN mkdir /gitroot
 # The commit ID for the "speed-up" version of search-indexer. Runs faster than normal, by using multiple threads.
@@ -12,6 +12,11 @@ RUN git clone https://github.com/reactome/search-indexer.git && \
 	sed -i -e 's/http:\/\/repo1/https:\/\/repo1/g' pom.xml && \
 	sed -i -e 's/http:\/\/repo/https:\/\/repo/g' pom.xml && \
 	sed -i 's/<dependencies>/<dependencies>\n<dependency>\n<groupId>javax.annotation<\/groupId><artifactId>javax.annotation-api<\/artifactId><version>1.3.1<\/version><\/dependency>/g' pom.xml && \
+	sed -i 's/<dependencies>/<dependencies>\n<dependency>\n<groupId>javax.xml.bind<\/groupId><artifactId>jaxb-api<\/artifactId><version>2.3.1<\/version><\/dependency>/g' pom.xml && \
+	# sed -i 's/<jdk\.version>1\.8<\/jdk\.version>/<jdk.version>11<\/jdk.version>/g' pom.xml && \
+	# sed -i 's/<maven\.compiler\.version>.*<\/maven\.compiler\.version>/<maven.compiler.version>3.8.1<\/maven.compiler.version>/g' pom.xml && \
+	# sed -i 's/<source>\$\{jdk\.version\}<\/source>/<release>11<\/release>/g' pom.xml && \
+	# sed -i 's/<target>\$\{jdk\.version\}<\/target>//g' pom.xml && \
 	mvn --no-transfer-progress clean compile package -DskipTests && ls -lht ./target && \
 	mkdir /indexer && \
 	cp /gitroot/search-indexer/target/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar && \
@@ -20,7 +25,11 @@ RUN git clone https://github.com/reactome/search-indexer.git && \
 # We'll need to get stuff from graphdb
 FROM reactome/graphdb:${RELEASE_VERSION} as graphdb
 # final base images is solr
-FROM solr:6.6.5-alpine
+# This is the last alpine-based version of solr. It still uses JDK 8.
+# Testing with solr 8.x will test Java 11 compatibility, but running Neo4j as well
+# as working with other non-solr users has been difficult in solr 8.x docker images
+# so testing with 7.6 (it's still an upgrade from 6).
+FROM solr:7.6.0	-alpine
 USER root
 RUN mkdir /indexer
 # bring the indexer from the "builder" image.
@@ -32,15 +41,7 @@ COPY --from=graphdb /var/lib/neo4j/bin/neo4j-admin /var/lib/neo4j/bin/neo4j-admi
 COPY --from=graphdb /var/lib/neo4j/conf/neo4j.conf /var/lib/neo4j/conf/neo4j.conf
 COPY --from=builder  /gitroot/search-indexer/solr-conf/reactome/ /custom-solr-conf/
 
-
-# copy neo4j
-
-
-
-# RUN ls -lht /custom-solr-conf/
-
 # setup for neo4j
-
 RUN ls -lht /var/lib/neo4j/conf/neo4j.conf
 # Args for neo4j user/password - I'm not sure if ENV variables get inherited
 # when I do "FROM ..." but this way, a user can redefine them for this
@@ -50,8 +51,6 @@ ENV NEO4J_USER=$NEO4J_USER
 ARG NEO4J_PASSWORD=neo4j-password
 ENV NEO4J_PASSWORD=$NEO4J_PASSWORD
 ENV NEO4J_AUTH $NEO4J_USER/$NEO4J_PASSWORD
-
-
 
 # we'll need netcat so that solr can "wait-for" neo4j to start. parallel is to
 # speed up the download of Icon XML Metadata files.
@@ -81,11 +80,9 @@ RUN ln -s /var/lib/neo4j/conf /conf
 WORKDIR /
 
 # We'll also need EHLD files
-# RUN mkdir /tmp/ehld
 ADD https://reactome.org/download/current/ehlds.tgz /tmp/ehld.tgz
 USER root
 RUN chmod a+rw /tmp && chmod a+rw /tmp/ehld.tgz
-# RUN cd /tmp/ && tar -zxf ehld.tgz && echo "Files in /tmp/ehld " && ls ehld/* | wc -l
 
 USER solr
 # Create a new core.
