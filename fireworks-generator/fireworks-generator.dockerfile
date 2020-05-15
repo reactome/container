@@ -1,6 +1,6 @@
 ARG RELEASE_VERSION=R71
 
-FROM maven:3.6.3-jdk-8 AS builder
+FROM maven:3.6.3-jdk-11 AS builder
 # Issues with Java 11: cannot find javax.annotation
 RUN mkdir /gitroot
 ENV FIREWORKS_SRC_VERSION=master
