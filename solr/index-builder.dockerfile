@@ -11,6 +11,7 @@ RUN git clone https://github.com/reactome/search-indexer.git && \
 	git checkout $INDEXER_VERSION && \
 	sed -i -e 's/http:\/\/repo1/https:\/\/repo1/g' pom.xml && \
 	sed -i -e 's/http:\/\/repo/https:\/\/repo/g' pom.xml && \
+	sed -i 's/<dependencies>/<dependencies>\n<dependency>\n<groupId>javax.annotation<\/groupId><artifactId>javax.annotation-api<\/artifactId><version>1.3.1<\/version><\/dependency>/g' pom.xml && \
 	mvn --no-transfer-progress clean compile package -DskipTests && ls -lht ./target && \
 	mkdir /indexer && \
 	cp /gitroot/search-indexer/target/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar && \

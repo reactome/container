@@ -9,6 +9,8 @@ WORKDIR /gitroot/
 RUN git clone https://github.com/reactome-pwp/fireworks-layout.git
 WORKDIR /gitroot/fireworks-layout
 RUN git checkout $FIREWORKS_SRC_VERSION
+# Include javax.annotation-api for Java 11
+RUN sed -i 's/<dependencies>/<dependencies>\n<dependency>\n<groupId>javax.annotation<\/groupId><artifactId>javax.annotation-api<\/artifactId><version>1.3.1<\/version><\/dependency>/g' pom.xml
 RUN mvn --no-transfer-progress clean compile package -DskipTests && ls -lht ./target
 
 # Now, rebase on the Reactome Neo4j image

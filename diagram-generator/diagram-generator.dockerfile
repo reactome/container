@@ -19,6 +19,7 @@ RUN git clone https://github.com/reactome-pwp/diagram-converter.git && \
 	sed -i -e 's/<\/configuration>/<logger name="org.apache" level="WARN"\/><logger name="org.springframework" level="WARN"\/><logger name="org.neo4j" level="WARN"\/><logger name="httpclient" level="WARN"\/><\/configuration>/g' logback.xml && \
 	cd /gitroot/diagram-converter && \
 	sed -i -e 's/<exclude>\*\*\/logback\.xml<\/exclude>/ /g' pom.xml && \
+	sed -i 's/<dependencies>/<dependencies>\n<dependency>\n<groupId>javax.annotation<\/groupId><artifactId>javax.annotation-api<\/artifactId><version>1.3.1<\/version><\/dependency>/g' pom.xml && \
 	mvn --no-transfer-progress clean compile package -DskipTests && ls -lht ./target && \
 	mkdir /diagram-converter && \
 	cp /gitroot/diagram-converter/target/diagram-converter-jar-with-dependencies.jar /diagram-converter/diagram-converter-jar-with-dependencies.jar
