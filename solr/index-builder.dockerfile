@@ -29,7 +29,7 @@ FROM reactome/graphdb:${RELEASE_VERSION} as graphdb
 # Testing with solr 8.x will test Java 11 compatibility, but running Neo4j as well
 # as working with other non-solr users has been difficult in solr 8.x docker images
 # so testing with 7.6 (it's still an upgrade from 6).
-FROM solr:7.6.0	-alpine
+FROM solr:7.6.0-alpine
 USER root
 RUN mkdir /indexer
 # bring the indexer from the "builder" image.
