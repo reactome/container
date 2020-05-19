@@ -27,6 +27,9 @@ echo "Waiting for solr..."
 bash /wait-for.sh localhost:8983 -t 90
 echo "Now building the solr index..."
 cd /indexer
+
+java -version
+
 # run the indexer.
 time su-exec root java -jar ./Indexer-jar-with-dependencies.jar \
   -a localhost -b 7474 -c $NEO4J_USER -d $NEO4J_PASSWORD \
