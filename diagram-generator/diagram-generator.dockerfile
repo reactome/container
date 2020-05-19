@@ -1,5 +1,5 @@
 ARG RELEASE_VERSION=R71
-FROM maven:3.6.3-jdk-8 AS builder
+FROM maven:3.6.3-jdk-11 AS builder
 # Java 11 causes issues with building diagram-converter: missing package javax.xml.bind.annotation
 # Also, missing classes such as XmlType, JAXBException...
 RUN mkdir /gitroot
@@ -20,6 +20,7 @@ RUN git clone https://github.com/reactome-pwp/diagram-converter.git && \
 	cd /gitroot/diagram-converter && \
 	sed -i -e 's/<exclude>\*\*\/logback\.xml<\/exclude>/ /g' pom.xml && \
 	sed -i 's/<dependencies>/<dependencies>\n<dependency>\n<groupId>javax.annotation<\/groupId><artifactId>javax.annotation-api<\/artifactId><version>1.3.1<\/version><\/dependency>/g' pom.xml && \
+	sed -i 's/<dependencies>/<dependencies>\n<dependency>\n<groupId>javax.xml.bind<\/groupId><artifactId>jaxb-api<\/artifactId><version>2.3.1<\/version><\/dependency>/g' pom.xml && \
 	mvn --no-transfer-progress clean compile package -DskipTests && ls -lht ./target && \
 	mkdir /diagram-converter && \
 	cp /gitroot/diagram-converter/target/diagram-converter-jar-with-dependencies.jar /diagram-converter/diagram-converter-jar-with-dependencies.jar
