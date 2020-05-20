@@ -45,7 +45,9 @@ FROM reactome/diagram-generator as diagrams
 # Get Fireworks files
 FROM reactome/fireworks-generator as fireworks
 # Final re-base will be Tomcat
-FROM tomcat:9.0.35-jdk8-openjdk
+# Neo4j (3.4.9) complains about JDK 11 not being officially supported, but it seems to run OK.
+# Still, we should look into migrating to Neo4j 4.x
+FROM tomcat:9.0.35-jdk11-openjdk
 
 ENV EXTENSION_SCRIPT=/data/neo4j-init.sh
 ENV NEO4J_EDITION=community
