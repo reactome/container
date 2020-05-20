@@ -1,5 +1,5 @@
 ARG RELEASE_VERSION=Release72
-FROM maven:3.6.3-jdk-8 AS builder
+FROM maven:3.6.3-jdk-11 AS builder
 ENV PATHWAY_BROWSER_VERSION=master
 RUN mkdir -p /gitroot && \
 	mkdir -p /webapps
@@ -35,7 +35,7 @@ FROM reactome/graphdb:${RELEASE_VERSION} AS graphdb
 FROM reactome/fireworks-generator as fireworks
 FROM reactome/diagram-generator as diagrams
 # Ok, now re-base the image as Tomcat
-FROM tomcat:8.5.35-jre8
+FROM tomcat:9.0.35-jdk11-openjdk
 ENV EXTENSION_SCRIPT=/data/neo4j-init.sh
 ENV NEO4J_EDITION=community
 ARG NEO4J_USER=neo4j
@@ -86,4 +86,4 @@ RUN chmod a+r /usr/local/tomcat/webapps/download/current/ehld/svgsummary.txt
 # load and set entrypoint
 CMD ["/analysis-service-entrypoint.sh"]
 RUN apt-get update && apt-get install netcat gosu procps -y && apt-get autoremove && ln -s  $(which gosu) /bin/su-exec
-# Run this as: docker run --name reactome-analysis-service -p 8080:8080 reactome/stand-alone-analysis-service:Release71
+# Run this as: docker run --name reactome-analysis-service -p 8080:8080 reactome/analysis-service-and-pwb:Release72
