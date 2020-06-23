@@ -3,7 +3,7 @@ FROM maven:3.6.3-jdk-8 AS builder
 
 RUN mkdir /gitroot
 # The commit ID for the "speed-up" version of search-indexer. Runs faster than normal, by using multiple threads.
-ENV INDEXER_VERSION=4184c653e4fa1a2fe350f2ff238183956a22ab75
+ENV INDEXER_VERSION=speed-up
 WORKDIR /gitroot/
 RUN mkdir /gitroot/search-indexer
 RUN git clone https://github.com/reactome/search-indexer.git && \
