@@ -1,4 +1,4 @@
-ARG RELEASE_VERSION=Release72
+ARG RELEASE_VERSION=Release73
 FROM maven:3.6.3-jdk-8 AS builder
 ENV PATHWAY_BROWSER_VERSION=master
 RUN mkdir -p /gitroot && \
@@ -26,7 +26,24 @@ RUN git clone https://github.com/reactome-pwp/browser.git \
   && sed -i 's/\(new DownloadsTabPresenter(this\.eventBus, downloads);\)/\/\/ \1/g' ./src/main/java/org/reactome/web/pwp/client/AppController.java \
   && sed -i 's/\(DETAILS_TABS\.add(downloads);\)/\/\/ \1/g' ./src/main/java/org/reactome/web/pwp/client/AppController.java \
   && $MVN_CMD gwt:import-sources compile package \
-  && mv /gitroot/browser/target/PathwayBrowser*.war /webapps/PathwayBrowser.war
+  && mv /gitroot/browser/target/PathwayBrowser*.war /webapps/PathwayBrowser.war \
+	&& cd /webapps && git clone https://github.com/reactome-pwp/reacfoam.git && rm -rf reacfoam/.git
+
+RUN git clone https://github.com/reactome/experiment-digester.git
+
+RUN cd /gitroot/experiment-digester \
+  && $MVN_CMD -P Experiment-Digester-Local package -DskipTests \
+  && ls -lht /gitroot/experiment-digester/target
+
+# Generate the experiments.bin file
+RUN cd /gitroot/experiment-digester && \
+  java -jar target/digester-importer-jar-with-dependencies.jar \
+    -o /experiments.bin \
+    -e https://www.ebi.ac.uk/gxa/experiments-content/E-PROT-3/resources/ExperimentDownloadSupplier.Proteomics/tsv && \
+  ls -lht /experiments.bin
+
+RUN cp /gitroot/experiment-digester/target/ExperimentDigester.war /webapps/
+RUN cp /experiments.bin /webapps/experiments.bin
 
 FROM reactome/analysis-core AS analysiscorebuilder
 FROM reactome/stand-alone-analysis-service:${RELEASE_VERSION} AS analysisservice
@@ -51,10 +68,10 @@ RUN mkdir -p /usr/local/diagram/static && \
   mkdir -p /var/www/html/download/current/ehld && \
   mkdir -p /usr/local/interactors/tuple
 
-COPY ./entrypoint.sh /analysis-service-entrypoint.sh
+COPY ./entrypoint.sh /entrypoint.sh
 RUN mkdir -p /usr/local/AnalysisService/analysis-results \
   && useradd neo4j \
-  && chmod a+x /analysis-service-entrypoint.sh
+  && chmod a+x /entrypoint.sh
 # Copy the analysis file
 COPY --from=fireworks /fireworks-json-files /tmp/fireworks
 # ContentService expects fireworks to be in a different location...
@@ -65,6 +82,7 @@ RUN mkdir -p /usr/local/tomcat/webapps/download/current/ && cp -r /tmp/fireworks
 COPY --from=analysiscorebuilder /output/analysis.bin /analysis.bin
 # Copy the web applications created in the builder stage.
 COPY --from=builder /webapps/ /usr/local/tomcat/webapps/
+COPY --from=builder /webapps/experiments.bin /experiments.bin
 # Copy graph database
 COPY --from=graphdb /data/neo4j-init.sh /data/neo4j-init.sh
 COPY --from=graphdb /docker-entrypoint.sh /neo4j-entrypoint.sh
@@ -83,7 +101,8 @@ RUN cd /usr/local/tomcat/webapps/download/current && tar -zxf ehld.tgz && rm ehl
 ADD https://reactome.org/download/current/ehld/svgsummary.txt /usr/local/tomcat/webapps/download/current/ehld/svgsummary.txt
 RUN chmod a+r /usr/local/tomcat/webapps/download/current/ehld/svgsummary.txt
 
+
 # load and set entrypoint
-CMD ["/analysis-service-entrypoint.sh"]
+CMD ["/entrypoint.sh"]
 RUN apt-get update && apt-get install netcat gosu procps -y && apt-get autoremove && ln -s  $(which gosu) /bin/su-exec
 # Run this as: docker run --name reactome-analysis-service -p 8080:8080 reactome/stand-alone-analysis-service:Release71

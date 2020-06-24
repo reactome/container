@@ -43,5 +43,12 @@
 				<report.password>report.password</report.password>
 			</properties>
 		</profile>
+		<profile>
+			<id>Experiment-Digester-Local</id>
+			<properties>
+				<!-- Path to the experiments binary file -->
+				<experiments.data.file>/experiments.bin</experiments.data.file>
+			</properties>
+		</profile>
 	</profiles>
 </settings>
