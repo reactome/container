@@ -1,0 +1,156 @@
+pipeline
+{
+    agent any
+    environment
+    {
+      RELEASE_VERSION = "JENKINSTEST"
+    }
+
+    stages
+    {
+        stage('Checkout')
+        {
+            steps
+            {
+                // Get some code from a GitHub repository
+                git branch: 'feature/Joomla', url: 'https://github.com/reactome/container.git'
+            }
+        }
+        stage('Download graphdb')
+        {
+            steps
+            {
+                dir("neo4j")
+                {
+                    script
+                    {
+                        if (!fileExists('reactome-${env.RELEASE_VERSION}.graphdb.tgz'))
+                        {
+                            // fileOperations([fileDownloadOperation(password: '', proxyHost: '', proxyPort: '', targetFileName: "reactome-${env.RELEASE_VERSION}.graphdb.tgz", targetLocation: './neo4j', url: 'https://reactome.org/download/current/reactome.graphdb.tgz', userName: '')])
+                            sh "cp /home/sshorser/reactome-JENKINSTEST.graphdb.tgz ./reactome-${env.RELEASE_VERSION}.graphdb.tgz"
+                        }
+                        sh "ls -lht"
+                    }
+                }
+            }
+        }
+        stage("Build graphdb")
+        {
+            steps
+            {
+                dir("neo4j")
+                {
+                    script
+                    {
+                        sh "ls -lht"
+                        docker.build("reactome/graphdb:$RELEASE_VERSION --build-arg GRAPHDB_LOCATION=reactome-${env.RELEASE_VERSION}.graphdb.tgz --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f ./neo4j_stand-alone.dockerfile")
+                    }
+                }
+            }
+        }
+        // stage("Generate supporting files and content")
+        // {
+        //     parallel
+        //     {
+                stage("analysis-core")
+                {
+                    steps
+                    {
+                        dir("analysis-core")
+                        {
+                            script
+                            {
+                                docker.build("reactome/analysis-core:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f analysis-core.dockerfile")
+                            }
+                        }
+                    }
+                }
+                stage("fireworks-generator")
+                {
+                    steps
+                    {
+                        dir("fireworks-generator")
+                        {
+                            script
+                            {
+                                docker.build("reactome/fireworks-generator:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f fireworks-generator.dockerfile")
+                            }
+                        }
+                    }
+                }
+                stage("mysql database and diagram files")
+                {
+                    steps
+                    {
+                        dir("mysql")
+                        {
+                            script
+                            {
+                                docker.build("reactome/reactome-mysql:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f mysql.dockerfile")
+                            }
+                        }
+                        dir("diagram-generator")
+                        {
+                            script
+                            {
+                                docker.build("reactome/diagram-generator:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f diagram-generator.dockerfile")
+                            }
+                        }
+                    }
+                }
+        //     }
+        // }
+        stage("solr-index")
+        {
+            steps
+            {
+                dir("solr")
+                {
+                    script
+                    {
+                        docker.build("reactome/solr:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f index-builder.dockerfile")
+                    }
+                }
+            }
+        }
+        stage ("Build web applications")
+        {
+            parallel
+            {
+                stage("Analysis service")
+                {
+                    steps
+                    {
+                        dir("stand-alone-analysis-service")
+                        {
+                            script
+                            {
+                                docker.build("reactome/stand-alone-analysis-service:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f analysis-service.dockerfile")
+                            }
+                        }
+                        dir("pathway-browser")
+                        {
+                            script
+                            {
+                                docker.build("reactome/analysis-service-and-pwb:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f pathway-browser.dockerfile")
+                            }
+                        }
+                    }
+                }
+                stage("Content Service")
+                {
+                    steps
+                    {
+                        dir("stand-alone-content-service")
+                        {
+                            script
+                            {
+                                docker.build("reactome/stand-alone-content-service:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f content-service.dockerfile")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
