@@ -34,7 +34,7 @@ LABEL maintainer=solomon.shorser@oicr.on.ca
 LABEL ReleaseVersion=$RELEASE_VERSION
 EXPOSE 7474 7473 7687
 # default is a local, zipped copy of the Reactome graph database.
-ADD ${GRAPHDB_LOCATION} /var/lib/neo4j/data/databases/reactome.graphdb.tgz
+COPY ${GRAPHDB_LOCATION} /var/lib/neo4j/data/databases/reactome.graphdb.tgz
 COPY ./conf/neo4j.conf /var/lib/neo4j/conf/neo4j.conf
 COPY ./neo4j-init.sh /data/neo4j-init.sh
 
