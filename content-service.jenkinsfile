@@ -1,0 +1,84 @@
+pipeline {
+    agent any
+    environment
+    {
+      RELEASE_VERSION = "JENKINSTEST"
+    }
+
+    stages
+    {
+        stage('Checkout')
+        {
+            steps
+            {
+                // Get some code from a GitHub repository
+                git branch: 'feature/Joomla', url: 'https://github.com/reactome/container.git'
+            }
+        }
+        stage("Build graphdb")
+        {
+            steps
+            {
+                dir("neo4j")
+                {
+                    script
+                    {
+                        docker.build("reactome/graphdb:$RELEASE_VERSION --build-arg GRAPHDB_LOCATION=https://reactome.org/download/current/reactome.graphdb.tgz --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f ./neo4j_stand-alone.dockerfile")
+                    }
+                }
+            }
+        }
+        stage("Generate: solr index, diagrams, relational db")
+        {
+            parallel
+            {
+                stage("solr-index")
+                {
+                    steps
+                    {
+                        dir("solr")
+                        {
+                            script
+                            {
+                                docker.build("reactome/solr:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f index-builder.dockerfile")
+                            }
+                        }
+                    }
+                }
+                stage("mysql database and diagram files")
+                {
+                    steps
+                    {
+                        dir("mysql")
+                        {
+                            script
+                            {
+                                docker.build("reactome/reactome-mysql:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f mysql.dockerfile")
+                            }
+                        }
+                        dir("diagram-generator")
+                        {
+                            script
+                            {
+                                docker.build("reactome/diagram-generator:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f diagram-generator.dockerfile")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        stage ("Build content-service web application")
+        {
+            steps
+            {
+                dir("stand-alone-content-service")
+                {
+                    script
+                    {
+                        docker.build("reactome/stand-alone-content-service:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f content-service.dockerfile")
+                    }
+                }
+            }
+        }
+    }
+}

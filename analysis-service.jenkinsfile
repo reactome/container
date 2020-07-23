@@ -1,0 +1,91 @@
+pipeline {
+    agent any
+    environment
+    {
+      RELEASE_VERSION = "JENKINSTEST"
+    }
+
+    stages
+    {
+        stage('Checkout')
+        {
+            steps
+            {
+                // Get some code from a GitHub repository
+                git branch: 'feature/Joomla', url: 'https://github.com/reactome/container.git'
+            }
+        }
+        // stage('Download graphdb')
+        // {
+        //     steps
+        //     {
+        //         fileOperations([fileDownloadOperation(password: '', proxyHost: '', proxyPort: '', targetFileName: 'reactome-${env.RELEASE_VERSION}.graphdb.tgz', targetLocation: './', url: 'https://reactome.org/download/current/reactome.graphdb.tgz', userName: '')])
+        //     }
+        // }
+        stage("Build graphdb")
+        {
+            steps
+            {
+                dir("neo4j")
+                {
+                    script
+                    {
+                        docker.build("reactome/graphdb:$RELEASE_VERSION --build-arg GRAPHDB_LOCATION=https://reactome.org/download/current/reactome.graphdb.tgz --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f ./neo4j_stand-alone.dockerfile")
+                    }
+                }
+            }
+        }
+        stage("Generate Analysis Core file & Fireworks files")
+        {
+            parallel
+            {
+                stage("analysis-core")
+                {
+                    steps
+                    {
+                        dir("analysis-core")
+                        {
+                            script
+                            {
+                                docker.build("reactome/analysis-core:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f analysis-core.dockerfile")
+                            }
+                        }
+                    }
+                }
+                stage("fireworks-generator")
+                {
+                    steps
+                    {
+                        dir("fireworks-generator")
+                        {
+                            script
+                            {
+                                docker.build("reactome/fireworks-generator:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f fireworks-generator.dockerfile")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        stage ("Build analysis-service web application")
+        {
+            steps
+            {
+                dir("stand-alone-analysis-service")
+                {
+                    script
+                    {
+                        docker.build("reactome/stand-alone-analysis-service:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f analysis-service.dockerfile")
+                    }
+                }
+                dir("pathway-browser")
+                {
+                    script
+                    {
+                        docker.build("reactome/analysis-service-and-pwb:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f pathway-browser.dockerfile")
+                    }
+                }
+            }
+        }
+    }
+}
