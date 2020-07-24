@@ -15,6 +15,14 @@ pipeline {
                 git branch: 'feature/Joomla', url: 'https://github.com/reactome/container.git'
             }
         }
+        stage('Download graphdb')
+        {
+            steps
+            {
+                fileOperations([fileDownloadOperation(password: '', proxyHost: '', proxyPort: '', targetFileName: "reactome-${env.RELEASE_VERSION}.graphdb.tgz", targetLocation: './neo4j', url: 'https://reactome.org/download/current/reactome.graphdb.tgz', userName: '')])
+            }
+        }
+
         stage("Build graphdb")
         {
             steps
@@ -23,7 +31,7 @@ pipeline {
                 {
                     script
                     {
-                        docker.build("reactome/graphdb:$RELEASE_VERSION --build-arg GRAPHDB_LOCATION=https://reactome.org/download/current/reactome.graphdb.tgz --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f ./neo4j_stand-alone.dockerfile")
+                        docker.build("reactome/graphdb:$RELEASE_VERSION --build-arg GRAPHDB_LOCATION=./reactome-${env.RELEASE_VERSION}.graphdb.tgz --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f ./neo4j_stand-alone.dockerfile")
                     }
                 }
             }
