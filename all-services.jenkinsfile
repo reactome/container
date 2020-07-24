@@ -13,7 +13,7 @@ pipeline
             steps
             {
                 // Get some code from a GitHub repository
-                git branch: 'feature/Joomla', url: 'https://github.com/reactome/container.git'
+                git branch: 'feature/jenkinsintegration', url: 'https://github.com/reactome/container.git'
             }
         }
         stage('Download graphdb')
@@ -43,11 +43,13 @@ pipeline
                     script
                     {
                         sh "ls -lht"
-                        docker.build("reactome/graphdb:$RELEASE_VERSION --build-arg GRAPHDB_LOCATION=reactome-${env.RELEASE_VERSION}.graphdb.tgz --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f ./neo4j_stand-alone.dockerfile")
+                        docker.build("reactome/graphdb:${env.RELEASE_VERSION} --no-cache --build-arg GRAPHDB_LOCATION=reactome-${env.RELEASE_VERSION}.graphdb.tgz --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f ./neo4j_stand-alone.dockerfile")
                     }
                 }
             }
         }
+        // It turns out that trying to do too many things in parallel here doesn't really save any time at all, the total running time was almost exactly the same - 2h17m for both!
+        // But the advantage of running these sequentially is that it's not as resource-demanding on the server as the parallel version is.
         // stage("Generate supporting files and content")
         // {
         //     parallel
