@@ -2,7 +2,9 @@ pipeline {
     agent any
     environment
     {
-      RELEASE_VERSION = "JENKINSTEST"
+      // NOTE: this file must be executed in a directory whose name is a numeric sequence, and whose parent is named "Releases".
+      // This is how other Jenkinsfiles in the Release process determine the current release number.
+      RELEASE_VERSION = (pwd() =~ /Releases\/(\d+)\//)[0][1];
     }
 
     stages
@@ -36,7 +38,7 @@ pipeline {
                 }
             }
         }
-        stage("Generate: solr index, diagrams, relational db")
+        stage("Generate: solr index and diagrams (also: set up relational db)")
         {
             parallel
             {

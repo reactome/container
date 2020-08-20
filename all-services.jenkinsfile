@@ -3,7 +3,9 @@ pipeline
     agent any
     environment
     {
-      RELEASE_VERSION = "JENKINSTEST"
+      // NOTE: this file must be executed in a directory whose name is a numeric sequence, and whose parent is named "Releases".
+      // This is how other Jenkinsfiles in the Release process determine the current release number.
+      RELEASE_VERSION = (pwd() =~ /Releases\/(\d+)\//)[0][1];
     }
 
     stages
@@ -48,60 +50,54 @@ pipeline
                 }
             }
         }
-        // It turns out that trying to do too many things in parallel here doesn't really save any time at all, the total running time was almost exactly the same - 2h17m for both!
-        // But the advantage of running these sequentially is that it's not as resource-demanding on the server as the parallel version is.
-        // stage("Generate supporting files and content")
-        // {
-        //     parallel
-        //     {
-                stage("analysis-core")
+
+        stage("analysis-core")
+        {
+            steps
+            {
+                dir("analysis-core")
                 {
-                    steps
+                    script
                     {
-                        dir("analysis-core")
-                        {
-                            script
-                            {
-                                docker.build("reactome/analysis-core:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f analysis-core.dockerfile")
-                            }
-                        }
+                        docker.build("reactome/analysis-core:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f analysis-core.dockerfile")
                     }
                 }
-                stage("fireworks-generator")
+            }
+        }
+        stage("fireworks-generator")
+        {
+            steps
+            {
+                dir("fireworks-generator")
                 {
-                    steps
+                    script
                     {
-                        dir("fireworks-generator")
-                        {
-                            script
-                            {
-                                docker.build("reactome/fireworks-generator:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f fireworks-generator.dockerfile")
-                            }
-                        }
+                        docker.build("reactome/fireworks-generator:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f fireworks-generator.dockerfile")
                     }
                 }
-                stage("mysql database and diagram files")
+            }
+        }
+        stage("mysql database and diagram files")
+        {
+            steps
+            {
+                dir("mysql")
                 {
-                    steps
+                    script
                     {
-                        dir("mysql")
-                        {
-                            script
-                            {
-                                docker.build("reactome/reactome-mysql:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f mysql.dockerfile")
-                            }
-                        }
-                        dir("diagram-generator")
-                        {
-                            script
-                            {
-                                docker.build("reactome/diagram-generator:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f diagram-generator.dockerfile")
-                            }
-                        }
+                        docker.build("reactome/reactome-mysql:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f mysql.dockerfile")
                     }
                 }
-        //     }
-        // }
+                dir("diagram-generator")
+                {
+                    script
+                    {
+                        docker.build("reactome/diagram-generator:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f diagram-generator.dockerfile")
+                    }
+                }
+            }
+        }
+
         stage("solr-index")
         {
             steps
@@ -119,7 +115,7 @@ pipeline
         {
             parallel
             {
-                stage("Analysis service")
+                stage("Analysis Service images")
                 {
                     steps
                     {
@@ -139,7 +135,7 @@ pipeline
                         }
                     }
                 }
-                stage("Content Service")
+                stage("Content Service image")
                 {
                     steps
                     {
