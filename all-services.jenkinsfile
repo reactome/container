@@ -28,8 +28,7 @@ pipeline
                     {
                         if (!fileExists('reactome-${env.RELEASE_VERSION}.graphdb.tgz'))
                         {
-                            // fileOperations([fileDownloadOperation(password: '', proxyHost: '', proxyPort: '', targetFileName: "reactome-${env.RELEASE_VERSION}.graphdb.tgz", targetLocation: './neo4j', url: 'https://reactome.org/download/current/reactome.graphdb.tgz', userName: '')])
-                            sh "cp /home/sshorser/reactome-JENKINSTEST.graphdb.tgz ./reactome-${env.RELEASE_VERSION}.graphdb.tgz"
+                            fileOperations([fileDownloadOperation(password: '', proxyHost: '', proxyPort: '', targetFileName: "reactome-${env.RELEASE_VERSION}.graphdb.tgz", targetLocation: './neo4j', url: 'https://reactome.org/download/current/reactome.graphdb.tgz', userName: '')])
                         }
                         sh "ls -lht"
                     }
