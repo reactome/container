@@ -75,7 +75,7 @@ echo -e "\nChecking interactors - list of psiquic resources"
 check_vals 'ContentService/interactors/psicquic/resources' 'Interactors_psiquic_resources'
 
 echo -e "\nChecking interactors - pathays with molecule"
-check_vals 'ContentService/interactors/static/molecule/Q9BXM7-1/pathways' 'Interactors_molecule_pathways'
+check_vals 'ContentService/interactors/static/molecule/Q9BXM7-1/pathways?species=Homo%20sapiens' 'Interactors_molecule_pathways'
 
 echo -e "\nChecking mapping to UniProt"
 check_vals 'ContentService/data/mapping/UniProt/PTEN/reactions' 'Maping_to_UniProt'
