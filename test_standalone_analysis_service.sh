@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # Before running this test script, start the stand-alone AnalysisService:
-# docker run --rm -p 8080:8080 reactome/stand-alone-analysis-service
+# docker run --rm -p 8080:8080 reactome/stand-alone-analysis-service:${RELEASE_VERSION} (eg:74; if port is already allocated locally, try '1234:8080')
 
 # Getting the path to `time` ensures that we don't use the built-in *shell* command with the same name.
 # This "other" time command allows some better formatting options for output.
