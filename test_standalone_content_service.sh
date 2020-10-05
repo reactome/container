@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # Before running this test script, start the stand-alone ContentService:
-# docker run --rm -p 8080:8080 reactome/stand-alone-content-service
+# docker run --rm -p 8080:8080 reactome/stand-alone-content-service (eg:74; if port is already allocated locally, try '1234:8080')
 
 # get path to shell-independent "time" command. Many shells define a "time" keyword which is not what we want here.
 PATH_TO_TIMECMD=$(which time)
