@@ -46,12 +46,12 @@ RUN cd /gitroot/experiment-digester && \
 RUN cp /gitroot/experiment-digester/target/ExperimentDigester.war /webapps/
 RUN cp /experiments.bin /webapps/experiments.bin
 
-FROM reactome/analysis-core AS analysiscorebuilder
+FROM reactome/analysis-core:${RELEASE_VERSION} AS analysiscorebuilder
 FROM reactome/stand-alone-analysis-service:${RELEASE_VERSION} AS analysisservice
 FROM reactome/stand-alone-content-service:${RELEASE_VERSION} AS contentservice
 FROM reactome/graphdb:${RELEASE_VERSION} AS graphdb
-FROM reactome/fireworks-generator as fireworks
-FROM reactome/diagram-generator as diagrams
+FROM reactome/fireworks-generator:${RELEASE_VERSION} as fireworks
+FROM reactome/diagram-generator:${RELEASE_VERSION} as diagrams
 # Ok, now re-base the image as Tomcat
 FROM tomcat:8.5.35-jre8
 ENV EXTENSION_SCRIPT=/data/neo4j-init.sh
