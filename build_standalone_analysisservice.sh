@@ -1,35 +1,35 @@
 #! /bin/bash
 
-RELEASE_VERSION=Release73
+RELEASE_VERSION=Release73-TEST
 NEO4J_USER=neo4j
 NEO4J_PASSWORD=n304j
 
 STARTING_DIR=$(pwd)
 set -e
-echo -e "===\nBuilding graph database...\n"
-cd $STARTING_DIR/neo4j
-docker build -t reactome/graphdb:$RELEASE_VERSION \
-	--build-arg NEO4J_USER=$NEO4J_USER \
-	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
-	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
-	--build-arg GRAPHDB_LOCATION=https://reactome.org/download/current/reactome.graphdb.tgz \
-	-f ./neo4j_stand-alone.dockerfile .
-
-echo -e "===\nCreating the Analyis file...\n"
-cd $STARTING_DIR/analysis-core
-docker build -t reactome/analysis-core \
-	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
-	--build-arg NEO4J_USER=$NEO4J_USER \
-	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
-	-f analysis-core.dockerfile .
-
-echo -e "===\nGenerating Fireworks files...\n"
-cd $STARTING_DIR/fireworks-generator
-docker build -t reactome/fireworks-generator \
-	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
-	--build-arg NEO4J_USER=$NEO4J_USER \
-	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
-	-f fireworks-generator.dockerfile .
+# echo -e "===\nBuilding graph database...\n"
+# cd $STARTING_DIR/neo4j
+# docker build -t reactome/graphdb:$RELEASE_VERSION \
+# 	--build-arg NEO4J_USER=$NEO4J_USER \
+# 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
+# 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
+# 	--build-arg GRAPHDB_LOCATION=https://reactome.org/download/current/reactome.graphdb.tgz \
+# 	-f ./neo4j_stand-alone.dockerfile .
+#
+# echo -e "===\nCreating the Analyis file...\n"
+# cd $STARTING_DIR/analysis-core
+# docker build -t reactome/analysis-core \
+# 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
+# 	--build-arg NEO4J_USER=$NEO4J_USER \
+# 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
+# 	-f analysis-core.dockerfile .
+#
+# echo -e "===\nGenerating Fireworks files...\n"
+# cd $STARTING_DIR/fireworks-generator
+# docker build -t reactome/fireworks-generator \
+# 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
+# 	--build-arg NEO4J_USER=$NEO4J_USER \
+# 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
+# 	-f fireworks-generator.dockerfile .
 
 echo -e "===\nBuilding analysis-service image...\n"
 cd $STARTING_DIR/stand-alone-analysis-service
@@ -37,7 +37,7 @@ docker build -t reactome/stand-alone-analysis-service \
 	--build-arg NEO4J_USER=$NEO4J_USER \
 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
-	-f analysis-service.dockerfile .
+	-f analysis-service-FIX_PREFIXES.dockerfile .
 
 cd $STARTING_DIR/
 

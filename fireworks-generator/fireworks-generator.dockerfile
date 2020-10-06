@@ -1,4 +1,4 @@
-ARG RELEASE_VERSION=R71
+ARG RELEASE_VERSION=Release74
 
 FROM maven:3.6.3-jdk-8 AS builder
 
