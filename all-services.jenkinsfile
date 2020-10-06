@@ -3,35 +3,28 @@ pipeline
     agent any
     environment
     {
-        script
-        {
-          // NOTE: this file must be executed in a directory whose name is a numeric sequence, and whose parent is named "Releases".
-          // This is how other Jenkinsfiles in the Release process determine the current release number.
-          RELEASE_VERSION = (pwd() =~ /Releases\/(\d+)\//)[0][1];
-        }
+      // NOTE: this file must be executed in a directory whose name is a numeric sequence, and whose parent is named "Releases".
+      // This is how other Jenkinsfiles in the Release process determine the current release number.
+        RELEASE_VERSION = getReleaseVersion();
     }
 
     stages
     {
-        stage('Checkout')
-        {
-            steps
-            {
-                // Get some code from a GitHub repository
-                git branch: 'feature/jenkinsintegration', url: 'https://github.com/reactome/container.git'
-            }
-        }
+        // End of probably removable code
         stage('Download graphdb')
         {
             steps
             {
-                script
+                dir("neo4j")
                 {
-                    if (!fileExists('reactome-${env.RELEASE_VERSION}.graphdb.tgz'))
+                    script
                     {
-                        fileOperations([fileDownloadOperation(password: '', proxyHost: '', proxyPort: '', targetFileName: "reactome-${env.RELEASE_VERSION}.graphdb.tgz", targetLocation: './neo4j', url: 'https://reactome.org/download/current/reactome.graphdb.tgz', userName: '')])
+                        if (!fileExists('reactome-${env.RELEASE_VERSION}.graphdb.tgz'))
+                        {
+                            fileOperations([fileDownloadOperation(password: '', proxyHost: '', proxyPort: '', targetFileName: "reactome-${env.RELEASE_VERSION}.graphdb.tgz", targetLocation: './', url: 'https://reactome.org/download/current/reactome.graphdb.tgz', userName: '')])
+                        }
+                        sh "ls -lht"
                     }
-                    sh "ls -lht"
                 }
             }
         }
@@ -49,7 +42,6 @@ pipeline
                 }
             }
         }
-
         stage("analysis-core")
         {
             steps
@@ -96,7 +88,6 @@ pipeline
                 }
             }
         }
-
         stage("solr-index")
         {
             steps
@@ -114,7 +105,7 @@ pipeline
         {
             parallel
             {
-                stage("Analysis Service images")
+                stage("Analysis Service image")
                 {
                     steps
                     {
@@ -123,13 +114,6 @@ pipeline
                             script
                             {
                                 docker.build("reactome/stand-alone-analysis-service:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f analysis-service.dockerfile")
-                            }
-                        }
-                        dir("pathway-browser")
-                        {
-                            script
-                            {
-                                docker.build("reactome/analysis-service-and-pwb:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f pathway-browser.dockerfile")
                             }
                         }
                     }
@@ -149,5 +133,24 @@ pipeline
                 }
             }
         }
+        stage("Pathway Browser image")
+        {
+            steps
+            {
+                dir("pathway-browser")
+                {
+                    script
+                    {
+                        docker.build("reactome/analysis-service-and-pwb:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f pathway-browser.dockerfile")
+                    }
+                }
+            }
+        }
     }
+}
+
+// Gets release number from URL of job. The expectation, as mentioned above, is that the URL will have a format of 'Releases/XX', where XX is the release number.
+def getReleaseVersion()
+{
+    return (pwd() =~ /Releases\/(\d+)\//)[0][1];
 }
