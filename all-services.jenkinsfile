@@ -5,7 +5,7 @@ pipeline
     {
       // NOTE: this file must be executed in a directory whose name is a numeric sequence, and whose parent is named "Releases".
       // This is how other Jenkinsfiles in the Release process determine the current release number.
-        RELEASE_VERSION = "Release" + getReleaseVersion();
+        RELEASE_VERSION = getReleaseVersionTag();
     }
 
     stages
@@ -150,7 +150,7 @@ pipeline
 }
 
 // Gets release number from URL of job. The expectation, as mentioned above, is that the URL will have a format of 'Releases/XX', where XX is the release number.
-def getReleaseVersion()
+def getReleaseVersionTag()
 {
-    return (pwd() =~ /Releases\/(\d+)\//)[0][1];
+    return "Release" + (pwd() =~ /Releases\/(\d+)\//)[0][1];
 }
