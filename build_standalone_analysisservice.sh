@@ -1,6 +1,6 @@
 #! /bin/bash
 
-RELEASE_VERSION=Release73
+RELEASE_VERSION=Release73-TEST
 NEO4J_USER=neo4j
 NEO4J_PASSWORD=n304j
 
@@ -37,7 +37,7 @@ docker build -t reactome/stand-alone-analysis-service \
 	--build-arg NEO4J_USER=$NEO4J_USER \
 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
-	-f analysis-service.dockerfile .
+	-f analysis-service-FIX_PREFIXES.dockerfile .
 
 cd $STARTING_DIR/
 

@@ -4,7 +4,7 @@
 #    docker run --rm -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=gk_current reactome/reactome-mysql:R67
 FROM mysql:5.7.24
 ARG MYSQL_ROOT_PASSWORD=root
-ARG RELEASE_VERSION=R71
+ARG RELEASE_VERSION=Release74
 LABEL ReleaseVersion ${RELEASE_VERSION}
 WORKDIR /docker-entrypoint-initdb.d
 RUN apt-get update && apt-get install wget netcat pigz -y

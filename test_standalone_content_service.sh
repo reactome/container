@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # Before running this test script, start the stand-alone ContentService:
-# docker run --rm -p 8080:8080 reactome/stand-alone-content-service
+# docker run --rm -p 8080:8080 reactome/stand-alone-content-service:ReleaseXX (eg:Release74; if port is already allocated locally, try '1234:8080')
 
 # get path to shell-independent "time" command. Many shells define a "time" keyword which is not what we want here.
 PATH_TO_TIMECMD=$(which time)
@@ -75,7 +75,7 @@ echo -e "\nChecking interactors - list of psiquic resources"
 check_vals 'ContentService/interactors/psicquic/resources' 'Interactors_psiquic_resources'
 
 echo -e "\nChecking interactors - pathays with molecule"
-check_vals 'ContentService/interactors/static/molecule/Q9BXM7-1/pathways' 'Interactors_molecule_pathways'
+check_vals 'ContentService/interactors/static/molecule/Q9BXM7-1/pathways?species=Homo%20sapiens' 'Interactors_molecule_pathways'
 
 echo -e "\nChecking mapping to UniProt"
 check_vals 'ContentService/data/mapping/UniProt/PTEN/reactions' 'Maping_to_UniProt'

@@ -1,4 +1,4 @@
-ARG RELEASE_VERSION=R71
+ARG RELEASE_VERSION=Release74
 FROM maven:3.6.3-jdk-8 AS builder
 
 RUN mkdir -p /gitroot
@@ -37,9 +37,9 @@ FROM reactome/graphdb:${RELEASE_VERSION} AS graphdb
 # Get solr index
 FROM reactome/solr:${RELEASE_VERSION} as solr
 # Get diagram files.
-FROM reactome/diagram-generator as diagrams
+FROM reactome/diagram-generator:${RELEASE_VERSION} as diagrams
 # Get Fireworks files
-FROM reactome/fireworks-generator as fireworks
+FROM reactome/fireworks-generator:${RELEASE_VERSION} as fireworks
 # Final re-base will be Tomcat
 FROM tomcat:8.5.35-jre8
 
