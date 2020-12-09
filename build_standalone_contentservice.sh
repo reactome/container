@@ -1,6 +1,6 @@
 #! /bin/bash
 
-RELEASE_VERSION=Release73
+RELEASE_VERSION=Release75
 NEO4J_USER=neo4j
 NEO4J_PASSWORD=n304j
 
@@ -31,7 +31,7 @@ docker build -t reactome/reactome-mysql:$RELEASE_VERSION \
 
 echo -e "===\nGenerating diagram files...\n"
 cd $STARTING_DIR/diagram-generator
-docker build -t reactome/diagram-generator \
+docker build -t reactome/diagram-generator:${RELEASE_VERSION} \
 	--build-arg NEO4J_USER=$NEO4J_USER \
 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \

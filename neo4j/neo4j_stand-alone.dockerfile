@@ -20,9 +20,9 @@
 #
 # To run this, execute: `docker run --rm -p 7474:7474 -p 7687:7687 --name reactome-graphdb reactome/graphdb:ReleaseXX`
 # The Neo4j web interface will be available at http://localhost:7474
-FROM neo4j:3.5.14
+FROM neo4j:3.5.25
 # RELEASE_VERSION should be given when building the image.
-ARG RELEASE_VERSION=Release74
+ARG RELEASE_VERSION=Release75
 # If you want to override user/password at RUN time, do it as 'docker run -e NEO4J_AUTH="neo4j/PASSWORD" ... reactome/graphdb'
 ARG NEO4J_USER=neo4j
 ARG NEO4J_PASSWORD=neo4j-password
