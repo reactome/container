@@ -26,10 +26,13 @@ RUN git clone https://github.com/reactome-pwp/browser.git \
   && sed -i 's/\(new DownloadsTabPresenter(this\.eventBus, downloads);\)/\/\/ \1/g' ./src/main/java/org/reactome/web/pwp/client/AppController.java \
   && sed -i 's/\(DETAILS_TABS\.add(downloads);\)/\/\/ \1/g' ./src/main/java/org/reactome/web/pwp/client/AppController.java \
 	&& sed -i 's/https:\/\/127.0.0.1/http:\/\/localhost:8080/g' ./src/main/java/org/reactome/web/pwp/client/tools/analysis/tissues/TissueDistribution.java \
+	&& sed -i 's/<neo4j\.password>.*<\/neo4j\.password>/<neo4j.password>'${NEO4J_PASSWORD}'<\/neo4j.password>/g'  /maven-settings.xml \
   && $MVN_CMD gwt:import-sources compile package \
-  && mv /gitroot/browser/target/PathwayBrowser*.war /webapps/PathwayBrowser.war \
-	&& cd /webapps && git clone https://github.com/reactome-pwp/reacfoam.git && rm -rf reacfoam/.git
-
+  && mv /gitroot/browser/target/PathwayBrowser*.war /webapps/PathwayBrowser.war
+# COPY github.token /tmp/github.token
+ARG GITHUB_TOKEN
+RUN cd /webapps && git clone https://${GITHUB_TOKEN}:x-oauth-basic@github.com/reactome-pwp/reacfoam.git && cd reacfoam && git checkout demo-version && rm -rf .git
+# && rm /tmp/github.token
 RUN git clone https://github.com/reactome/experiment-digester.git
 
 RUN cd /gitroot/experiment-digester \

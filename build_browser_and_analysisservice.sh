@@ -1,8 +1,8 @@
 #! /bin/bash
 
-RELEASE_VERSION=Release73
+RELEASE_VERSION=Release75
 NEO4J_USER=neo4j
-NEO4J_PASSWORD=n304j
+NEO4J_PASSWORD=neo4j-password
 
 STARTING_DIR=$(pwd)
 set -e
@@ -17,7 +17,7 @@ docker build -t reactome/graphdb:$RELEASE_VERSION \
 
 echo -e "===\nCreating the Analyis file...\n"
 cd $STARTING_DIR/analysis-core
-docker build -t reactome/analysis-core \
+docker build -t reactome/analysis-core:${RELEASE_VERSION} \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
 	--build-arg NEO4J_USER=$NEO4J_USER \
 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
@@ -25,18 +25,36 @@ docker build -t reactome/analysis-core \
 
 echo -e "===\nGenerating Fireworks files...\n"
 cd $STARTING_DIR/fireworks-generator
-docker build -t reactome/fireworks-generator \
+docker build -t reactome/fireworks-generator:${RELEASE_VERSION} \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
 	--build-arg NEO4J_USER=$NEO4J_USER \
 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
 	-f fireworks-generator.dockerfile .
 
-echo -e "===\nBuilding analysis-service + PathwayBrowser image...\n"
-cd $STARTING_DIR/pathway-browser
-docker build -t reactome/analysis-service-and-pwb \
+echo -e "===\nBuilding relational database...\n"
+cd $STARTING_DIR/mysql
+docker build -t reactome/reactome-mysql:$RELEASE_VERSION \
+	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
+	-f mysql.dockerfile .
+
+echo -e "===\nGenerating diagram files...\n"
+cd $STARTING_DIR/diagram-generator
+docker build -t reactome/diagram-generator:${RELEASE_VERSION} \
 	--build-arg NEO4J_USER=$NEO4J_USER \
 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
+	-f diagram-generator.dockerfile .
+
+# You will need to generate a Personal Access Token to access the Reacfoam repo. Save it in a file "github.token"
+# Make sure you give the token the permissions: repo (repo:status, repo_deployment, public_repo, repo:invite, security_events) and read:repo_hook
+GITHUB_TOKEN=$(cat github.token)
+echo -e "===\nBuilding analysis-service + PathwayBrowser image...\n"
+cd $STARTING_DIR/pathway-browser
+docker build -t reactome/analysis-service-and-pwb:${RELEASE_VERSION} \
+	--build-arg NEO4J_USER=$NEO4J_USER \
+	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
+	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
+	--build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
 	-f pathway-browser.dockerfile .
 
 cd $STARTING_DIR

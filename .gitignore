@@ -18,3 +18,5 @@ certificates/*
 docker-compose-img
 fireworks_and_diagrams.tar.gz
 diagram.tgz
+id_rsa*
+*.token
