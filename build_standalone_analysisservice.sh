@@ -12,7 +12,7 @@ docker build -t reactome/graphdb:$RELEASE_VERSION \
 	--build-arg NEO4J_USER=$NEO4J_USER \
 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
-	--build-arg GRAPHDB_LOCATION=https://reactome.org/download/current/reactome.graphdb.tgz \
+	--build-arg GRAPHDB_LOCATION=./reactome.graphdb.tgz \
 	-f ./neo4j_stand-alone.dockerfile .
 
 echo -e "===\nCreating the Analyis file...\n"
@@ -25,7 +25,7 @@ docker build -t reactome/analysis-core \
 
 echo -e "===\nGenerating Fireworks files...\n"
 cd $STARTING_DIR/fireworks-generator
-docker build -t reactome/fireworks-generator \
+docker build -t reactome/fireworks-generator:$RELEASE_VERSION \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
 	--build-arg NEO4J_USER=$NEO4J_USER \
 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
