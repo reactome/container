@@ -12,7 +12,7 @@ docker build -t reactome/graphdb:$RELEASE_VERSION \
 	--build-arg NEO4J_USER=$NEO4J_USER \
 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
-	--build-arg GRAPHDB_LOCATION=https://reactome.org/download/current/reactome.graphdb.tgz \
+	--build-arg GRAPHDB_LOCATION=./reactome.graphdb.tgz \
 	-f ./neo4j_stand-alone.dockerfile .
 
 echo -e "===\nCreating the Analyis file...\n"
@@ -47,9 +47,9 @@ docker build -t reactome/diagram-generator:${RELEASE_VERSION} \
 
 # You will need to generate a Personal Access Token to access the Reacfoam repo. Save it in a file "github.token"
 # Make sure you give the token the permissions: repo (repo:status, repo_deployment, public_repo, repo:invite, security_events) and read:repo_hook
+cd $STARTING_DIR/pathway-browser
 GITHUB_TOKEN=$(cat github.token)
 echo -e "===\nBuilding analysis-service + PathwayBrowser image...\n"
-cd $STARTING_DIR/pathway-browser
 docker build -t reactome/analysis-service-and-pwb:${RELEASE_VERSION} \
 	--build-arg NEO4J_USER=$NEO4J_USER \
 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
@@ -63,5 +63,5 @@ echo -e "===\nImages built: "
 # We are building 4 "reactome" images, so lets display them
 docker images | grep "reactome" | head -n 4
 
-echo -e "Now you can run the stand-alone content-service like this:\n'docker run --name reactome-analysis-service -p 8080:8080 reactome/stand-alone-analysis-service:${RELEASE_VERSION}'"
+echo -e "Now you can run the stand-alone content-service like this:\n'docker run --name reactome-pwb-and-analysis-service -p 8080:8080 reactome/analysis-service-and-pwb:${RELEASE_VERSION}'"
 set +e
