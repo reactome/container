@@ -1,4 +1,4 @@
-ARG RELEASE_VERSION=Release74
+ARG RELEASE_VERSION=Release75
 FROM maven:3.6.3-jdk-8 AS builder
 
 RUN mkdir /gitroot
