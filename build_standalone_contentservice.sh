@@ -2,7 +2,7 @@
 
 RELEASE_VERSION=Release75
 NEO4J_USER=neo4j
-NEO4J_PASSWORD=n304j
+NEO4J_PASSWORD=neo4j-password
 
 STARTING_DIR=$(pwd)
 set -e
@@ -51,5 +51,5 @@ echo -e "===\nImages built: "
 # We are building 4 "reactome" images, so lets display them
 docker images | grep "reactome" | head -n 4
 
-echo -e "Now you can run the stand-alone content-service like this:\n'docker run --name reactome-content-service -p 8080:8080 reactome/stand-alone-content-service:Release71'"
+echo -e "Now you can run the stand-alone content-service like this:\n'docker run --name reactome-content-service -p 8080:8080 reactome/stand-alone-content-service:Release${RELEASE_VERSION}'"
 set +e

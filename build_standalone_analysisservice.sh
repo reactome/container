@@ -2,7 +2,7 @@
 
 RELEASE_VERSION=Release75
 NEO4J_USER=neo4j
-NEO4J_PASSWORD=n304j
+NEO4J_PASSWORD=neo4j-password
 
 STARTING_DIR=$(pwd)
 set -e

@@ -1,4 +1,4 @@
-ARG RELEASE_VERSION=Release74
+ARG RELEASE_VERSION=Release75
 FROM maven:3.6.3-jdk-8 AS builder
 ENV PATHWAY_BROWSER_VERSION=master
 RUN mkdir -p /gitroot && \
@@ -60,7 +60,7 @@ FROM tomcat:8.5.35-jre8
 ENV EXTENSION_SCRIPT=/data/neo4j-init.sh
 ENV NEO4J_EDITION=community
 ARG NEO4J_USER=neo4j
-ARG NEO4J_PASSWORD=n304j
+ARG NEO4J_PASSWORD=neo4j-password
 ENV NEO4J_USER ${NEO4J_USER}
 ENV NEO4J_PASSWORD ${NEO4J_PASSWORD}
 ENV NEO4J_AUTH="${NEO4J_USER}/${NEO4J_PASSWORD}"
@@ -81,7 +81,9 @@ COPY --from=fireworks /fireworks-json-files /tmp/fireworks
 # ContentService expects fireworks to be in a different location...
 # And since we're relying on a pre-built image for ContentService AND AnalysisService,
 # It's easier to just put Fireworks in both places. Future TODO: make all images use the same location, for consistency.
-RUN mkdir -p /usr/local/tomcat/webapps/download/current/ && cp -r /tmp/fireworks /usr/local/tomcat/webapps/download/current/fireworks
+RUN mkdir -p /usr/local/tomcat/webapps/download/current/ \
+	&& cp -r /tmp/fireworks /usr/local/tomcat/webapps/download/current/fireworks \
+	&& rm -rf /tmp/fireworks
 
 COPY --from=analysiscorebuilder /output/analysis.bin /analysis.bin
 # Copy the web applications created in the builder stage.
@@ -98,6 +100,11 @@ COPY --from=analysisservice /usr/local/tomcat/webapps/AnalysisService.war /usr/l
 COPY --from=contentservice /usr/local/tomcat/webapps/ContentService.war /usr/local/tomcat/webapps/ContentService.war
 COPY --from=diagrams /diagrams /usr/local/tomcat/webapps/download/current/diagram
 COPY ./wait-for.sh /wait-for.sh
+
+# Set up links to fireworks files for reacfoam
+RUN cd /usr/local/tomcat/webapps/reacfoam/resources/dataset/fireworks \
+	&& rm -rf * \
+	&& for f in $(ls /usr/local/tomcat/webapps/download/current/fireworks) ; do ln /usr/local/tomcat/webapps/download/current/fireworks/$f  ./$f ; done
 
 # Files needed for the PathwayBrowser
 ADD https://reactome.org/download/current/ehlds.tgz /usr/local/tomcat/webapps/download/current/ehld.tgz
