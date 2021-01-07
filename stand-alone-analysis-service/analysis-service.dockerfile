@@ -1,4 +1,4 @@
-ARG RELEASE_VERSION=Release74
+ARG RELEASE_VERSION=Release75
 FROM maven:3.6.3-jdk-8 AS builder
 ENV PATHWAY_BROWSER_VERSION=master
 RUN mkdir -p /gitroot && \
@@ -13,6 +13,9 @@ ENV NEO4J_PASSWORD ${NEO4J_PASSWORD}
 ENV NEO4J_AUTH="${NEO4J_USER}/${NEO4J_PASSWORD}"
 ENV MVN_CMD="mvn --no-transfer-progress --global-settings /maven-settings.xml -Dmaven.repo.local=/mvn/alt-m2/ -DskipTests"
 COPY ./analysis-service-maven-settings.xml /maven-settings.xml
+RUN sed -i -e 's/<neo4j\.password>.*<\/neo4j\.password>/<neo4j\.password>${NEO4J_PASSWORD}<\/neo4j\.password>/g' /mvn-settings.xml && \
+		sed -i -e 's/<neo4j\.user>.*<\/neo4j\.user>/<neo4j\.user>${NEO4J_USER}<\/neo4j\.user>/g' /mvn-settings.xml
+
 # Build the applications
 RUN cd /gitroot/ && git clone https://github.com/reactome/analysis-report.git \
 	&& cd /gitroot/analysis-report \
