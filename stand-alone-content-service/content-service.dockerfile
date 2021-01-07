@@ -1,4 +1,4 @@
-ARG RELEASE_VERSION=Release74
+ARG RELEASE_VERSION=Release75
 FROM maven:3.6.3-jdk-8 AS builder
 
 RUN mkdir -p /gitroot
@@ -15,7 +15,7 @@ ARG NEO4J_PASSWORD=neo4j-password
 ENV NEO4J_USER ${NEO4J_USER}
 ENV NEO4J_PASSWORD ${NEO4J_PASSWORD}
 ENV NEO4J_AUTH="${NEO4J_USER}/${NEO4J_PASSWORD}"
-ENV MVN_CMD "mvn --no-transfer-progress --global-settings  /mvn-settings.xml"
+ENV MVN_CMD "mvn -DskipTests --no-transfer-progress --global-settings /mvn-settings.xml"
 RUN cd /gitroot/ && git clone https://github.com/reactome/content-service.git && \
 	cd /gitroot/content-service && \
 	git checkout $CONTENT_SERVICE_VERSION && \
