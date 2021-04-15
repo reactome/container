@@ -13,7 +13,7 @@ RUN git clone https://github.com/reactome/search-indexer.git && \
 	sed -i -e 's/http:\/\/repo/https:\/\/repo/g' pom.xml && \
 	mvn --no-transfer-progress clean compile package -DskipTests && ls -lht ./target && \
 	mkdir /indexer && \
-	cp /gitroot/search-indexer/target/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar && \
+	cp /gitroot/search-indexer/target/search-indexer-jar-with-dependencies.jar /indexer/search-indexer-jar-with-dependencies.jar && \
 	rm -rf ~/.m2
 
 # We'll need to get stuff from graphdb
@@ -23,7 +23,7 @@ FROM solr:6.6.5-alpine
 USER root
 RUN mkdir /indexer
 # bring the indexer from the "builder" image.
-COPY --from=builder /indexer/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
+COPY --from=builder /indexer/search-indexer-jar-with-dependencies.jar /indexer/search-indexer-jar-with-dependencies.jar
 COPY --from=graphdb /docker-entrypoint.sh /neo4j-entrypoint.sh
 COPY --from=graphdb /data /data
 COPY --from=graphdb /var/lib/neo4j /var/lib/neo4j
