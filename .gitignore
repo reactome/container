@@ -1,6 +1,7 @@
 webapps/*
 mysql/tomcat_data/*.gz
 mysql/wordpress_data/*.gz
+mysql/joomla_data/*.gz
 logs/*
 fireworks/*
 diagram/*
@@ -13,3 +14,9 @@ neo4j/data/*
 neo4j/*.tgz
 toc_files/*
 tmp_files/*
+certificates/*
+docker-compose-img
+fireworks_and_diagrams.tar.gz
+diagram.tgz
+id_rsa*
+*.token
