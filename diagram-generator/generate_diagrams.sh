@@ -12,10 +12,6 @@ bash /neo4j-entrypoint.sh neo4j &
 echo "Waiting for Neo4j..."
 bash /wait-for.sh localhost:7687 -t 120 && bash /wait-for.sh localhost:7474 -t 120
 
-# tried forcing TLS 1.2 but that didn't seem to work...
-# echo "tls_version=TLSv1.2" >> /etc/mysql/mysql.cnf
-# echo "require_secure_transport=ON" >> /etc/mysql/mysql.cnf
-
 # Start MySQL
 /usr/local/bin/docker-entrypoint.sh mysqld &
 # service mysqld start &
@@ -28,7 +24,6 @@ echo -e "\n\n" > /etc/java-8-openjdk/accessibility.properties
 echo "Running diagram generator..."
 # Run the diagram generator
 # NOTE: NEO4J_USER and NEO4J_PASSWORD are set in the dockerfile.
-# Tried to force TLS 1.2 with " -Djdk.tls.client.protocols=TLSv1.2 -Dhttps.protocols=TLSv1.2" but it didn't seem to work.
 cd /diagram-converter/
 java -jar /diagram-converter/diagram-converter-jar-with-dependencies.jar \
 	 -a localhost \
