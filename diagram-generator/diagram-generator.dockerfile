@@ -57,10 +57,14 @@ RUN ln -s /var/lib/neo4j/conf /conf
 WORKDIR /
 COPY ./generate_diagrams.sh /diagram-converter/generate_diagrams.sh
 # neo4j-entrypoint expects su-exec, but there doesn't seem to be a package for that. gosu should be able to do the same thing.
-RUN mkdir -p /usr/share/man/man1 && \
-  apt-get update && apt-get install gosu openjdk-8-jdk-headless openjdk-8-jre-headless netcat -y \
+# The sed line below is to make Java more compatible with MySQL 5.7 because I can't seem to get MySQL 5.7 working with TLSv1.2
+RUN apt-get install software-properties-common -y -qq \
+  && apt-add-repository 'deb http://security.debian.org/debian-security stretch/updates main' \
+  && mkdir -p /usr/share/man/man1 && \
+  apt-get update && apt-get install gosu openjdk-8-jdk-headless openjdk-8-jre-headless netcat -y -qq \
   && ln -s  $(which gosu) /bin/su-exec \
   && mkdir /diagrams \
+  && sed -i 's/\(jdk\.tls\.disabledAlgorithms=.*\)\(TLSv1, TLSv1.1,\)\(.*\)/\1\3/g' /etc/java-8-openjdk/security/java.security \
   && chmod a+x /diagram-converter/generate_diagrams.sh && /diagram-converter/generate_diagrams.sh
 
 # Ok, now that diagrams are generated, maybe we should rebase on something smaller and only copy over what we need.
