@@ -142,7 +142,8 @@ pipeline
                     script
                     {
                       // Make sure you set up the github Personal Access Token before this step runs.
-                        docker.build("reactome/analysis-service-and-pwb:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f pathway-browser.dockerfile")
+                      // you can (re-)generate your github token in Github by going to Settings -> Developer Settings -> Personal Access Token
+                        docker.build("reactome/analysis-service-and-pwb:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} --build-arg GITHUB_TOKEN=${env.GITHUB_TOKEN} -f pathway-browser.dockerfile")
                     }
                 }
             }
