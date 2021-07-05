@@ -55,6 +55,12 @@
                 <fireworks.json.folder>/usr/local/tomcat/webapps/download/current/fireworks</fireworks.json.folder>
                 <report.user>report_user</report.user>
                 <report.password>report_user</report.password>
+                <!-- MySQL is needed for SBML Export -->
+                <mysql.host>localhost</mysql.host>
+                <mysql.port>3306</mysql.port>
+                <mysql.user>root</mysql.user>
+                <mysql.password>root</mysql.password>
+                <mysql.reactome.database>current</mysql.reactome.database>
             </properties>
             <repositories>
                 <!-- MAVEN central -->
