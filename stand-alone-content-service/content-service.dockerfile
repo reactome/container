@@ -1,4 +1,4 @@
-ARG RELEASE_VERSION=Release75
+ARG RELEASE_VERSION=Release77
 FROM maven:3.6.3-jdk-8 AS builder
 
 RUN mkdir -p /gitroot
@@ -40,8 +40,11 @@ FROM reactome/solr:${RELEASE_VERSION} as solr
 FROM reactome/diagram-generator:${RELEASE_VERSION} as diagrams
 # Get Fireworks files
 FROM reactome/fireworks-generator:${RELEASE_VERSION} as fireworks
+# Need relational database for SBML export
+FROM reactome/reactome-mysql:${RELEASE_VERSION} as relationaldb
 # Final re-base will be Tomcat
 FROM tomcat:8.5.35-jre8
+
 
 ENV EXTENSION_SCRIPT=/data/neo4j-init.sh
 ENV NEO4J_EDITION=community
@@ -50,13 +53,48 @@ RUN useradd neo4j
 RUN useradd solr
 
 EXPOSE 8080
-
+# RUN uname -a && exit 2
 # Paths for content service
 RUN mkdir -p /usr/local/diagram/static && \
 	mkdir -p /usr/local/diagram/exporter && \
 	mkdir -p /var/www/html/download/current/ehld && \
 	mkdir -p /usr/local/interactors/tuple && \
-	apt-get update && apt-get install netcat gosu procps -y && apt-get autoremove && ln -s  $(which gosu) /bin/su-exec
+	apt-get update && apt-get install lsb-release -y && \
+	# wget http://repo.mysql.com/mysql-apt-config_0.8.16-1_all.deb \
+	#     && echo mysql-apt-config    mysql-apt-config/repo-codename  select  bionic | debconf-set-selections \
+	#     && echo mysql-apt-config    mysql-apt-config/repo-distro    select  ubuntu | debconf-set-selections \
+	#     && echo mysql-apt-config    mysql-apt-config/select-server  select  mysql-5.7 | debconf-set-selections \
+	#     && echo mysql-apt-config    mysql-apt-config/select-product select  Ok | debconf-set-selections \
+	#     && dpkg -i mysql-apt-config_0.8.16-1_all.deb \
+	#     && apt-get update && apt-get install -y mysql-server=5.7.33-1ubuntu18.04 && \
+	apt-get install netcat gosu procps mlocate -y && \
+	apt-get autoremove && ln -s  $(which gosu) /bin/su-exec
+# RUN wget --progress=bar:force https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.34-linux-glibc2.12-i686.tar.gz && \
+# 	tar -xzf mysql-5.7.34-linux-glibc2.12-i686.tar.gz && rm mysql-5.7.34-linux-glibc2.12-i686.tar.gz && \
+# 	cp -ra mysql-5.7.34-linux-glibc2.12-i686/bin/* /usr/bin/ && \
+# 	cp -ra mysql-5.7.34-linux-glibc2.12-i686/lib/* /usr/lib/ && \
+# 	cp -ra mysql-5.7.34-linux-glibc2.12-i686/support-files/mysql.server  /etc/init.d/mysql.server && \
+# 	rm -rf  mysql-5.7.34-linux-glibc2.12-i686
+
+# RUN wget --progress=bar:force https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-community-source_5.7.34-1ubuntu18.04_amd64.deb && \
+# 	dpkg -i mysql-community-source_5.7.34-1ubuntu18.04_amd64.deb
+
+RUN wget --progress=bar:force https://downloads.mysql.com/archives/get/p/23/file/mysql-server_5.7.33-1ubuntu18.04_amd64.deb-bundle.tar
+RUN apt-get update && apt-get install libaio1 libc6 libmecab2 libnuma1 perl -y
+# MySQL requires newer version of libc6 than what is already in this docker image
+RUN tar -xf mysql-server_5.7.33-1ubuntu18.04_amd64.deb-bundle.tar && ls -lht *.deb && \
+	wget --progress=bar:force http://archive.ubuntu.com/ubuntu/pool/main/g/glibc/libc6_2.27-3ubuntu1_amd64.deb && \
+	dpkg -i libc6_2.27-3ubuntu1_amd64.deb && \
+	echo 'mysql-community-server-5.7.33 mysql-community-server/root_password password root' | debconf-set-selections && \
+	echo 'mysql-community-server mysql-community-server/root_password password root' | debconf-set-selections  && \
+	dpkg -i mysql-common_5.7.33-1ubuntu18.04_amd64.deb && \
+	dpkg -i mysql-community-client_5.7.33-1ubuntu18.04_amd64.deb && \
+	dpkg -i mysql-client_5.7.33-1ubuntu18.04_amd64.deb && \
+	dpkg -i mysql-community-server_5.7.33-1ubuntu18.04_amd64.deb && \
+	rm -rf *.deb mysql-server_5.7.33-1ubuntu18.04_amd64.deb-bundle.tar && \
+	pwd && ls -lht
+
+# OR maybe just install MySQL from https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.34-linux-glibc2.12-i686.tar.gz
 # load and set entrypoint
 COPY ./wait-for.sh /wait-for.sh
 COPY ./entrypoint.sh /content-service-entrypoint.sh
@@ -67,6 +105,11 @@ ENV NEO4J_PASSWORD ${NEO4J_PASSWORD}
 ENV NEO4J_AUTH="${NEO4J_USER}/${NEO4J_PASSWORD}"
 # Copy the web applications created in the builder stage.
 COPY --from=builder /webapps/ /usr/local/tomcat/webapps/
+
+COPY --from=relationaldb /data/mysql /var/lib/mysql
+# COPY --from=relationaldb /usr/bin/mysql* /usr/bin/
+# COPY --from=relationaldb /usr/sbin/mysql* /usr/sbin/
+
 # Copy graph database
 COPY --from=graphdb /var/lib/neo4j /var/lib/neo4j
 COPY --from=graphdb /var/lib/neo4j/logs /var/lib/neo4j/logs
@@ -83,6 +126,8 @@ COPY --from=solr /custom-solr-conf /custom-solr-conf
 COPY --from=solr /docker-entrypoint-initdb.d /docker-entrypoint-initdb.d
 COPY --from=diagrams /diagrams /usr/local/diagram/static
 COPY --from=fireworks /fireworks-json-files /usr/local/tomcat/webapps/download/current/fireworks
+# COPY --from=relationaldb /usr/lib/x86_64-linux-gnu/libaio.so.1 /usr/lib/x86_64-linux-gnu/libaio.so.1
+# COPY --from=relationaldb /usr/lib/x86_64-linux-gnu/libaio.so.1.0.1 /usr/lib/x86_64-linux-gnu/libaio.so.1.0.1
 RUN chmod a+x /content-service-entrypoint.sh
 CMD ["/content-service-entrypoint.sh"]
 
