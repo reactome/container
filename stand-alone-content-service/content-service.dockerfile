@@ -60,39 +60,23 @@ RUN mkdir -p /usr/local/diagram/static && \
 	mkdir -p /var/www/html/download/current/ehld && \
 	mkdir -p /usr/local/interactors/tuple && \
 	apt-get update && apt-get install lsb-release -y && \
-	# wget http://repo.mysql.com/mysql-apt-config_0.8.16-1_all.deb \
-	#     && echo mysql-apt-config    mysql-apt-config/repo-codename  select  bionic | debconf-set-selections \
-	#     && echo mysql-apt-config    mysql-apt-config/repo-distro    select  ubuntu | debconf-set-selections \
-	#     && echo mysql-apt-config    mysql-apt-config/select-server  select  mysql-5.7 | debconf-set-selections \
-	#     && echo mysql-apt-config    mysql-apt-config/select-product select  Ok | debconf-set-selections \
-	#     && dpkg -i mysql-apt-config_0.8.16-1_all.deb \
-	#     && apt-get update && apt-get install -y mysql-server=5.7.33-1ubuntu18.04 && \
 	apt-get install netcat gosu procps mlocate -y && \
 	apt-get autoremove && ln -s  $(which gosu) /bin/su-exec
-# RUN wget --progress=bar:force https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.34-linux-glibc2.12-i686.tar.gz && \
-# 	tar -xzf mysql-5.7.34-linux-glibc2.12-i686.tar.gz && rm mysql-5.7.34-linux-glibc2.12-i686.tar.gz && \
-# 	cp -ra mysql-5.7.34-linux-glibc2.12-i686/bin/* /usr/bin/ && \
-# 	cp -ra mysql-5.7.34-linux-glibc2.12-i686/lib/* /usr/lib/ && \
-# 	cp -ra mysql-5.7.34-linux-glibc2.12-i686/support-files/mysql.server  /etc/init.d/mysql.server && \
-# 	rm -rf  mysql-5.7.34-linux-glibc2.12-i686
 
-# RUN wget --progress=bar:force https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-community-source_5.7.34-1ubuntu18.04_amd64.deb && \
-# 	dpkg -i mysql-community-source_5.7.34-1ubuntu18.04_amd64.deb
-
-RUN wget --progress=bar:force https://downloads.mysql.com/archives/get/p/23/file/mysql-server_5.7.33-1ubuntu18.04_amd64.deb-bundle.tar
-RUN apt-get update && apt-get install libaio1 libc6 libmecab2 libnuma1 perl -y
+RUN wget --progress=bar:force https://downloads.mysql.com/archives/get/p/23/file/mysql-server_5.7.33-1ubuntu18.04_amd64.deb-bundle.tar && \
+	apt-get update && apt-get install libaio1 libc6 libmecab2 libnuma1 perl -y && \
 # MySQL requires newer version of libc6 than what is already in this docker image
-RUN tar -xf mysql-server_5.7.33-1ubuntu18.04_amd64.deb-bundle.tar && ls -lht *.deb && \
+	tar -xf mysql-server_5.7.33-1ubuntu18.04_amd64.deb-bundle.tar && ls -lht *.deb && \
 	wget --progress=bar:force http://archive.ubuntu.com/ubuntu/pool/main/g/glibc/libc6_2.27-3ubuntu1_amd64.deb && \
 	dpkg -i libc6_2.27-3ubuntu1_amd64.deb && \
+# OBVIOUSLY don't expose this container to the outside world! Or change the password here and in the application config.
 	echo 'mysql-community-server-5.7.33 mysql-community-server/root_password password root' | debconf-set-selections && \
 	echo 'mysql-community-server mysql-community-server/root_password password root' | debconf-set-selections  && \
 	dpkg -i mysql-common_5.7.33-1ubuntu18.04_amd64.deb && \
 	dpkg -i mysql-community-client_5.7.33-1ubuntu18.04_amd64.deb && \
 	dpkg -i mysql-client_5.7.33-1ubuntu18.04_amd64.deb && \
 	dpkg -i mysql-community-server_5.7.33-1ubuntu18.04_amd64.deb && \
-	rm -rf *.deb mysql-server_5.7.33-1ubuntu18.04_amd64.deb-bundle.tar && \
-	pwd && ls -lht
+	rm -rf *.deb mysql-server_5.7.33-1ubuntu18.04_amd64.deb-bundle.tar 
 
 # OR maybe just install MySQL from https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.34-linux-glibc2.12-i686.tar.gz
 # load and set entrypoint
