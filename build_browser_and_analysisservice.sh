@@ -1,6 +1,6 @@
 #! /bin/bash
 
-RELEASE_VERSION=Release76
+RELEASE_VERSION=Release77
 NEO4J_USER=neo4j
 NEO4J_PASSWORD=neo4j-password
 
@@ -48,7 +48,8 @@ docker build -t reactome/diagram-generator:${RELEASE_VERSION} \
 # You will need to generate a Personal Access Token to access the Reacfoam repo. Save it in a file "github.token"
 # Make sure you give the token the permissions: repo (repo:status, repo_deployment, public_repo, repo:invite, security_events) and read:repo_hook
 cd $STARTING_DIR/pathway-browser
-GITHUB_TOKEN=$(cat github.token)
+set -x
+GITHUB_TOKEN=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
 echo -e "===\nBuilding analysis-service + PathwayBrowser image...\n"
 docker build -t reactome/analysis-service-and-pwb:${RELEASE_VERSION} \
 	--build-arg NEO4J_USER=$NEO4J_USER \
@@ -56,7 +57,7 @@ docker build -t reactome/analysis-service-and-pwb:${RELEASE_VERSION} \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
 	--build-arg GITHUB_TOKEN=$GITHUB_TOKEN \
 	-f pathway-browser.dockerfile .
-
+set +x
 cd $STARTING_DIR
 
 echo -e "===\nImages built: "

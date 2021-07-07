@@ -1,6 +1,6 @@
 #! /bin/bash
 
-RELEASE_VERSION=Release76
+RELEASE_VERSION=Release77
 NEO4J_USER=neo4j
 NEO4J_PASSWORD=neo4j-password
 
