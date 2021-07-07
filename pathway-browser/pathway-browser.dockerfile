@@ -51,12 +51,15 @@ RUN cp /experiments.bin /webapps/experiments.bin
 
 FROM reactome/analysis-core:${RELEASE_VERSION} AS analysiscorebuilder
 FROM reactome/stand-alone-analysis-service:${RELEASE_VERSION} AS analysisservice
-FROM reactome/stand-alone-content-service:${RELEASE_VERSION} AS contentservice
-FROM reactome/graphdb:${RELEASE_VERSION} AS graphdb
-FROM reactome/fireworks-generator:${RELEASE_VERSION} as fireworks
-FROM reactome/diagram-generator:${RELEASE_VERSION} as diagrams
+# FROM reactome/graphdb:${RELEASE_VERSION} AS graphdb
+# FROM reactome/fireworks-generator:${RELEASE_VERSION} as fireworks
+# FROM reactome/diagram-generator:${RELEASE_VERSION} as diagrams
+# Use content-service as the final base-layer because
+# it already contains Tomcat, ContentService, MySQL, Neo4j, Solr,
+# Fireworks, and Diagrams
+FROM reactome/stand-alone-content-service:${RELEASE_VERSION}
 # Ok, now re-base the image as Tomcat
-FROM tomcat:8.5.35-jre8
+# FROM tomcat:8.5.35-jre8
 ENV EXTENSION_SCRIPT=/data/neo4j-init.sh
 ENV NEO4J_EDITION=community
 ARG NEO4J_USER=neo4j
@@ -74,31 +77,31 @@ RUN mkdir -p /usr/local/diagram/static && \
 
 COPY ./entrypoint.sh /entrypoint.sh
 RUN mkdir -p /usr/local/AnalysisService/analysis-results \
-  && useradd neo4j \
+  # && useradd neo4j \
   && chmod a+x /entrypoint.sh
 # Copy the analysis file
-COPY --from=fireworks /fireworks-json-files /tmp/fireworks
+# COPY --from=fireworks /fireworks-json-files /tmp/fireworks
 # ContentService expects fireworks to be in a different location...
 # And since we're relying on a pre-built image for ContentService AND AnalysisService,
 # It's easier to just put Fireworks in both places. Future TODO: make all images use the same location, for consistency.
-RUN mkdir -p /usr/local/tomcat/webapps/download/current/ \
-	&& cp -r /tmp/fireworks /usr/local/tomcat/webapps/download/current/fireworks \
-	&& rm -rf /tmp/fireworks
+RUN mkdir -p /usr/local/tomcat/webapps/download/current/
+#	 && cp -r /tmp/fireworks /usr/local/tomcat/webapps/download/current/fireworks \
+#	 && rm -rf /tmp/fireworks
 
 COPY --from=analysiscorebuilder /output/analysis.bin /analysis.bin
 # Copy the web applications created in the builder stage.
 COPY --from=builder /webapps/ /usr/local/tomcat/webapps/
 COPY --from=builder /webapps/experiments.bin /experiments.bin
 # Copy graph database
-COPY --from=graphdb /data/neo4j-init.sh /data/neo4j-init.sh
-COPY --from=graphdb /docker-entrypoint.sh /neo4j-entrypoint.sh
-COPY --from=graphdb /var/lib/neo4j /var/lib/neo4j
-COPY --from=graphdb /logs /var/lib/neo4j/logs
-COPY --from=graphdb /var/lib/neo4j/conf/neo4j.conf /var/lib/neo4j/conf/neo4j.conf
-COPY --from=graphdb /data /var/lib/neo4j/data
+# COPY --from=graphdb /data/neo4j-init.sh /data/neo4j-init.sh
+# COPY --from=graphdb /docker-entrypoint.sh /neo4j-entrypoint.sh
+# COPY --from=graphdb /var/lib/neo4j /var/lib/neo4j
+# COPY --from=graphdb /logs /var/lib/neo4j/logs
+# COPY --from=graphdb /var/lib/neo4j/conf/neo4j.conf /var/lib/neo4j/conf/neo4j.conf
+# COPY --from=graphdb /data /var/lib/neo4j/data
 COPY --from=analysisservice /usr/local/tomcat/webapps/AnalysisService.war /usr/local/tomcat/webapps/AnalysisService.war
-COPY --from=contentservice /usr/local/tomcat/webapps/ContentService.war /usr/local/tomcat/webapps/ContentService.war
-COPY --from=diagrams /diagrams /usr/local/tomcat/webapps/download/current/diagram
+# COPY --from=contentservice /usr/local/tomcat/webapps/ContentService.war /usr/local/tomcat/webapps/ContentService.war
+# COPY --from=diagrams /diagrams /usr/local/tomcat/webapps/download/current/diagram
 COPY ./wait-for.sh /wait-for.sh
 
 # Set up links to fireworks files for reacfoam
@@ -111,9 +114,12 @@ ADD https://reactome.org/download/current/ehlds.tgz /usr/local/tomcat/webapps/do
 RUN cd /usr/local/tomcat/webapps/download/current && tar -zxf ehld.tgz && rm ehld.tgz
 ADD https://reactome.org/download/current/ehld/svgsummary.txt /usr/local/tomcat/webapps/download/current/ehld/svgsummary.txt
 RUN chmod a+r /usr/local/tomcat/webapps/download/current/ehld/svgsummary.txt
-
-
+RUN chown -R www-data:www-data /usr/local/diagram/static/* && ln -s /usr/local/diagram/static /usr/local/tomcat/webapps/download/current/diagram && chown -R www-data:www-data /usr/local/tomcat/webapps/download/current/diagram
+# Allow symlinks for the JSON files in /usr/local/tomcat/webapps/download/current/diagram , othwerwise, certain PwB features may not work.
+RUN mkdir -p /usr/local/tomcat/webapps/download/META-INF/ && \
+	echo "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Context path=\"/download\"><Resources allowLinking=\"true\"></Resources></Context>" > /usr/local/tomcat/webapps/download/META-INF/context.xml
 # load and set entrypoint
 CMD ["/entrypoint.sh"]
-RUN apt-get update && apt-get install netcat gosu procps -y && apt-get autoremove && ln -s  $(which gosu) /bin/su-exec
+# This is already done in the content-service layer
+# RUN ln -s  $(which gosu) /bin/su-exec
 # Run this as: docker run --name reactome-analysis-service -p 8080:8080 reactome/stand-alone-analysis-service:Release71
