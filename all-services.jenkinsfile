@@ -37,7 +37,7 @@ pipeline
                     script
                     {
                         sh "ls -lht"
-                        docker.build("reactome/graphdb:${env.RELEASE_VERSION} --no-cache --build-arg GRAPHDB_LOCATION=reactome-${env.RELEASE_VERSION}.graphdb.tgz --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f ./neo4j_stand-alone.dockerfile")
+                        docker.build("reactome/graphdb:${env.RELEASE_VERSION} --build-arg GRAPHDB_LOCATION=reactome-${env.RELEASE_VERSION}.graphdb.tgz --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f ./neo4j_stand-alone.dockerfile")
                     }
                 }
             }
