@@ -58,7 +58,7 @@ WORKDIR /
 COPY ./generate_diagrams.sh /diagram-converter/generate_diagrams.sh
 # neo4j-entrypoint expects su-exec, but there doesn't seem to be a package for that. gosu should be able to do the same thing.
 # The sed line below is to make Java more compatible with MySQL 5.7 because I can't seem to get MySQL 5.7 working with TLSv1.2
-RUN apt-get install software-properties-common -y -qq \
+RUN apt-get update && apt-get install software-properties-common -y -qq \
   && apt-add-repository 'deb http://security.debian.org/debian-security stretch/updates main' \
   && mkdir -p /usr/share/man/man1 && \
   apt-get update && apt-get install gosu openjdk-8-jdk-headless openjdk-8-jre-headless netcat -y -qq \
