@@ -49,7 +49,7 @@ docker build -t reactome/diagram-generator:${RELEASE_VERSION} \
 # Make sure you give the token the permissions: repo (repo:status, repo_deployment, public_repo, repo:invite, security_events) and read:repo_hook
 cd $STARTING_DIR/pathway-browser
 set -x
-GITHUB_TOKEN=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
+GITHUB_TOKEN=$(cat github.token)
 echo -e "===\nBuilding analysis-service + PathwayBrowser image...\n"
 docker build -t reactome/analysis-service-and-pwb:${RELEASE_VERSION} \
 	--build-arg NEO4J_USER=$NEO4J_USER \
