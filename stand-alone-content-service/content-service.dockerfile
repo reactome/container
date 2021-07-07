@@ -45,15 +45,14 @@ FROM reactome/reactome-mysql:${RELEASE_VERSION} as relationaldb
 # Final re-base will be Tomcat
 FROM tomcat:8.5.35-jre8
 
-
 ENV EXTENSION_SCRIPT=/data/neo4j-init.sh
 ENV NEO4J_EDITION=community
-
+# We'll need a neo4j and solr user
 RUN useradd neo4j
 RUN useradd solr
 
 EXPOSE 8080
-# RUN uname -a && exit 2
+
 # Paths for content service
 RUN mkdir -p /usr/local/diagram/static && \
 	mkdir -p /usr/local/diagram/exporter && \
@@ -69,14 +68,14 @@ RUN wget --progress=bar:force https://downloads.mysql.com/archives/get/p/23/file
 	tar -xf mysql-server_5.7.33-1ubuntu18.04_amd64.deb-bundle.tar && ls -lht *.deb && \
 	wget --progress=bar:force http://archive.ubuntu.com/ubuntu/pool/main/g/glibc/libc6_2.27-3ubuntu1_amd64.deb && \
 	dpkg -i libc6_2.27-3ubuntu1_amd64.deb && \
-# OBVIOUSLY don't expose this container to the outside world! Or change the password here and in the application config.
+# OBVIOUSLY don't expose this container to the outside world! Or change the password here *AND* in the application config.
 	echo 'mysql-community-server-5.7.33 mysql-community-server/root_password password root' | debconf-set-selections && \
 	echo 'mysql-community-server mysql-community-server/root_password password root' | debconf-set-selections  && \
 	dpkg -i mysql-common_5.7.33-1ubuntu18.04_amd64.deb && \
 	dpkg -i mysql-community-client_5.7.33-1ubuntu18.04_amd64.deb && \
 	dpkg -i mysql-client_5.7.33-1ubuntu18.04_amd64.deb && \
 	dpkg -i mysql-community-server_5.7.33-1ubuntu18.04_amd64.deb && \
-	rm -rf *.deb mysql-server_5.7.33-1ubuntu18.04_amd64.deb-bundle.tar 
+	rm -rf *.deb mysql-server_5.7.33-1ubuntu18.04_amd64.deb-bundle.tar
 
 # OR maybe just install MySQL from https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.34-linux-glibc2.12-i686.tar.gz
 # load and set entrypoint
@@ -87,13 +86,11 @@ ARG NEO4J_PASSWORD=neo4j-password
 ENV NEO4J_USER ${NEO4J_USER}
 ENV NEO4J_PASSWORD ${NEO4J_PASSWORD}
 ENV NEO4J_AUTH="${NEO4J_USER}/${NEO4J_PASSWORD}"
+
 # Copy the web applications created in the builder stage.
 COPY --from=builder /webapps/ /usr/local/tomcat/webapps/
-
+# Copy the MySQL database
 COPY --from=relationaldb /data/mysql /var/lib/mysql
-# COPY --from=relationaldb /usr/bin/mysql* /usr/bin/
-# COPY --from=relationaldb /usr/sbin/mysql* /usr/sbin/
-
 # Copy graph database
 COPY --from=graphdb /var/lib/neo4j /var/lib/neo4j
 COPY --from=graphdb /var/lib/neo4j/logs /var/lib/neo4j/logs
@@ -110,8 +107,6 @@ COPY --from=solr /custom-solr-conf /custom-solr-conf
 COPY --from=solr /docker-entrypoint-initdb.d /docker-entrypoint-initdb.d
 COPY --from=diagrams /diagrams /usr/local/diagram/static
 COPY --from=fireworks /fireworks-json-files /usr/local/tomcat/webapps/download/current/fireworks
-# COPY --from=relationaldb /usr/lib/x86_64-linux-gnu/libaio.so.1 /usr/lib/x86_64-linux-gnu/libaio.so.1
-# COPY --from=relationaldb /usr/lib/x86_64-linux-gnu/libaio.so.1.0.1 /usr/lib/x86_64-linux-gnu/libaio.so.1.0.1
 RUN chmod a+x /content-service-entrypoint.sh
 CMD ["/content-service-entrypoint.sh"]
 
