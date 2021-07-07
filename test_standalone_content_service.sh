@@ -65,6 +65,8 @@ check_vals ContentService/data/eventsHierarchy/9606 'Human event hierarchy'
 # check_vals 'ContentService/exporter/diagram/R-HSA-177929.svg?quality=5&flgInteractors=true&title=true&margin=15&ehld=true&diagramProfile=Modern&resource=total&analysisProfile=Standard' "SVG_Export"
 # It seems like for SBGN, the order of output elements might also be non-deterministic, so I guess only SBML is going to be easy to test...
 
+# ...never mind, it seems that the elements in SBML Exports might not be in the same sequence, and it looks like even some metadata might not be exactly the same. Comparing outputs could be very difficult.
+# Verify that they are produced but don't freak out if they don't match. OR, use some sort of SBML-specific tool (if it exists) to check for diffs.
 echo -e "\nChecking SBML export"
 check_vals 'ContentService/exporter/event/R-HSA-5205682.sbml' 'SBML_Export'
 
