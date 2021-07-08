@@ -1,19 +1,10 @@
-
-
-:warning: _**ATTENTION**_ :warning:
-
-This project is currently a :construction: "work-in-progress" :construction:. The most current code is currently on the [feature/Joomla](https://github.com/reactome/container/tree/feature/Joomla) branch, though please be aware that since there is active development on that branch, the code may change unexpectedly.
-
 # Reactome Container
 
 ## Table of Contents
 
 - [Overview](#overview)
-- [Details](#details)
-- [Setup](#set-up)
-- [Bulding the docker images](#Bulding-the-docker-images)
-- [How to use](#how-to-use)
-- [Configuration](#configuration)
+- [docker-compose](#docker-compose)
+- [Stand-alone images](#Stand-alone-images)
 
 ## Overview
 
@@ -22,6 +13,8 @@ This project is currently a :construction: "work-in-progress" :construction:. Th
 There are two ways to use the contents of this repository. The first is to run a set of docker containers connected to each other with docker-compose. This is intended to replicate the Reactome production environment as closely as possible.
 
 The second way is to build and run a set of stand-alone containers that only provide a single, independent service.
+
+Be aware that building these images can be a resource-intensive process. You will want to ensure you have about 30 GB free to build the largest images. The final images are not that big, but docker will use up more disk space while its building. Some image-builds may also require &gt; 10 GB of RAM while building (Note: these numbers are estimates, based on observations made while building on one specific machine - resource usage might be different with different OS/hardware configurations).
 
 ### docker-compose
 
@@ -66,3 +59,23 @@ In the [stand-alone-analysis-service](./stand-alone-analysis-service) directory,
 
 #### analysis-service-and-pathwaybrowser
 In the [pathway-browser](./pathway-browser) directory, there is a dockerfile named `pathway-browser.dockerfile`. This file will let you build a docker image that contains the PathwayBrowser & the Analysis Service and all supporting components.
+
+### Scripts
+There are a few convenience script to help build the stand-alone docker images.
+
+ - build_all.sh
+ - build_browser_and_analysisservice.sh
+ - build_standalone_analysisservice.sh
+ - build_standalone_content_service.sh
+
+#### build_all.sh
+This script builds all of the images needed to run the docker-compose setup. Be aware that the docker-compose setup is not actively used at the moment (2021-07-08) so this script might be out of date.
+
+#### build_browser_and_analysisservice.sh
+This script will build all of the images neede to build the final `analysis-service-and-pwb` image. It does not take any arguments. Be sure to update the value for `$RELEASE_VERSION` when you are running it for a new release.
+
+#### build_standalone_analysisservice.sh
+This script will build all of the images neede to build the final `stand-alone-analysis-service` image. It does not take any arguments. Be sure to update the value for `$RELEASE_VERSION` when you are running it for a new release.
+
+#### build_standalone_contentservice.sh
+This script will build all of the images neede to build the final `stand-alone-content-service` image. It does not take any arguments. Be sure to update the value for `$RELEASE_VERSION` when you are running it for a new release.
