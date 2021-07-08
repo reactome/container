@@ -63,3 +63,6 @@ In the [stand-alone-content-service](./stand-alone-content-service) directory, t
 
 #### stand-alone-analysis-service
 In the [stand-alone-analysis-service](./stand-alone-analysis-service) directory, there is a docker file named `analysis-service.dockerfile`. This will let you build a docker image that contains the AnalysisService and all supporting components.
+
+#### analysis-service-and-pathwaybrowser
+In the [pathway-browser](./pathway-browser) directory, there is a dockerfile named `pathway-browser.dockerfile`. This file will let you build a docker image that contains the PathwayBrowser & the Analysis Service and all supporting components.
