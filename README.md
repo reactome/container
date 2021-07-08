@@ -72,10 +72,17 @@ There are a few convenience script to help build the stand-alone docker images.
 This script builds all of the images needed to run the docker-compose setup. Be aware that the docker-compose setup is not actively used at the moment (2021-07-08) so this script might be out of date.
 
 #### build_browser_and_analysisservice.sh
-This script will build all of the images neede to build the final `analysis-service-and-pwb` image. It does not take any arguments. Be sure to update the value for `$RELEASE_VERSION` when you are running it for a new release.
+This script will build all of the images neede to build the final `stand-alone-analysis-service` image. It does not take any arguments. Be sure to update the value for `$RELEASE_VERSION` when you are running it for a new release.
 
 #### build_standalone_analysisservice.sh
 This script will build all of the images neede to build the final `stand-alone-analysis-service` image. It does not take any arguments. Be sure to update the value for `$RELEASE_VERSION` when you are running it for a new release.
 
 #### build_standalone_contentservice.sh
 This script will build all of the images neede to build the final `stand-alone-content-service` image. It does not take any arguments. Be sure to update the value for `$RELEASE_VERSION` when you are running it for a new release.
+
+### Jenkinsfiles
+There are a few Jenkinsfiles that can be used to build the docker images from Jenkins.
+
+ - all-services.jenkinsfile - This file will build docker images for `stand-alone-analysis-service`, `stand-alone-analysis-service`, `stand-alone-analysis-service`, and `graphdb`.
+ - analysis-service.jenkinsfile - This file will build docker images for `stand-alone-analysis-service`. NOTE: `all-services.jenkinsfile` is what's currently used in the Jenkins setup, so `stand-alone-analysis-service` might not be up to date.
+ - content-service.jenkinsfile - This file will build docker images for `stand-alone-content-service`. NOTE: `all-services.jenkinsfile` is what's currently used in the Jenkins setup, so `stand-alone-content-service` might not be up to date.
