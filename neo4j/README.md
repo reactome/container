@@ -17,7 +17,7 @@ The image can be run like this:
 ```bash
 docker run --rm -p 7474:7474 -p 7687:7687 --name reactome-graphdb reactome/graphdb:R999
 ```
-  - neo4j-ini.sh - this is used to extract and prepare the graph database file for neo4j.
+ - neo4j-ini.sh - this is used to extract and prepare the graph database file for neo4j.
 
  - neo4j_generated_from_mysql.dockerfile - this is used to build a new docker image that contains the Reactome graph database. This dockerfile will build the graph database from the data in the Reactome MySQL database. See [mysql](../mysql/README.md) for more information about the MySQL database. This dockerfile is used by others which can be used to run the entire Reactome system in docker containers.
-  - generate_graphdb.sh - this is used to generate the graph database from the relational database.
+ - generate_graphdb.sh - this is used to generate the graph database from the relational database using the [graph-importer](https://github.com/reactome/graph-importer).
