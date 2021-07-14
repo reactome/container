@@ -12,6 +12,14 @@ bash /neo4j-entrypoint.sh neo4j &
 echo "Waiting for Neo4j..."
 bash /wait-for.sh localhost:7687 -t 90 && bash /wait-for.sh localhost:7474 -t 90
 
+echo "Waiting for solr..."
+su-exec solr solr-foreground &
+bash /wait-for.sh localhost:8983 -t 120
+
+echo "Waiting for MySQL..."
+mysqld --user=root &
+bash /wait-for.sh localhost:3306 -t 120
+
 echo "Starting tomcat..."
 # Now that Neo4j has been started, we can run tomcat
 cd /usr/local/tomcat

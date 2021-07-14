@@ -1,6 +1,6 @@
 #! /bin/bash
 
-RELEASE_VERSION=Release76
+RELEASE_VERSION=Release77
 NEO4J_USER=neo4j
 NEO4J_PASSWORD=neo4j-password
 
@@ -37,9 +37,17 @@ docker build -t reactome/diagram-generator:${RELEASE_VERSION} \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
 	-f diagram-generator.dockerfile .
 
+echo -e "===\nGenerating Fireworks files...\n"
+cd $STARTING_DIR/fireworks-generator
+docker build -t reactome/fireworks-generator:$RELEASE_VERSION \
+	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
+	--build-arg NEO4J_USER=$NEO4J_USER \
+	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
+	-f fireworks-generator.dockerfile .
+
 echo -e "===\nBuilding content-service image...\n"
 cd $STARTING_DIR/stand-alone-content-service
-docker build -t reactome/stand-alone-content-service \
+docker build -t reactome/stand-alone-content-service:${RELEASE_VERSION} \
 	--build-arg NEO4J_USER=$NEO4J_USER \
 	--build-arg NEO4J_PASSWORD=$NEO4J_PASSWORD \
 	--build-arg RELEASE_VERSION=$RELEASE_VERSION \
@@ -51,5 +59,5 @@ echo -e "===\nImages built: "
 # We are building 4 "reactome" images, so lets display them
 docker images | grep "reactome" | head -n 4
 
-echo -e "Now you can run the stand-alone content-service like this:\n'docker run --name reactome-content-service -p 8080:8080 reactome/stand-alone-content-service:Release${RELEASE_VERSION}'"
+echo -e "Now you can run the stand-alone content-service like this:\n'docker run --name reactome-content-service -p 8080:8080 reactome/stand-alone-content-service:${RELEASE_VERSION}'"
 set +e

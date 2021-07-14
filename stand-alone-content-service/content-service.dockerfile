@@ -1,4 +1,4 @@
-ARG RELEASE_VERSION=Release75
+ARG RELEASE_VERSION=Release77
 FROM maven:3.6.3-jdk-8 AS builder
 
 RUN mkdir -p /gitroot
@@ -40,12 +40,14 @@ FROM reactome/solr:${RELEASE_VERSION} as solr
 FROM reactome/diagram-generator:${RELEASE_VERSION} as diagrams
 # Get Fireworks files
 FROM reactome/fireworks-generator:${RELEASE_VERSION} as fireworks
+# Need relational database for SBML export
+FROM reactome/reactome-mysql:${RELEASE_VERSION} as relationaldb
 # Final re-base will be Tomcat
 FROM tomcat:8.5.35-jre8
 
 ENV EXTENSION_SCRIPT=/data/neo4j-init.sh
 ENV NEO4J_EDITION=community
-
+# We'll need a neo4j and solr user
 RUN useradd neo4j
 RUN useradd solr
 
@@ -56,7 +58,26 @@ RUN mkdir -p /usr/local/diagram/static && \
 	mkdir -p /usr/local/diagram/exporter && \
 	mkdir -p /var/www/html/download/current/ehld && \
 	mkdir -p /usr/local/interactors/tuple && \
-	apt-get update && apt-get install netcat gosu procps -y && apt-get autoremove && ln -s  $(which gosu) /bin/su-exec
+	apt-get update && apt-get install lsb-release -y && \
+	apt-get install netcat gosu procps mlocate -y && \
+	apt-get autoremove && ln -s  $(which gosu) /bin/su-exec
+
+RUN wget --progress=bar:force https://downloads.mysql.com/archives/get/p/23/file/mysql-server_5.7.33-1ubuntu18.04_amd64.deb-bundle.tar && \
+	apt-get update && apt-get install libaio1 libc6 libmecab2 libnuma1 perl -y && \
+# MySQL requires newer version of libc6 than what is already in this docker image
+	tar -xf mysql-server_5.7.33-1ubuntu18.04_amd64.deb-bundle.tar && ls -lht *.deb && \
+	wget --progress=bar:force http://archive.ubuntu.com/ubuntu/pool/main/g/glibc/libc6_2.27-3ubuntu1_amd64.deb && \
+	dpkg -i libc6_2.27-3ubuntu1_amd64.deb && \
+# OBVIOUSLY don't expose this container to the outside world! Or change the password here *AND* in the application config.
+	echo 'mysql-community-server-5.7.33 mysql-community-server/root_password password root' | debconf-set-selections && \
+	echo 'mysql-community-server mysql-community-server/root_password password root' | debconf-set-selections  && \
+	dpkg -i mysql-common_5.7.33-1ubuntu18.04_amd64.deb && \
+	dpkg -i mysql-community-client_5.7.33-1ubuntu18.04_amd64.deb && \
+	dpkg -i mysql-client_5.7.33-1ubuntu18.04_amd64.deb && \
+	dpkg -i mysql-community-server_5.7.33-1ubuntu18.04_amd64.deb && \
+	rm -rf *.deb mysql-server_5.7.33-1ubuntu18.04_amd64.deb-bundle.tar
+
+# OR maybe just install MySQL from https://dev.mysql.com/get/Downloads/MySQL-5.7/mysql-5.7.34-linux-glibc2.12-i686.tar.gz
 # load and set entrypoint
 COPY ./wait-for.sh /wait-for.sh
 COPY ./entrypoint.sh /content-service-entrypoint.sh
@@ -65,8 +86,11 @@ ARG NEO4J_PASSWORD=neo4j-password
 ENV NEO4J_USER ${NEO4J_USER}
 ENV NEO4J_PASSWORD ${NEO4J_PASSWORD}
 ENV NEO4J_AUTH="${NEO4J_USER}/${NEO4J_PASSWORD}"
+
 # Copy the web applications created in the builder stage.
 COPY --from=builder /webapps/ /usr/local/tomcat/webapps/
+# Copy the MySQL database
+COPY --from=relationaldb /data/mysql /var/lib/mysql
 # Copy graph database
 COPY --from=graphdb /var/lib/neo4j /var/lib/neo4j
 COPY --from=graphdb /var/lib/neo4j/logs /var/lib/neo4j/logs

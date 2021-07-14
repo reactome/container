@@ -3,7 +3,7 @@
 # simple script to build ALL of the images necessary to run Reactome in docker containers.
 
 #TODO: get the Release version as well as Neo4j username/password from a file.
-RELEASE_VERSION=Release75
+RELEASE_VERSION=Release77
 NEO4J_USER=neo4j
 NEO4J_PASSWORD=n304j
 set -e
