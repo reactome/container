@@ -5,7 +5,7 @@ RUN mkdir -p /gitroot
 WORKDIR /gitroot
 # master fails when interacting with neo4j, for some reason.
 # ENV ANALYSIS_CORE_VERSION=386fd461c2c702e574ad178f8995f3a8a7390166
-ENV ANALYSIS_CORE_VERSION=feature/java-8-build
+ENV ANALYSIS_CORE_VERSION=00b0bb611a6ef8892e07a91745464de328610580
 RUN git clone https://github.com/reactome/analysis-core.git && \
 	cd analysis-core && git checkout $ANALYSIS_CORE_VERSION && \
 	cd /gitroot/analysis-core && \
