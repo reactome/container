@@ -20,3 +20,7 @@ fireworks_and_diagrams.tar.gz
 diagram.tgz
 id_rsa*
 *.token
+
+# IntelliJ Files
+.idea/
+*.iml
