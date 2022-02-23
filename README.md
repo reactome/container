@@ -1,163 +1,90 @@
-
-
-:warning: _**ATTENTION**_ :warning:
-
-This project is currently a :construction: "work-in-progress" :construction:. The most current code is currently on the [feature/Joomla](https://github.com/reactome/container/tree/feature/Joomla) branch, though please be aware that since there is active development on that branch, the code may change unexpectedly.
-
 # Reactome Container
 
 ## Table of Contents
 
 - [Overview](#overview)
-- [Details](#details)
-- [Setup](#set-up)
-- [Bulding the docker images](#Bulding-the-docker-images)
-- [How to use](#how-to-use)
-- [Configuration](#configuration)
+- [docker-compose](#docker-compose)
+- [Stand-alone images](#Stand-alone-images)
+- [Scripts](#scripts)
+- [Jenkinsfiles](#jenkinsfiles)
 
 ## Overview
 
 [Reactome](http://reactome.org/) is a free, open-source, curated and peer reviewed pathway database. It is an online bioinformatics database of human biology described in molecular terms. It is an on-line encyclopedia of core human pathways. [Reactome Wiki](http://wiki.reactome.org/index.php/Main_Page) provides more details about reactome.
 
-This project enables users to setup a standalone reactome server on their own system. With this server users will be able to run an instance of [Reactome](http://reactome.org/) on their local system. The components of the Reactome server are packaged in  docker containers, so any system capable of running docker can run an instance of this server. The image given below gives a high-level view of the project describing how different components of the project are connected to each other and what endpoints are available to the user for interaction.
+There are two ways to use the contents of this repository. The first is to run a set of docker containers connected to each other with docker-compose. This is intended to replicate the Reactome production environment as closely as possible.
 
-![reactome-no-volume](./documentation-images/all-services-abstract-view.png)
+The second way is to build and run a set of stand-alone containers that only provide a single, independent service.
 
-The graphs on this page were generated using [docker-compose-viz](https://github.com/pmsipilot/docker-compose-viz). For a better understanding of these graphs, visit [docker-compose-viz/How to read the graph](https://github.com/pmsipilot/docker-compose-viz#how-to-read-the-graph).
+Be aware that building these images can be a resource-intensive process. You will want to ensure you have about 30 GB free to build the largest images. The final images are not that big, but docker will use up more disk space while its building. Some image-builds may also require &gt; 10 GB of RAM while building (Note: these numbers are estimates, based on observations made while building on one specific machine - resource usage might be different with different OS/hardware configurations).
 
-### Details
+### docker-compose
 
-This project builds up a reactome server with all the required java applications inside docker containers and deploys them. A detailed view of structure of the project is shown in the image below. This image describes how files on the host are mapped inside the container.
+This option will create and run the following containers:
 
-![All services - detailed view](./documentation-images/all-services.png)
+ - mysql-for-tomcat - This contains the Reactome's biological pathways, as a relational database.
+ - mysql-for-joomla - THis contains Reactome's CMS (Joomla) content.
+ - neo4j-db -  This contains the Reactome's biological pathways, as a graph database.
+ - solr - This contains Reactome's solr index.
+ - tomcat - This contains Tomcat, and all of the Reactome web applications.
+ - joomla-sites - This contains the Reactome CMS (Reactome uses Joomla).
 
-The graphical representation of each internal service is shown below
-
-Tomcat
-![Tomcat](./documentation-images/tomcat.png)
-
-Joomla
-![Joomla](./documentation-images/joomla.png)
-
-MySQL (For Tomcat and Joomla)
-![MySQL for Tomcat and Joomla](./documentation-images/MySQL_DBs.png)
-
-Solr
-![Solr](./documentation-images/solr.png)
-
-Neo4j
-![Neo4j](./documentation-images/neo4j-db.png)
-
-
-## Set Up
-
-Before you can run this project, you need to [install docker](https://docs.docker.com/install/), then [install docker-compose](https://docs.docker.com/compose/install/), and then [install git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git) on your system.
-
-Begin with cloning the repository along with its submodule using:
-
-```
-git clone --recursive https://github.com/reactome/container.git
-```
-
-If above command fails, or if you obtained copy of repository by zipped folder, then you may initialize submodule manually
-
-```
-git clone https://github.com/reactome/container.git
-cd container
-git submodule update --init --recursive
-```
-
-## Building the docker images
-
-A number of docker images need to be built in order to run the Reactome services. Many images are used to compile applications or create data. The diagram below illustrates the relationships between these images, and their dependencies.
-
-![Dependencies](./documentation-images/build-dependencies.png)
-
-To build the docker images, use the [`build_all.sh`](./build_all.sh) script>
-
+You can build these containers with a docker-compose command:
 ```bash
-bash ./build_all.sh
+$ docker-compose build
 ```
 
-This will build all of the intermediate images which create data or Java applications, as well as the final images which will be run as a part of your Reactome system.
-
-## Log folder permissions
-
-If solr or neo4j log folders have the wrong permissions, the containers will fail to run. To fix this you need to change the following permissions (assuming base directory): 
-
+You can run them with a run command (include the `-d` option if you want them to run in the background):
 ```bash
-chown -R 8983:8983 ./logs/solr
-chown -R 100:101 ./logs/neo4j
+$ docker-compose up
 ```
 
-If docker namespacing is set up, just sum uid/gid values with your namespace user's uid/gid.
+**NOTE** At the time of writing (2021-07-08), the docker-compose setup is not actively used and some parts of it may be out-of-date.
 
-## How to run
+### Stand-alone images
 
-After all images have been built successfully, use docker-compose to create a running Reactome system:
+This option will help you build a series of stand-alone images that contain just enough to run a single Reactome service. The images are:
 
-```bash
-docker-compose up
-```
+ - graphdb - This will create a docker image that contains Neo4j and the Reactome graph database.
+ - stand-alone-content-service - This will create a docker image that contains the ContentService web application, and any supporting components (Neo4j, MySQL, Tomcat, Solr)
+ - stand-alone-analysis-service - This will create a docker image that contains the AnalysisService web application, and any supporting components (Neo4j, Tomcat)
+ - analysis-service-and-pwb - This will create a docker image that contains the PathwayBrowser and AnalysisService web applications, and any supporting components (Neo4j, MySQL, Tomcat, Solr, ContentService)
 
-You will see the output of the various containers on the console. Your Reactome system is ready for use once you see a message from the Tomcat container that says something along the lines of
+#### graphdb
+In the [neo4j](./neo4j) directory, there are two dockerfiles: `neo4j_generated_from_mysql.dockerfile` & `neo4j_stand-alone.dockerfile`. `neo4j_generated_from_mysql.dockerfile` will build the Reactome graphdb docker image from the MySQL database using the [graph-importer](https://github.com/reactome/graph-importer). `neo4j_stand-alone.dockerfile` will build the docker image by downloading a pre-existing graph database from the Reactome [download page](https://reactome.org/download-data).
 
-> org.apache.catalina.startup.Catalina.start Server startup in 53252 ms
+#### stand-alone-content-service
+In the [stand-alone-content-service](./stand-alone-content-service) directory, there is a docker file named `content-service.dockerfile` that can be used to build a docker image that contains the ContentService, and all supporting components.
 
-You can navigate to [localhost](http://localhost) and you should see the main Reactome web page.
+#### stand-alone-analysis-service
+In the [stand-alone-analysis-service](./stand-alone-analysis-service) directory, there is a docker file named `analysis-service.dockerfile`. This will let you build a docker image that contains the AnalysisService and all supporting components.
 
-Other local URLs that may be of interest:
+#### analysis-service-and-pathwaybrowser
+In the [pathway-browser](./pathway-browser) directory, there is a dockerfile named `pathway-browser.dockerfile`. This file will let you build a docker image that contains the PathwayBrowser & the Analysis Service and all supporting components.
 
-- [localhost:8983](http://localhost:8983) - Solr Admin
-- [localhost:7474](http://localhost:7474) - Neo4j Admin
-- [localhost:8082](http://localhost:8082) - Tomcat Manager
+### Scripts
+There are a few convenience script to help build the stand-alone docker images.
 
-Use <kbd>Ctrl</kbd> - <kbd>C</kbd> to terminate the running system.
+ - build_all.sh
+ - build_browser_and_analysisservice.sh
+ - build_standalone_analysisservice.sh
+ - build_standalone_content_service.sh
 
-You can run docker-compose without `-d` flag once you have confirmed that your setup works correctly. `-d` runs docker-compose as a background process, so you won't see the output on the console.
-When you run use `-d`, shutting down the system requires an explicit docker-compose command:
+#### build_all.sh
+This script builds all of the images needed to run the docker-compose setup. Be aware that the docker-compose setup is not actively used at the moment (2021-07-08) so this script might be out of date.
 
-```bash
-docker-compose stop
-```
+#### build_browser_and_analysisservice.sh
+This script will build all of the images neede to build the final `stand-alone-analysis-service` image. It does not take any arguments. Be sure to update the value for `$RELEASE_VERSION` when you are running it for a new release.
 
-It is recommended that you become familiar with other docker & docker-compose commands, in order for you to efficiently work with dockerized tools.
+#### build_standalone_analysisservice.sh
+This script will build all of the images neede to build the final `stand-alone-analysis-service` image. It does not take any arguments. Be sure to update the value for `$RELEASE_VERSION` when you are running it for a new release.
 
-## Configuration
+#### build_standalone_contentservice.sh
+This script will build all of the images neede to build the final `stand-alone-content-service` image. It does not take any arguments. Be sure to update the value for `$RELEASE_VERSION` when you are running it for a new release.
 
-There are some aspects of this system that can be configured.
+### Jenkinsfiles
+There are a few Jenkinsfiles that can be used to build the docker images from Jenkins.
 
-### Release number
-
-You can configure the release number that will be used when build and running the system. The main place to configure this is in `build_all.sh`. Set the `RELEASE_NUMBER` variable to the Release number that you want to use.
-
-### Passwords
-
-You can configure some passwords for this system.
-
-___
-:warning:
-_If you plan to run this system on a publicly acccessible system, it is  **STRONGLY** recommended that you change the passwords._
-___
-
-#### Neo4j
-This password is ininitiall set in the `build_all.sh` script, and propagated to other components that need it. Set the `NEO4J_USER` and `NEO4J_PASSWORD` to your own values.
-
-Also be sure to update [./neo4j.env](./neo4j.env).
-
-#### Solr
-The password for the solr user is stored in [./solr/solr-security.json](./solr/solr-security.json). See https://lucene.apache.org/solr/guide/6_6/authentication-and-authorization-plugins.html for more information about how Solr handles security to learn how to modify this file. By default, the password is `solr`, you should change this.
-
-#### Tomcat
-The password for the tomcat admin user is found in [./tomcat/tomcast-users.xml](./tomcat/tomcast-users.xml). By default, the admin user is configured as
-
-```xml
-<user username="tomcat" password="tomcat-admin" roles="manager-gui"/>
-```
-
-You should change the username and the password.
-
-#### MySQL
-The MySQL containers should not have any publicly exposed ports when running. However, if you want to change the password for the database used by Tomcat, that can be set in [./mysql/mysql.dockerfile](./mysql/mysql.dockerfile); set the `MYSQL_ROOT_PASSWORD` variable. It will also need to be set in [./neo4j/neo4j_generated_from_mysql.dockerfile](./neo4j/neo4j_generated_from_mysql.dockerfile). Also be sure to update [./tomcat.env](./tomcat.env).
-
-For Joomla, you will need to set the passwords in [./joomla.env](./joomla.env).
+ - all-services.jenkinsfile - This file will build docker images for `stand-alone-analysis-service`, `stand-alone-analysis-service`, `stand-alone-analysis-service`, and `graphdb`.
+ - analysis-service.jenkinsfile - This file will build docker images for `stand-alone-analysis-service`. NOTE: `all-services.jenkinsfile` is what's currently used in the Jenkins setup, so `stand-alone-analysis-service` might not be up to date.
+ - content-service.jenkinsfile - This file will build docker images for `stand-alone-content-service`. NOTE: `all-services.jenkinsfile` is what's currently used in the Jenkins setup, so `stand-alone-content-service` might not be up to date.
