@@ -1,0 +1,55 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+						https://maven.apache.org/xsd/settings-1.0.0.xsd">
+	<localRepository>/mvn/alt-m2/</localRepository>
+	<profiles>
+		<profile>
+			<id>AnalysisService-Local</id>
+			<properties>
+				<!-- Analysis -->
+				<analysis.structure.file>/analysis.bin</analysis.structure.file>
+				<analysis.data.file>/analysis.bin</analysis.data.file>
+				<analysis.data.tmp>/tmp/analysis-tmp</analysis.data.tmp>
+				<analysis.result.root>/usr/local/AnalysisService/analysis-results</analysis.result.root>
+				<analysis.report.log>/usr/local/AnalysisService/analysis-reports</analysis.report.log>
+				<!-- Logging -->
+				<log4j.root>/usr/local/AnalysisService/log</log4j.root>
+				<!-- Reactome Server to query header and footer -->
+				<template.server>http://localhost/</template.server>
+				<!-- There's no expectation for a stand-alone AnalysisService in a docker container to actually send mail, but if these settings aren't configured, the appliacation won't run.  -->
+				<mail.host>localhost</mail.host>
+				<mail.port>25</mail.port>
+				<mail.username>user</mail.username>
+				<mail.password>password</mail.password>
+				<mail.to>user@mailserver.org</mail.to>
+				<mail.enable.auth>false</mail.enable.auth>
+
+				<neo4j.host>localhost</neo4j.host>
+				<neo4j.port>7474</neo4j.port>
+				<neo4j.user>neo4j</neo4j.user>
+				<neo4j.password>neo4j-password</neo4j.password>
+
+				<diagram.json.folder>/tmp/diagrams</diagram.json.folder>
+				<ehld.folder>/tmp/ehld</ehld.folder>
+				<fireworks.json.folder>/tmp/fireworks</fireworks.json.folder>
+				<analysis.data.tmp>/tmp/analysis-data</analysis.data.tmp>
+				<svg.summary.file>/tmp/svg</svg.summary.file>
+				<analysis.export.temp.folder>/tmp</analysis.export.temp.folder>
+				<cnf.startup.notification>false</cnf.startup.notification>
+				<cnf.startup.notification.from></cnf.startup.notification.from>
+				<cnf.startup.notification.to></cnf.startup.notification.to>
+
+				<report.user>report.user</report.user>
+				<report.password>report.password</report.password>
+			</properties>
+		</profile>
+		<profile>
+			<id>Experiment-Digester-Local</id>
+			<properties>
+				<!-- Path to the experiments binary file -->
+				<experiments.data.file>/experiments.bin</experiments.data.file>
+			</properties>
+		</profile>
+	</profiles>
+</settings>
