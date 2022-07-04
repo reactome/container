@@ -7,11 +7,8 @@ fireworks/*
 diagram/*
 tomcat/analysis-service
 java-application-builder/downloads/*
-<<<<<<< HEAD
 java-application-builder/logs/*
-=======
 java-application-builder/logs
->>>>>>> main
 neo4j/data/*
 solr/data/*
 neo4j/data/*

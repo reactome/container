@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-version: '3'
-=======
 version: '3.7'
->>>>>>> main
 services:
 
   mysql-for-tomcat:
@@ -73,7 +69,6 @@ services:
       - neo4j-db
     entrypoint: bash -c "ls -lht /certs && /wait-for.sh neo4j-db:7687 -t 500 && /wait-for.sh neo4j-db:7474 -t 500 && /wait-for.sh solr-for-reactome:8983 -t 500 && /wait-for.sh mysql-for-tomcat:3306 -t 500 && /wait-for.sh joomla-sites:80 -t 500 && { echo yes | keytool -v -import -file /certs/server.crt -alias joomla-sites -keystore cacerts.jks -keypass changeit -storepass changeit || ( keytool -v -delete -alias joomla-sites -keystore  cacerts.jks -storepass changeit && echo yes | keytool -v -import -file /certs/server.crt -alias joomla-sites -keystore cacerts.jks -keypass changeit -storepass changeit ) ; } && catalina.sh run"
     volumes:
-<<<<<<< HEAD
       - ./java-application-builder/webapps/ReactomeRESTfulAPI.war:/usr/local/tomcat/webapps/ReactomeRESTfulAPI.war #it  has been copied from feature/build-web-applications after building webapps
       - ./java-application-builder/webapps/PathwayBrowser.war:/usr/local/tomcat/webapps/PathwayBrowser.war
       - ./java-application-builder/webapps/analysis-service.war:/usr/local/tomcat/webapps/analysis-service.war
@@ -84,10 +79,8 @@ services:
       # - ./tomcat/webapps/ContentService.war:/usr/local/tomcat/webapps/ContentService.war
       - ./java-application-builder/downloads/diagrams_and_fireworks/fireworks:/usr/local/tomcat/webapps/download/current/fireworks
       - ./java-application-builder/downloads/diagrams_and_fireworks/diagram:/usr/local/tomcat/webapps/download/current/diagram
-=======
       - fireworks-dir:/usr/local/tomcat/webapps/download/current/fireworks
       - diagrams-dir:/usr/local/tomcat/webapps/download/current/diagram
->>>>>>> main
       - ./wait-for.sh:/wait-for.sh
       - ./tomcat/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
       - ./tomcat/tomcat-server.xml:/usr/local/tomcat/conf/server.xml
