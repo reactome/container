@@ -1,0 +1,127 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+                      https://maven.apache.org/xsd/settings-1.0.0.xsd">
+    <profiles>
+        <profile>
+            <id>ContentService-Local</id>
+            <properties>
+                <!-- Neo4j Configuration -->
+                <neo4j.host>localhost</neo4j.host>
+                <neo4j.port>7474</neo4j.port>
+                <neo4j.user>neo4j</neo4j.user>
+                <neo4j.password>neo4j-password</neo4j.password>
+                <!-- SolR Configuration -->
+                <solr.host>http://localhost:8983/solr/</solr.host>
+                <solr.user>solr</solr.user>
+                <solr.password>solr</solr.password>
+                <solr.core>reactome</solr.core>
+                <!-- Interators Database -->
+                <interactors.SQLite>/interactors.db</interactors.SQLite>
+                <!-- Logging -->
+                <logging.dir>/usr/local/search/log/content-service</logging.dir>
+                <logging.database>${logging.dir}/search.db</logging.database>
+                <logging.level>WARN</logging.level>
+                <!-- Mail Configuration, using FakeSMTP -->
+                <!-- Properties are ready to use GMail, etc. -->
+                <mail.host>localhost</mail.host>
+                <mail.port>8081</mail.port>
+                <mail.username>username</mail.username>
+                <mail.password>password</mail.password>
+                <mail.enable.auth>false</mail.enable.auth>
+                <mail.error.dest>helpdesk@mycompany.co.uk</mail.error.dest>
+                <mail.support.dest>helpdesk@mycompany.co.uk</mail.support.dest>
+                <mail.to>helpdesk@mycompany.co.uk</mail.to>
+                <!-- Reactome Server to query header and footer -->
+                <template.server>https://joomla-sites/</template.server>
+                <!-- Interactor custom folder -->
+                <tuples.uploaded.files.folder>/usr/local/interactors/tuple</tuples.uploaded.files.folder>
+                <!--
+				  The cron has to match 6 fields which are: second, minute, hour, day of month, month, day(s) of week
+				  e.g run every 10 minutes =>  0 */10 * * * *
+					  (*) - match any
+					  */X - means every "X"
+			  -->
+                <psicquic.resources.cache.cron>0 */59 * * * *</psicquic.resources.cache.cron>
+                <!-- PPTX Exporter -->
+                <diagram.json.folder>/usr/local/diagram/static</diagram.json.folder>
+                <diagram.exporter.temp.folder>/usr/local/diagram/exporter</diagram.exporter.temp.folder>
+                <!-- AOP: Do not enable. -->
+                <aop.enabled>false</aop.enabled>
+                <ehld.folder>/var/www/html/download/current/ehld</ehld.folder>
+                <svg.summary.file>/var/www/html/download/current/ehld/svgsummary.txt</svg.summary.file>
+                <analysis.server>https://localhost/</analysis.server>
+                <startup.notification>false</startup.notification>
+                <fireworks.json.folder>/usr/local/tomcat/webapps/download/current/fireworks</fireworks.json.folder>
+                <report.user>report_user</report.user>
+                <report.password>report_user</report.password>
+                <!-- MySQL is needed for SBML Export -->
+                <mysql.host>localhost</mysql.host>
+                <mysql.port>3306</mysql.port>
+                <mysql.user>root</mysql.user>
+                <mysql.password>root</mysql.password>
+                <mysql.reactome.database>current</mysql.reactome.database>
+            </properties>
+            <repositories>
+                <!-- MAVEN central -->
+                <repository>
+                    <id>central</id>
+                    <name>Maven Repository Switchboard</name>
+                    <layout>default</layout>
+                    <url>https://repo1.maven.org/maven2</url>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>central-bck</id>
+                    <name>Maven Repository Switchboard</name>
+                    <layout>default</layout>
+                    <url>https://repo1.maven.org/maven/</url>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+                <!-- EBI repo -->
+                <repository>
+                    <id>nexus-ebi-repo</id>
+                    <name>The EBI internal repository</name>
+                    <url>http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-repo/</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                </repository>
+                <!-- EBI SNAPSHOT repo -->
+                <repository>
+                    <id>nexus-ebi-snapshot-repo</id>
+                    <name>The EBI internal snapshot repository</name>
+                    <url>http://www.ebi.ac.uk/Tools/maven/repos/content/groups/ebi-snapshots/</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>com.springsource.repository.bundles.release</id>
+                    <name>EBR Spring Release Repository</name>
+                    <url>http://repository.springsource.com/maven/bundles/release</url>
+                </repository>
+                <repository>
+                    <id>com.springsource.repository.bundles.external</id>
+                    <name>EBR External Release Repository</name>
+                    <url>http://repository.springsource.com/maven/bundles/external</url>
+                </repository>
+                <repository>
+                    <id>JBoss 3rd party</id>
+                    <name>JBoss 3rd party</name>
+                    <url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/</url>
+                </repository>
+            </repositories>
+        </profile>
+    </profiles>
+</settings>

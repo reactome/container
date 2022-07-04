@@ -1,16 +1,5 @@
-version: '3'
+ersion: '3.7'
 services:
-
-  tomcat:
-    image: tomcat:7.0
-    container_name: tomcat-server
-    depends_on: 
-      - database
-    volumes:
-      - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
-      - ./release/scripts/:/usr/local/bin/perl/scripts
-    env_file:
-      - .env
 
   apache-server:
     image: httpd:2.4
@@ -19,10 +8,142 @@ services:
       - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
       - ./release/scripts/:/usr/local/bin/perl/scripts
 
-  database:
-    image: mysql
-    container_name: mysql-database
-    volumes:
-      - ./mysql/docker-entrypoint-initdb.d/:/docker-entrypoint-initdb.d
+  mysql-for-tomcat:
+    image: reactome/reactome-mysql:$RELEASE_VERSION
+    build:
+      context: ./mysql
+      dockerfile: mysql.dockerfile
+      args:
+        RELEASE_VERSION: $RELEASE_VERSION
+    hostname: mysql-for-tomcat
+    container_name: mysql-for-tomcat
     env_file:
-      - .env
+      - tomcat.env
+    volumes:
+      - ./mysql/init.sh:/init.sh
+      - ./logs/mysql/tomcat:/var/log/mysql
+      - mysql-for-tomcat-log:/backup
+    command: bash -c "/init.sh && exec /entrypoint.sh mysqld"
+
+  neo4j-db:
+    image: "reactome/graphdb:${RELEASE_VERSION}"
+    build:
+      context: ./neo4j
+      dockerfile: neo4j_generated_from_mysql.dockerfile
+      args:
+        RELEASE_VERSION: $RELEASE_VERSION
+    container_name: neo4j-db
+    hostname: neo4j-db
+    env_file:
+      - neo4j.env
+    volumes:
+      - ./logs/neo4j/:/var/lib/neo4j/logs/
+    ports:
+      - 7474:7474
+      - 7687:7687
+
+  solr:
+    image: "reactome/solr:${RELEASE_VERSION}"
+    container_name: solr-for-reactome
+    hostname: solr-for-reactome
+    build:
+      context: ./solr
+      dockerfile: index-builder.dockerfile
+      args:
+        RELEASE_VERSION: $RELEASE_VERSION
+    ports:
+      - 8983:8983
+    volumes:
+      - ./logs/solr/:/opt/solr/server/logs/:rw
+      - ./solr/solr-security.json:/opt/solr/server/solr/security.json:rw
+    entrypoint: solr start -f
+
+  tomcat:
+    image: reactome/tomcat
+    container_name: tomcat-server
+    hostname: tomcat-server
+    build:
+      context: ./tomcat
+      dockerfile: tomcat.dockerfile
+    depends_on:
+      - mysql-for-tomcat
+      - joomla-sites
+      - neo4j-db
+      - solr
+    links:
+      - mysql-for-tomcat
+      - joomla-sites
+      - neo4j-db
+    entrypoint: bash -c "ls -lht /certs && /wait-for.sh neo4j-db:7687 -t 500 && /wait-for.sh neo4j-db:7474 -t 500 && /wait-for.sh solr-for-reactome:8983 -t 500 && /wait-for.sh mysql-for-tomcat:3306 -t 500 && /wait-for.sh joomla-sites:80 -t 500 && { echo yes | keytool -v -import -file /certs/server.crt -alias joomla-sites -keystore cacerts.jks -keypass changeit -storepass changeit || ( keytool -v -delete -alias joomla-sites -keystore  cacerts.jks -storepass changeit && echo yes | keytool -v -import -file /certs/server.crt -alias joomla-sites -keystore cacerts.jks -keypass changeit -storepass changeit ) ; } && catalina.sh run"
+    volumes:
+      - fireworks-dir:/usr/local/tomcat/webapps/download/current/fireworks
+      - diagrams-dir:/usr/local/tomcat/webapps/download/current/diagram
+      - ./wait-for.sh:/wait-for.sh
+      - ./tomcat/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
+      - ./tomcat/tomcat-server.xml:/usr/local/tomcat/conf/server.xml
+      - ./tomcat/tomcat-manager.xml:/usr/local/tomcat/conf/Catalina/localhost/manager.xml
+      - ./tomcat/analysis-service/results:/usr/local/AnalysisService/analysis-results
+      - ./tomcat/analysis-service/reports:/usr/local/AnalysisService/analysis-reports
+      - ./logs/applications/AnalysisService:/usr/local/AnalysisService/log
+      - ./logs/applications/ContentService:/usr/local/search/log/content-service
+      - ./logs/applications/DataContent:/usr/local/search/log/data-content
+      - ./logs/tomcat/:/usr/local/tomcat/logs/ #to save logs inside host directory of tomcat/logs/
+      - ./certificates:/certs
+      - ./release/modules/GKB/:/usr/local/gkb/modules/GKB
+      - ./release/scripts/:/usr/local/bin/perl/scripts
+    env_file:
+      - tomcat.env
+    ports:
+      - 8082:8080
+
+  mysql-for-joomla:
+    image: mysql:5.7.24
+    hostname: mysql-for-joomla
+    container_name: mysql-for-joomla
+    env_file:
+      - joomla.env
+    volumes:
+      - ./joomla/Website/database/:/docker-entrypoint-initdb.d
+      - ./mysql/init.sh:/init.sh
+      - ./logs/mysql/joomla:/var/log/mysql
+      - mysql-for-joomla-log:/backup
+    command: bash -c "/init.sh && exec /entrypoint.sh mysqld"
+
+  joomla-sites:
+    hostname: joomla-sites
+    image: reactome/joomla
+    build:
+      context: ./joomla
+      dockerfile: joomla.dockerfile
+    container_name: joomla-sites
+    links:
+      - mysql-for-joomla
+    depends_on:
+      - mysql-for-joomla
+    env_file:
+      - joomla.env
+    ports:
+      - 80:80
+      - 443:443
+    entrypoint: bash -c "/wait-for.sh mysql-for-joomla:3306 -t 360  -- cp /etc/apache2/ssl/* /certs/ && /usr/local/bin/docker-php-entrypoint apache2-foreground"
+    volumes:
+      - ./wait-for.sh:/wait-for.sh
+      - ./joomla/000-default-common.conf:/etc/apache2/sites-common/000-default-common.conf
+      - ./joomla/000-default.conf:/etc/apache2/sites-enabled/000-default.conf
+      - ./joomla/configuration.php:/var/www/html/configuration.php
+      - ./certificates:/certs
+      - ./joomla/Secrets.pm:/var/www/html/cgi-modules/GKB/Secrets.pm
+      - ./joomla/cgi-modules/GKB/FrontPage3.pm:/var/www/html/cgi-modules/GKB/FrontPage3.pm
+      - ./joomla/cgi-modules/GKB/Utils/InstructionLibrary.pm:/var/www/html/cgi-modules/GKB/Utils/InstructionLibrary.pm
+      - ./joomla/cgi-modules/GKB/WebUtils.pm:/var/www/html/cgi-modules/GKB/WebUtils.pm
+      - ./joomla/cgi-modules/GKB/Config.pm:/var/www/html/cgi-modules/GKB/Config.pm
+      - ./joomla/cgi-modules/GKB/URLMaker.pm:/var/www/html/cgi-modules/GKB/URLMaker.pm
+      - fireworks-dir:/var/www/html/download/current/fireworks
+      - diagrams-dir:/var/www/html/download/current/diagram
+
+volumes:
+  mysql-for-joomla-log:
+  mysql-for-tomcat-log:
+  fireworks-dir:
+  diagrams-dir:
+>>>>>>> main
