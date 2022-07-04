@@ -60,10 +60,6 @@ services:
       dockerfile: tomcat.dockerfile
     depends_on:
       - mysql-for-tomcat
-<<<<<<< HEAD
-      - wordpress-sites
-    links:
-      - mysql-for-tomcat
       - wordpress-sites
     entrypoint: bash -c "/wait-for.sh mysql-for-tomcat:3306 -t 360 && /wait-for.sh wordpress-sites:80 -t 360 && catalina.sh run"
     volumes:
@@ -76,19 +72,18 @@ services:
       - ./java-application-builder/downloads/analysis.bin:/analysis.bin
       - ./java-application-builder/downloads/diagrams_and_fireworks/fireworks:/usr/local/tomcat/webapps/download/current/fireworks
       - ./java-application-builder/downloads/diagrams_and_fireworks/diagram:/usr/local/tomcat/webapps/download/current/diagram
-=======
       - joomla-sites
       - neo4j-db
       - solr
     links:
       - mysql-for-tomcat
+      - wordpress-sites
       - joomla-sites
       - neo4j-db
     entrypoint: bash -c "ls -lht /certs && /wait-for.sh neo4j-db:7687 -t 500 && /wait-for.sh neo4j-db:7474 -t 500 && /wait-for.sh solr-for-reactome:8983 -t 500 && /wait-for.sh mysql-for-tomcat:3306 -t 500 && /wait-for.sh joomla-sites:80 -t 500 && { echo yes | keytool -v -import -file /certs/server.crt -alias joomla-sites -keystore cacerts.jks -keypass changeit -storepass changeit || ( keytool -v -delete -alias joomla-sites -keystore  cacerts.jks -storepass changeit && echo yes | keytool -v -import -file /certs/server.crt -alias joomla-sites -keystore cacerts.jks -keypass changeit -storepass changeit ) ; } && catalina.sh run"
     volumes:
       - fireworks-dir:/usr/local/tomcat/webapps/download/current/fireworks
       - diagrams-dir:/usr/local/tomcat/webapps/download/current/diagram
->>>>>>> main
       - ./wait-for.sh:/wait-for.sh
       - ./tomcat/tomcat-users.xml:/usr/local/tomcat/conf/tomcat-users.xml
       - ./tomcat/tomcat-server.xml:/usr/local/tomcat/conf/server.xml
@@ -105,7 +100,6 @@ services:
     ports:
       - 8082:8080
 
-<<<<<<< HEAD
   mysql-for-tomcat:
     image: mysql
     hostname: mysql-for-tomcat
@@ -114,7 +108,7 @@ services:
       - tomcat.env
     volumes:
       - ./mysql/tomcat_data/:/docker-entrypoint-initdb.d
-=======
+
   mysql-for-joomla:
     image: mysql:5.7.24
     hostname: mysql-for-joomla
@@ -123,7 +117,6 @@ services:
       - joomla.env
     volumes:
       - ./joomla/Website/database/:/docker-entrypoint-initdb.d
->>>>>>> main
       - ./mysql/init.sh:/init.sh
       - ./logs/mysql/joomla:/var/log/mysql
       - mysql-for-joomla-log:/backup
