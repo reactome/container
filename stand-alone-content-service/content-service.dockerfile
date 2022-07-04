@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-ARG RELEASE_VERSION=Release72
-=======
 ARG RELEASE_VERSION=Release77
->>>>>>> main
 FROM maven:3.6.3-jdk-8 AS builder
 # Cannot build content-service with Java 11, maven error is:
 #    [ERROR] Failed to execute goal on project content-service:
