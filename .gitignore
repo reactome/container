@@ -1,14 +1,30 @@
 webapps/*
 mysql/tomcat_data/*.gz
+mysql/wordpress_data/*.gz
+mysql/joomla_data/*.gz
 logs/*
 fireworks/*
 diagram/*
 tomcat/analysis-service
 java-application-builder/downloads/*
+<<<<<<< HEAD
 java-application-builder/logs/*
+=======
+java-application-builder/logs
+>>>>>>> main
 neo4j/data/*
 solr/data/*
 neo4j/data/*
 neo4j/*.tgz
 toc_files/*
 tmp_files/*
+certificates/*
+docker-compose-img
+fireworks_and_diagrams.tar.gz
+diagram.tgz
+id_rsa*
+*.token
+
+# IntelliJ Files
+.idea/
+*.iml
