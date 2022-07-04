@@ -1,11 +1,8 @@
 webapps/*
 mysql/tomcat_data/*.gz
 mysql/wordpress_data/*.gz
-<<<<<<< HEAD
 mysql/wordpress_data/_set_host.sh
-=======
 mysql/joomla_data/*.gz
->>>>>>> main
 logs/*
 fireworks/*
 diagram/*
