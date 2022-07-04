@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # Before running this test script, start the stand-alone AnalysisService:
-# docker run --rm -p 8080:8080 reactome/stand-alone-analysis-service
+# docker run --rm -p 8080:8080 reactome/stand-alone-analysis-service:ReleaseXX (eg:Release74; if port is already allocated locally, try '1234:8080')
 
 # Getting the path to `time` ensures that we don't use the built-in *shell* command with the same name.
 # This "other" time command allows some better formatting options for output.
@@ -72,8 +72,8 @@ check_vals_post()
   if [ "$LOCAL_VAL" != "$REMOTE_VAL" ] ; then
     echo "$VAL_NAME don't match!"
     # "jq '.'" ensures that JSON gets pretty-formatted before it's output to file. Makes debugging easier."
-    echo $LOCAL_VAL | jq '.' > /tmp/${VAL_NAME}_L
-    echo $REMOTE_VAL | jq '.' > /tmp/${VAL_NAME}_R
+    echo $LOCAL_VAL | jq -S '.' > /tmp/${VAL_NAME}_L
+    echo $REMOTE_VAL | jq -S '.' > /tmp/${VAL_NAME}_R
     diff /tmp/${VAL_NAME}_L /tmp/${VAL_NAME}_R
   else
     echo -e "$VAL_NAME test passed.\n"

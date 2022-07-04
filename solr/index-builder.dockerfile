@@ -1,9 +1,10 @@
-ARG RELEASE_VERSION=Release72
+ARG RELEASE_VERSION=Release74
 FROM maven:3.6.3-jdk-11 AS builder
 # problems building with Java 11: missing XML classes: JAXBException, etc..., also: javax.xml.bind.annotation package does not exist.
+
 RUN mkdir /gitroot
 # The commit ID for the "speed-up" version of search-indexer. Runs faster than normal, by using multiple threads.
-ENV INDEXER_VERSION=4184c653e4fa1a2fe350f2ff238183956a22ab75
+ENV INDEXER_VERSION=master
 WORKDIR /gitroot/
 RUN mkdir /gitroot/search-indexer
 RUN git clone https://github.com/reactome/search-indexer.git && \
@@ -19,7 +20,7 @@ RUN git clone https://github.com/reactome/search-indexer.git && \
 	# sed -i 's/<target>\$\{jdk\.version\}<\/target>//g' pom.xml && \
 	mvn --no-transfer-progress clean compile package -DskipTests && ls -lht ./target && \
 	mkdir /indexer && \
-	cp /gitroot/search-indexer/target/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar && \
+	cp /gitroot/search-indexer/target/search-indexer-jar-with-dependencies.jar /indexer/search-indexer-jar-with-dependencies.jar && \
 	rm -rf ~/.m2
 
 # We'll need to get stuff from graphdb
@@ -33,7 +34,7 @@ FROM solr:7.6.0-alpine
 USER root
 RUN mkdir /indexer
 # bring the indexer from the "builder" image.
-COPY --from=builder /indexer/Indexer-jar-with-dependencies.jar /indexer/Indexer-jar-with-dependencies.jar
+COPY --from=builder /indexer/search-indexer-jar-with-dependencies.jar /indexer/search-indexer-jar-with-dependencies.jar
 COPY --from=graphdb /docker-entrypoint.sh /neo4j-entrypoint.sh
 COPY --from=graphdb /data /data
 COPY --from=graphdb /var/lib/neo4j /var/lib/neo4j

@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # Before running this test script, start the stand-alone ContentService:
-# docker run --rm -p 8080:8080 reactome/stand-alone-content-service
+# docker run --rm -p 8080:8080 reactome/stand-alone-content-service:ReleaseXX (eg:Release74; if port is already allocated locally, try '1234:8080')
 
 # get path to shell-independent "time" command. Many shells define a "time" keyword which is not what we want here.
 PATH_TO_TIMECMD=$(which time)
@@ -78,6 +78,8 @@ check_vals ContentService/data/eventsHierarchy/9606 'Human event hierarchy' '.'
 # check_vals 'ContentService/exporter/diagram/R-HSA-177929.svg?quality=5&flgInteractors=true&title=true&margin=15&ehld=true&diagramProfile=Modern&resource=total&analysisProfile=Standard' "SVG_Export"
 # It seems like for SBGN, the order of output elements might also be non-deterministic, so I guess only SBML is going to be easy to test...
 
+# ...never mind, it seems that the elements in SBML Exports might not be in the same sequence, and it looks like even some metadata might not be exactly the same. Comparing outputs could be very difficult.
+# Verify that they are produced but don't freak out if they don't match. OR, use some sort of SBML-specific tool (if it exists) to check for diffs.
 echo -e "\nChecking SBML export"
 check_vals 'ContentService/exporter/event/R-HSA-5205682.sbml' 'SBML_Export'
 
@@ -88,7 +90,7 @@ echo -e "\nChecking interactors - list of psiquic resources"
 check_vals 'ContentService/interactors/psicquic/resources' 'Interactors_psiquic_resources'
 
 echo -e "\nChecking interactors - pathays with molecule"
-check_vals 'ContentService/interactors/static/molecule/Q9BXM7-1/pathways' 'Interactors_molecule_pathways'
+check_vals 'ContentService/interactors/static/molecule/Q9BXM7-1/pathways?species=Homo%20sapiens' 'Interactors_molecule_pathways'
 
 echo -e "\nChecking mapping to UniProt"
 check_vals 'ContentService/data/mapping/UniProt/PTEN/reactions' 'Maping_to_UniProt'

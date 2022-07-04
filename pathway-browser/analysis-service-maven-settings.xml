@@ -35,12 +35,20 @@
 				<fireworks.json.folder>/tmp/fireworks</fireworks.json.folder>
 				<analysis.data.tmp>/tmp/analysis-data</analysis.data.tmp>
 				<svg.summary.file>/tmp/svg</svg.summary.file>
+				<analysis.export.temp.folder>/tmp</analysis.export.temp.folder>
 				<cnf.startup.notification>false</cnf.startup.notification>
 				<cnf.startup.notification.from></cnf.startup.notification.from>
 				<cnf.startup.notification.to></cnf.startup.notification.to>
 
 				<report.user>report.user</report.user>
 				<report.password>report.password</report.password>
+			</properties>
+		</profile>
+		<profile>
+			<id>Experiment-Digester-Local</id>
+			<properties>
+				<!-- Path to the experiments binary file -->
+				<experiments.data.file>/experiments.bin</experiments.data.file>
 			</properties>
 		</profile>
 	</profiles>

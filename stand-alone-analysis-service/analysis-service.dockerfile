@@ -1,9 +1,8 @@
-ARG RELEASE_VERSION=Release72
+ARG RELEASE_VERSION=Release75
 FROM maven:3.6.3-jdk-8 AS builder
 # JDK 11 complains about missing package javax.annotation
 ENV PATHWAY_BROWSER_VERSION=master
-RUN mkdir -p /gitroot && \
-	mkdir -p /webapps
+RUN mkdir -p /gitroot && mkdir -p /webapps
 WORKDIR /gitroot
 ENV ANALYSIS_SERVICE_VERSION=master
 ENV ANALYSIS_REPORT_VERSION=master
@@ -14,6 +13,9 @@ ENV NEO4J_PASSWORD ${NEO4J_PASSWORD}
 ENV NEO4J_AUTH="${NEO4J_USER}/${NEO4J_PASSWORD}"
 ENV MVN_CMD="mvn --no-transfer-progress --global-settings /maven-settings.xml -Dmaven.repo.local=/mvn/alt-m2/ -DskipTests"
 COPY ./analysis-service-maven-settings.xml /maven-settings.xml
+RUN sed -i -e 's/<neo4j\.password>.*<\/neo4j\.password>/<neo4j\.password>${NEO4J_PASSWORD}<\/neo4j\.password>/g' /maven-settings.xml && \
+		sed -i -e 's/<neo4j\.user>.*<\/neo4j\.user>/<neo4j\.user>${NEO4J_USER}<\/neo4j\.user>/g' /maven-settings.xml
+
 # Build the applications
 RUN cd /gitroot/ && git clone https://github.com/reactome/analysis-report.git \
 	&& cd /gitroot/analysis-report \
@@ -34,9 +36,9 @@ RUN cd /gitroot/ && git clone https://github.com/reactome/analysis-report.git \
 	&& ls -lht target && mv target/*.war /webapps/ \
 	&& rm -rf /mvn/alt-m2/
 
-FROM reactome/analysis-core AS analysiscorebuilder
+FROM reactome/analysis-core:${RELEASE_VERSION} AS analysiscorebuilder
 FROM reactome/graphdb:${RELEASE_VERSION} AS graphdb
-FROM reactome/fireworks-generator as fireworks
+FROM reactome/fireworks-generator:${RELEASE_VERSION} as fireworks
 # Ok, now re-base the image as Tomcat
 FROM tomcat:9.0.35-jdk11-openjdk
 ENV EXTENSION_SCRIPT=/data/neo4j-init.sh
