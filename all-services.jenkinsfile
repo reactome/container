@@ -1,0 +1,158 @@
+pipeline
+{
+    agent any
+    environment
+    {
+      // NOTE: this file must be executed in a directory whose name is a numeric sequence, and whose parent is named "Releases".
+      // This is how other Jenkinsfiles in the Release process determine the current release number.
+        RELEASE_VERSION = getReleaseVersionTag();
+    }
+
+    stages
+    {
+        // End of probably removable code
+        stage('Download graphdb')
+        {
+            steps
+            {
+                dir("neo4j")
+                {
+                    script
+                    {
+                        if (!fileExists('reactome-${env.RELEASE_VERSION}.graphdb.tgz'))
+                        {
+                            fileOperations([fileDownloadOperation(password: '', proxyHost: '', proxyPort: '', targetFileName: "reactome-${env.RELEASE_VERSION}.graphdb.tgz", targetLocation: './', url: 'https://reactome.org/download/current/reactome.graphdb.tgz', userName: '')])
+                        }
+                        sh "ls -lht"
+                    }
+                }
+            }
+        }
+        stage("Build graphdb")
+        {
+            steps
+            {
+                dir("neo4j")
+                {
+                    script
+                    {
+                        sh "ls -lht"
+                        docker.build("reactome/graphdb:${env.RELEASE_VERSION} --build-arg GRAPHDB_LOCATION=reactome-${env.RELEASE_VERSION}.graphdb.tgz --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f ./neo4j_stand-alone.dockerfile")
+                    }
+                }
+            }
+        }
+        stage("analysis-core")
+        {
+            steps
+            {
+                dir("analysis-core")
+                {
+                    script
+                    {
+                        docker.build("reactome/analysis-core:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f analysis-core.dockerfile")
+                    }
+                }
+            }
+        }
+        stage("fireworks-generator")
+        {
+            steps
+            {
+                dir("fireworks-generator")
+                {
+                    script
+                    {
+                        docker.build("reactome/fireworks-generator:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f fireworks-generator.dockerfile")
+                    }
+                }
+            }
+        }
+        stage("mysql database and diagram files")
+        {
+            steps
+            {
+                dir("mysql")
+                {
+                    script
+                    {
+                        docker.build("reactome/reactome-mysql:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f mysql.dockerfile")
+                    }
+                }
+                dir("diagram-generator")
+                {
+                    script
+                    {
+                        docker.build("reactome/diagram-generator:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f diagram-generator.dockerfile")
+                    }
+                }
+            }
+        }
+        stage("solr-index")
+        {
+            steps
+            {
+                dir("solr")
+                {
+                    script
+                    {
+                        docker.build("reactome/solr:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f index-builder.dockerfile")
+                    }
+                }
+            }
+        }
+        stage ("Build web applications")
+        {
+            parallel
+            {
+                stage("Analysis Service image")
+                {
+                    steps
+                    {
+                        dir("stand-alone-analysis-service")
+                        {
+                            script
+                            {
+                                docker.build("reactome/stand-alone-analysis-service:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f analysis-service.dockerfile")
+                            }
+                        }
+                    }
+                }
+                stage("Content Service image")
+                {
+                    steps
+                    {
+                        dir("stand-alone-content-service")
+                        {
+                            script
+                            {
+                                docker.build("reactome/stand-alone-content-service:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} -f content-service.dockerfile")
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        stage("Pathway Browser image")
+        {
+            steps
+            {
+                dir("pathway-browser")
+                {
+                    script
+                    {
+                      // Make sure you set up the github Personal Access Token before this step runs.
+                      // you can (re-)generate your github token in Github by going to Settings -> Developer Settings -> Personal Access Token
+                        docker.build("reactome/analysis-service-and-pwb:${env.RELEASE_VERSION} --build-arg RELEASE_VERSION=${env.RELEASE_VERSION} --build-arg GITHUB_TOKEN=${env.GITHUB_TOKEN} -f pathway-browser.dockerfile")
+                    }
+                }
+            }
+        }
+    }
+}
+
+// Gets release number from URL of job. The expectation, as mentioned above, is that the URL will have a format of 'Releases/XX', where XX is the release number.
+def getReleaseVersionTag()
+{
+    return "Release" + (pwd() =~ /Releases\/(\d+)\//)[0][1];
+}

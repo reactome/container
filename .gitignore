@@ -1,15 +1,30 @@
 webapps/*
 mysql/tomcat_data/*.gz
 mysql/wordpress_data/*.gz
+<<<<<<< HEAD
 mysql/wordpress_data/_set_host.sh
+=======
+mysql/joomla_data/*.gz
+>>>>>>> main
 logs/*
 fireworks/*
 diagram/*
 tomcat/analysis-service
 java-application-builder/downloads/*
+java-application-builder/logs
 neo4j/data/*
 solr/data/*
 neo4j/data/*
 neo4j/*.tgz
 toc_files/*
 tmp_files/*
+certificates/*
+docker-compose-img
+fireworks_and_diagrams.tar.gz
+diagram.tgz
+id_rsa*
+*.token
+
+# IntelliJ Files
+.idea/
+*.iml
