@@ -7,13 +7,13 @@ RUN mkdir -p /mvn/alt-m2/
 ENV MVN_CMD "mvn --no-transfer-progress --global-settings /mvn-settings.xml -Dmaven.repo.local=/mvn/alt-m2/ -DskipTests"
 ENV FIREWORKSJS_VERSION=master
 ENV FIREWORKS_VERSION=master
-RUN cd /gitroot && git clone https://github.com/reactome-pwp/fireworks.git \
+RUN cd /gitroot && git clone https://github.com/reactome/fireworks.git \
   && cd /gitroot/fireworks \
   && git checkout $FIREWORKS_VERSION \
   && cd /gitroot/fireworks \
   && sed -i -e 's/http:\/\/repo/https:\/\/repo/g' pom.xml \
   && $MVN_CMD package install  \
-  && cd /gitroot/ && git clone https://github.com/reactome-pwp/fireworks-js.git \
+  && cd /gitroot/ && git clone https://github.com/reactome/fireworks-js.git \
   && cd /gitroot/fireworks-js \
   && git checkout $FIREWORKSJS_VERSION \
   && cd /gitroot/fireworks-js \
