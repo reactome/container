@@ -51,4 +51,4 @@ WORKDIR /var/www/html
 RUN mkdir -p cgi-tmp/rtf && chown www-data:www-data cgi-tmp/rtf \
 	&& mkdir -p cgi-tmp/pdf && chown www-data:www-data cgi-tmp/pdf \
 	&& chown www-data:www-data ./cgi-tmp
-RUN apt-get update && apt-get install git -y && git clone https://github.com/reactome-pwp/reacfoam.git
+RUN apt-get update && apt-get install git -y && git clone https://github.com/reactome/reacfoam.git
