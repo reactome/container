@@ -7,7 +7,7 @@ RUN mkdir -p /mvn/alt-m2/
 ENV MVN_CMD "mvn --no-transfer-progress --global-settings /mvn-settings.xml -Dmaven.repo.local=/mvn/alt-m2/"
 
 ENV DIAGRAMJS_VERSION=master
-RUN cd /gitroot/ && git clone https://github.com/reactome-pwp/diagram-js.git \
+RUN cd /gitroot/ && git clone https://github.com/reactome/diagram-js.git \
   && cd /gitroot/diagram-js \
   && git checkout $DIAGRAMJS_VERSION \
   && cd /gitroot/diagram-js \
